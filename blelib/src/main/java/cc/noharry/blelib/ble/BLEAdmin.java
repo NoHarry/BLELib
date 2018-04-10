@@ -1,14 +1,15 @@
 package cc.noharry.blelib.ble;
 
-import android.app.Application;
+import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build.VERSION_CODES;
 import android.os.Handler;
-import android.support.annotation.NonNull;
+import cc.noharry.blelib.callback.BleScanCallback;
 import cc.noharry.blelib.util.L;
 
 /**
@@ -23,18 +24,18 @@ public class BLEAdmin {
   private final Handler mHandler;
   private BTStateReceiver btStateReceiver = null;
 
-  private BLEAdmin(Application app) {
-    mContext = app.getApplicationContext();
+  private BLEAdmin(Context context) {
+    mContext = context.getApplicationContext();
     BluetoothManager bluetoothManager= (BluetoothManager) mContext.getSystemService(Context.BLUETOOTH_SERVICE);
     mBluetoothAdapter = bluetoothManager.getAdapter();
     mHandler = new Handler(mContext.getMainLooper());
     btStateReceiver = new BTStateReceiver();
   }
 
-  public BLEAdmin getINSTANCE(@NonNull Application app){
+  public static BLEAdmin getINSTANCE(Context context){
     if (INSTANCE == null){
       synchronized (BLEAdmin.class){
-        INSTANCE = new BLEAdmin(app);
+        INSTANCE = new BLEAdmin(context);
       }
     }
     return INSTANCE;
@@ -98,6 +99,28 @@ public class BLEAdmin {
     }
   }
 
+  public void scan(BleScanConfig config,BleScanCallback callback){
+      L.e("开始扫描");
+    /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+      ParcelUuid uuid=new ParcelUuid(UUID.fromString("0000ffe0-0000-1000-8000-00805f9b34fb"));
+      ScanFilter filter=new ScanFilter.Builder().setServiceUuid(uuid).build();
+      List<ScanFilter> list=new ArrayList<>();
+      list.add(filter);
+      mBluetoothAdapter.getBluetoothLeScanner().startScan(list,new ScanSettings.Builder().build(),mCallBack);
+    }else {
+
+    }*/
+    if (!BleScanner.isScanning.get()){
+      BleScanner.getINSTANCE(mContext).scan(mBluetoothAdapter,config,callback);
+    }
+
+  }
+
+  @TargetApi(VERSION_CODES.LOLLIPOP)
+  public void stopScan(){
+    L.e("停止扫描");
+    BleScanner.getINSTANCE(mContext).stopScan(mBluetoothAdapter);
+  }
 
   private void registerBtStateReceiver(Context context) {
     IntentFilter filter = new IntentFilter();
