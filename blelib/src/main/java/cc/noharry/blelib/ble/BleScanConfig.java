@@ -13,7 +13,7 @@ public class BleScanConfig {
   private String[] mDeviceMac;
   private boolean isAutoConnect =false;
   private boolean isFuzzy= false;
-  private long mTimeOut=2000;
+  private long mScanTime=0;
 
 
   public UUID[] getUUIDS() {
@@ -56,12 +56,12 @@ public class BleScanConfig {
     isFuzzy = fuzzy;
   }
 
-  public long getTimeOut() {
-    return mTimeOut;
+  public long getScanTime() {
+    return mScanTime;
   }
 
-  private void setTimeOut(long timeOut) {
-    mTimeOut = timeOut;
+  public void setScanTime(long scanTime) {
+    mScanTime = scanTime;
   }
 
   public static class Builder{
@@ -70,7 +70,7 @@ public class BleScanConfig {
     private String[] mDeviceMac;
     private boolean isAutoConnect =false;
     private boolean isFuzzy= false;
-    private long mTimeOut=2000;
+    private long mScanTime=0;
 
     public Builder setUUID(UUID[] uuid){
       this.mUUIDS=uuid;
@@ -93,8 +93,8 @@ public class BleScanConfig {
       return this;
     }
 
-    public Builder setTimeOut(long timeOut){
-      this.mTimeOut=timeOut;
+    public Builder setScanTime(long scanTime){
+      this.mScanTime=scanTime;
       return this;
     }
 
@@ -104,7 +104,7 @@ public class BleScanConfig {
       config.setDeviceNames(this.mDeviceNames);
       config.setFuzzy(this.isFuzzy);
       config.setAutoConnect(this.isAutoConnect);
-      config.setTimeOut(this.mTimeOut);
+      config.setScanTime(this.mScanTime);
       config.setDeviceMac(this.mDeviceMac);
 
       return config;
