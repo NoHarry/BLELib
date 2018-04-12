@@ -1,13 +1,16 @@
 package cc.noharry.blelib.callback;
 
 import android.content.Context;
-import cc.noharry.blelib.ble.BLEAdmin;
 import cc.noharry.blelib.ble.BleScanConfig;
+import cc.noharry.blelib.ble.BleScanner;
 import cc.noharry.blelib.data.BleDevice;
 import cc.noharry.blelib.util.L;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -24,8 +27,8 @@ public  class NearScanCallback {
   private NearScanDeviceCallback mNearScanDeviceCallback;
   private Context mContext;
   private ScheduledExecutorService mExecutorService;
-  private ConcurrentHashMap<BleDevice, Integer> mDeviceMap;
   private List<BleDevice> mDeviceList;
+  private BlockingQueue<BleDevice> mBleDevices;
 
   public NearScanCallback(Context context,BleScanConfig config,BleScanCallback bleScanCallback,
       NearScanDeviceCallback nearScanDeviceCallback) {
@@ -38,10 +41,10 @@ public  class NearScanCallback {
   public void onScanStarted(boolean isStartSuccess){
     mBleScanCallback.onScanStarted(isStartSuccess);
     mStartTime = System.currentTimeMillis();
-    mDeviceMap = new ConcurrentHashMap<>();
     mDeviceList = new ArrayList<>();
-    mDeviceMap.clear();
     mDeviceList.clear();
+    mBleDevices=new LinkedBlockingQueue<>();
+    mBleDevices.clear();
     if (mBleScanConfig.getScanTime()!=0){
       startTimeTask();
     }
@@ -56,6 +59,15 @@ public  class NearScanCallback {
 
   public void onScanCompleted(List<BleDevice> deviceList){
     if (mBleScanCallback!=null){
+      Map<String,BleDevice> map=new HashMap<>();
+        while (!mBleDevices.isEmpty()){
+          BleDevice bleDevice = mBleDevices.poll();
+          map.put(bleDevice.getBluetoothDevice().getAddress(),bleDevice);
+        }
+        List<String> mac=new ArrayList<>(map.keySet());
+        for (String s:mac){
+          mDeviceList.add(map.get(s));
+        }
        mBleScanCallback.onScanCompleted(deviceList);
     }
   }
@@ -65,25 +77,16 @@ public  class NearScanCallback {
   }
 
   public void onScanCancel(){
-    stopTimeTask();
+    L.i("onScanCancel");
+    if (BleScanner.isScanning.get()){
+      stopTimeTask();
+      BleScanner.getINSTANCE(mContext).stopScan();
+      onScanCompleted(mDeviceList);
+    }
 
   }
   private void handleStoreDevice(BleDevice bleDevice) {
-    if (mDeviceList.isEmpty()){
-      mDeviceList.add(bleDevice);
-    }else {
-      updateDevice(bleDevice);
-    }
-  }
-
-  private void updateDevice(BleDevice bleDevice){
-    for (BleDevice b:mDeviceList){
-      if ((b.getBluetoothDevice().getName().equals(bleDevice.getBluetoothDevice().getName()))
-          &&(b.getBluetoothDevice().getName().equals(bleDevice.getBluetoothDevice().getName()))){
-        mDeviceList.remove(b);
-        mDeviceList.add(bleDevice);
-      }
-    }
+    mBleDevices.offer(bleDevice);
   }
 
   private void startTimeTask(){
@@ -91,7 +94,7 @@ public  class NearScanCallback {
     mExecutorService.schedule(new Runnable() {
       @Override
       public void run() {
-        BLEAdmin.getINSTANCE(mContext).stopScan();
+        BleScanner.getINSTANCE(mContext).stopScan();
         onScanCompleted(mDeviceList);
         L.e("定时停止");
       }
@@ -101,7 +104,9 @@ public  class NearScanCallback {
 
   private void stopTimeTask(){
     if (mExecutorService!=null){
+      L.i("stopTimeTask");
       mExecutorService.shutdownNow();
+      mExecutorService=null;
     }
   }
 

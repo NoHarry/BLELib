@@ -1,7 +1,6 @@
 package cc.noharry.blelib.ble;
 
 import android.annotation.TargetApi;
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanSettings;
 import android.content.Context;
@@ -42,17 +41,11 @@ public class BleScanner {
     return INSTANCE;
   }
 
-  public void scan(BluetoothAdapter adapter,BleScanConfig config,BleScanCallback callback){
-    /*try {
-      MethodUtils.checkScanConfig(config);
-    } catch (MacFormatException e) {
-      e.printStackTrace();
-      return;
-    }*/
+  public void scan(final BleScanConfig config, final BleScanCallback callback){
     mScanDeviceCallback = new NearScanDeviceCallback(mContext,config,callback);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
       try {
-        handleScanNew(adapter, config);
+        handleScanNew(config);
       }catch (IllegalArgumentException e){
         L.e("isScanning:"+isScanning.get());
         e.printStackTrace();
@@ -62,19 +55,29 @@ public class BleScanner {
     }
   }
 
-  public void stopScan(BluetoothAdapter adapter){
+  public void stopScan(){
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-     adapter.getBluetoothLeScanner().stopScan(mScanDeviceCallback);
+     BLEAdmin.getINSTANCE(mContext).getBluetoothAdapter()
+         .getBluetoothLeScanner().stopScan(mScanDeviceCallback);
      isScanning.set(false);
     }else {
 
     }
   }
 
+  public void cancelScan(){
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+      if (mScanDeviceCallback!=null){
+        mScanDeviceCallback.onScanCancel();
+      }
+    }else {
+
+    }
+  }
 
 
   @TargetApi(VERSION_CODES.LOLLIPOP)
-  private void handleScanNew(BluetoothAdapter adapter, BleScanConfig config) {
+  private void handleScanNew(BleScanConfig config) {
     List<ScanFilter> list=new ArrayList<>();
     UUID[] uuids = config.getUUIDS();
     if (uuids!=null){
@@ -91,15 +94,8 @@ public class BleScanner {
         list.add(filter);
       }
     }
-
-    ScanFilter filter=new ScanFilter.Builder().setDeviceName("LL20623").build();
-//    ScanFilter filter1=new ScanFilter.Builder().setDeviceName("LL21513").build();
-    ScanFilter scanFilter=new ScanFilter.Builder().setDeviceAddress("24:0A:C4:0D:4C:22").build();
-    ScanFilter filter1=new ScanFilter.Builder().build();
-//    list.add(filter);
-//    list.add(filter1);
-//    list.add(scanFilter);
-    adapter.getBluetoothLeScanner().startScan(list,new ScanSettings.Builder().build(),mScanDeviceCallback);
+    BLEAdmin.getINSTANCE(mContext).getBluetoothAdapter().getBluetoothLeScanner()
+        .startScan(list,new ScanSettings.Builder().build(),mScanDeviceCallback);
     isScanning.set(true);
     mScanDeviceCallback.onScanStart(true);
   }

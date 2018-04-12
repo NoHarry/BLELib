@@ -14,5 +14,12 @@
   android:id="@+id/btn_scan"
   />
 
+  <Button
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="stop scan"
+    android:id="@+id/btn_stop_scan"
+    />
+
 
 </LinearLayout>

@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         BleScanConfig config=new BleScanConfig.Builder()
             .setUUID(uuids)
             .setScanTime(5000)
-            .setDeviceMac(new String[]{"24:0A:C4:0D:4C:22"})
+            .setDeviceMac(new String[]{"00:0E:0B:14:70:DE"})
             .build();
         BLEAdmin.getINSTANCE(getApplication()).scan(config, new BleScanCallback() {
           @Override
@@ -46,13 +46,13 @@ public class MainActivity extends AppCompatActivity {
             L.i("onScanCompleted:"+deviceList);
           }
         });
-        /*mHandler.postDelayed(new Runnable() {
-          @Override
-          public void run() {
-            BLEAdmin.getINSTANCE(getApplication()).stopScan();
-          }
-        },5000);*/
 
+      }
+    });
+    findViewById(R.id.btn_stop_scan).setOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        BLEAdmin.getINSTANCE(getApplicationContext()).stopScan();
       }
     });
   }

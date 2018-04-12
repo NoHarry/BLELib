@@ -54,7 +54,7 @@ public class NearScanDeviceCallback extends ScanCallback {
   }
 
   public void onScanCancel(){
-
+    mNearScanCallback.onScanCancel();
   }
 
 }

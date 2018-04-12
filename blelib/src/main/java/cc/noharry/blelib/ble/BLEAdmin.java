@@ -99,19 +99,14 @@ public class BLEAdmin {
     }
   }
 
+  public BluetoothAdapter getBluetoothAdapter() {
+    return mBluetoothAdapter;
+  }
+
   public void scan(BleScanConfig config,BleScanCallback callback){
       L.e("开始扫描");
-    /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-      ParcelUuid uuid=new ParcelUuid(UUID.fromString("0000ffe0-0000-1000-8000-00805f9b34fb"));
-      ScanFilter filter=new ScanFilter.Builder().setServiceUuid(uuid).build();
-      List<ScanFilter> list=new ArrayList<>();
-      list.add(filter);
-      mBluetoothAdapter.getBluetoothLeScanner().startScan(list,new ScanSettings.Builder().build(),mCallBack);
-    }else {
-
-    }*/
     if (!BleScanner.isScanning.get()){
-      BleScanner.getINSTANCE(mContext).scan(mBluetoothAdapter,config,callback);
+      BleScanner.getINSTANCE(mContext).scan(config,callback);
     }
 
   }
@@ -119,7 +114,7 @@ public class BLEAdmin {
   @TargetApi(VERSION_CODES.LOLLIPOP)
   public void stopScan(){
     L.e("停止扫描");
-    BleScanner.getINSTANCE(mContext).stopScan(mBluetoothAdapter);
+    BleScanner.getINSTANCE(mContext).cancelScan();
   }
 
   private void registerBtStateReceiver(Context context) {
