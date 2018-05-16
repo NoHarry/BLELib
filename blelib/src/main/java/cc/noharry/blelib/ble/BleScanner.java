@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.ParcelUuid;
 import cc.noharry.blelib.callback.BleScanCallback;
+import cc.noharry.blelib.callback.NearLeScanDeviceCallback;
 import cc.noharry.blelib.callback.NearScanDeviceCallback;
 import cc.noharry.blelib.util.L;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ public class BleScanner {
   private Context mContext=null;
   private NearScanDeviceCallback mScanDeviceCallback;
   public static AtomicBoolean isScanning=new AtomicBoolean(false);
+  private NearLeScanDeviceCallback mNearLeScanDeviceCallback;
 
   private BleScanner(Context context) {
     mContext = context;
@@ -43,16 +45,27 @@ public class BleScanner {
 
   public void scan(final BleScanConfig config, final BleScanCallback callback){
     mScanDeviceCallback = new NearScanDeviceCallback(mContext,config,callback);
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+    mNearLeScanDeviceCallback = new NearLeScanDeviceCallback(config,callback,mContext);
+    //Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
+    if (Build.VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP){
       try {
         handleScanNew(config);
       }catch (IllegalArgumentException e){
         L.e("isScanning:"+isScanning.get());
         e.printStackTrace();
       }
+      L.i("开启新扫描");
     }else {
-
+        handleScan(config);
+      L.i("开启旧扫描");
     }
+  }
+
+  private void handleScan(BleScanConfig config) {
+    boolean startLeScan = BLEAdmin.getINSTANCE(mContext).getBluetoothAdapter()
+        .startLeScan(config.getUUIDS(), mNearLeScanDeviceCallback);
+    isScanning.set(startLeScan);
+    mNearLeScanDeviceCallback.onScanStart(startLeScan);
   }
 
   public void stopScan(){
@@ -61,7 +74,9 @@ public class BleScanner {
          .getBluetoothLeScanner().stopScan(mScanDeviceCallback);
      isScanning.set(false);
     }else {
-
+      BLEAdmin.getINSTANCE(mContext).getBluetoothAdapter()
+          .stopLeScan(mNearLeScanDeviceCallback);
+      isScanning.set(false);
     }
   }
 
@@ -71,7 +86,9 @@ public class BleScanner {
         mScanDeviceCallback.onScanCancel();
       }
     }else {
-
+      if (mNearLeScanDeviceCallback!=null){
+        mNearLeScanDeviceCallback.onScanCancel();
+      }
     }
   }
 

@@ -29,12 +29,21 @@ public  class NearScanCallback {
   private ScheduledExecutorService mExecutorService;
   private List<BleDevice> mDeviceList;
   private BlockingQueue<BleDevice> mBleDevices;
+  private NearLeScanDeviceCallback mNearLeScanDeviceCallback;
 
   public NearScanCallback(Context context,BleScanConfig config,BleScanCallback bleScanCallback,
       NearScanDeviceCallback nearScanDeviceCallback) {
     mBleScanCallback = bleScanCallback;
     mBleScanConfig = config;
     mNearScanDeviceCallback=nearScanDeviceCallback;
+    mContext=context;
+  }
+
+  public NearScanCallback(Context context,BleScanConfig config,BleScanCallback bleScanCallback,
+      NearLeScanDeviceCallback nearScanDeviceCallback) {
+    mBleScanCallback = bleScanCallback;
+    mBleScanConfig = config;
+    mNearLeScanDeviceCallback=nearScanDeviceCallback;
     mContext=context;
   }
 
@@ -52,8 +61,8 @@ public  class NearScanCallback {
   }
 
   public void onFoundDevice(BleDevice bleDevice){
-    mBleScanCallback.onFoundDevice(bleDevice);
-    handleStoreDevice(bleDevice);
+
+    handleStoreDevice(mBleScanConfig,bleDevice);
   }
 
 
@@ -85,8 +94,32 @@ public  class NearScanCallback {
     }
 
   }
-  private void handleStoreDevice(BleDevice bleDevice) {
-    mBleDevices.offer(bleDevice);
+  private void handleStoreDevice(BleScanConfig bleScanConfig,
+      BleDevice bleDevice) {
+    if (bleScanConfig.getDeviceNames()!=null){
+      String[] deviceNames = bleScanConfig.getDeviceNames();
+      String name = bleDevice.getBluetoothDevice().getName();
+      if (bleScanConfig.isFuzzy()){
+        for (String s:deviceNames){
+          if (name.contains(s)){
+            mBleScanCallback.onFoundDevice(bleDevice);
+            mBleDevices.offer(bleDevice);
+          }
+        }
+      }else {
+        for (String s:deviceNames){
+          if (name.equalsIgnoreCase(s)){
+            mBleScanCallback.onFoundDevice(bleDevice);
+            mBleDevices.offer(bleDevice);
+          }
+        }
+      }
+    }else {
+      mBleScanCallback.onFoundDevice(bleDevice);
+      mBleDevices.offer(bleDevice);
+    }
+
+
   }
 
   private void startTimeTask(){

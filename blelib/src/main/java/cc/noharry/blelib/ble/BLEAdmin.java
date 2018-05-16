@@ -83,6 +83,10 @@ public class BLEAdmin {
   public boolean openBT(OnBTOpenStateListener listener){
     btOpenStateListener=listener;
     registerBtStateReceiver(mContext);
+    if (mBluetoothAdapter.isEnabled()){
+      btOpenStateListener.onBTOpen();
+      return true;
+    }
     if (mBluetoothAdapter != null && !mBluetoothAdapter.isEnabled()){
       return mBluetoothAdapter.enable();
     }
