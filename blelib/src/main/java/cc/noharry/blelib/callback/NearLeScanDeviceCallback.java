@@ -3,7 +3,7 @@ package cc.noharry.blelib.callback;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
-import cc.noharry.blelib.ble.BleScanConfig;
+import cc.noharry.blelib.ble.scan.BleScanConfig;
 import cc.noharry.blelib.data.BleDevice;
 
 /**

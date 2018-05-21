@@ -1,8 +1,8 @@
 package cc.noharry.blelib.callback;
 
 import android.content.Context;
-import cc.noharry.blelib.ble.BleScanConfig;
-import cc.noharry.blelib.ble.BleScanner;
+import cc.noharry.blelib.ble.scan.BleScanConfig;
+import cc.noharry.blelib.ble.scan.BleScanner;
 import cc.noharry.blelib.data.BleDevice;
 import cc.noharry.blelib.util.L;
 import java.util.ArrayList;

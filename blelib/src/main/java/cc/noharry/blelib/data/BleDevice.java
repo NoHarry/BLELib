@@ -43,6 +43,31 @@ public class BleDevice implements Parcelable{
     }
   };
 
+  public String getName(){
+    if (mBluetoothDevice!=null){
+      return mBluetoothDevice.getName();
+    }else {
+      return null;
+    }
+  }
+
+  public String getMac(){
+    if (mBluetoothDevice!=null){
+      return mBluetoothDevice.getAddress();
+    }else {
+      return null;
+    }
+  }
+
+  public String getKey(){
+    if (mBluetoothDevice!=null){
+      return mBluetoothDevice.getName()+mBluetoothDevice.getAddress();
+    }else {
+      return "";
+    }
+  }
+
+
   public BluetoothDevice getBluetoothDevice() {
     return mBluetoothDevice;
   }

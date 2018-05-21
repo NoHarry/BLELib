@@ -6,7 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import cc.noharry.blelib.ble.BLEAdmin;
-import cc.noharry.blelib.ble.BleScanConfig;
+import cc.noharry.blelib.ble.scan.BleScanConfig;
 import cc.noharry.blelib.callback.BleScanCallback;
 import cc.noharry.blelib.data.BleDevice;
 import cc.noharry.blelib.util.L;

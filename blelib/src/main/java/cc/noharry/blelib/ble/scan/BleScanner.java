@@ -1,4 +1,4 @@
-package cc.noharry.blelib.ble;
+package cc.noharry.blelib.ble.scan;
 
 import android.annotation.TargetApi;
 import android.bluetooth.le.ScanFilter;
@@ -7,6 +7,7 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.ParcelUuid;
+import cc.noharry.blelib.ble.BLEAdmin;
 import cc.noharry.blelib.callback.BleScanCallback;
 import cc.noharry.blelib.callback.NearLeScanDeviceCallback;
 import cc.noharry.blelib.callback.NearScanDeviceCallback;

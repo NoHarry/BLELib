@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build.VERSION_CODES;
 import android.os.Handler;
+import cc.noharry.blelib.ble.scan.BleScanConfig;
+import cc.noharry.blelib.ble.scan.BleScanner;
 import cc.noharry.blelib.callback.BleScanCallback;
 import cc.noharry.blelib.util.L;
 
@@ -41,6 +43,9 @@ public class BLEAdmin {
     return INSTANCE;
   }
 
+  public Context getContext() {
+    return mContext;
+  }
 
   /**
    *
@@ -82,7 +87,7 @@ public class BLEAdmin {
    */
   public boolean openBT(OnBTOpenStateListener listener){
     btOpenStateListener=listener;
-    registerBtStateReceiver(mContext);
+    registerBtStateReceiver(getContext());
     if (mBluetoothAdapter.isEnabled()){
       btOpenStateListener.onBTOpen();
       return true;
@@ -108,17 +113,17 @@ public class BLEAdmin {
   }
 
   public void scan(BleScanConfig config,BleScanCallback callback){
-      L.e("开始扫描");
+      L.e("start scan");
     if (!BleScanner.isScanning.get()){
-      BleScanner.getINSTANCE(mContext).scan(config,callback);
+      BleScanner.getINSTANCE(getContext()).scan(config,callback);
     }
 
   }
 
   @TargetApi(VERSION_CODES.LOLLIPOP)
   public void stopScan(){
-    L.e("停止扫描");
-    BleScanner.getINSTANCE(mContext).cancelScan();
+    L.e("stop scan");
+    BleScanner.getINSTANCE(getContext()).cancelScan();
   }
 
   private void registerBtStateReceiver(Context context) {
@@ -161,7 +166,7 @@ public class BLEAdmin {
             if (null != btOpenStateListener){
               btOpenStateListener.onBTOpen();
             }
-            unRegisterBtStateReceiver(mContext);
+            unRegisterBtStateReceiver(getContext());
             break;
           default:
         }

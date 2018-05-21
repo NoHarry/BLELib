@@ -1,4 +1,4 @@
-package cc.noharry.blelib.ble;
+package cc.noharry.blelib.ble.scan;
 
 import java.util.UUID;
 

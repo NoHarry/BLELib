@@ -1,6 +1,6 @@
 package cc.noharry.blelib.util;
 
-import cc.noharry.blelib.ble.BleScanConfig;
+import cc.noharry.blelib.ble.scan.BleScanConfig;
 import cc.noharry.blelib.exception.MacFormatException;
 
 /**

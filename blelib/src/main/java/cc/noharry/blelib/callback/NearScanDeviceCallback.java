@@ -5,7 +5,7 @@ import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 import android.content.Context;
 import android.os.Build.VERSION_CODES;
-import cc.noharry.blelib.ble.BleScanConfig;
+import cc.noharry.blelib.ble.scan.BleScanConfig;
 import cc.noharry.blelib.data.BleDevice;
 import cc.noharry.blelib.util.L;
 import java.util.List;
