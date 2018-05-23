@@ -21,7 +21,7 @@ import cc.noharry.blelib.util.L;
 
 public class BLEAdmin {
   private static BLEAdmin INSTANCE = null;
-  private Context mContext = null;
+  private static Context mContext = null;
   private final BluetoothAdapter mBluetoothAdapter;
   private final Handler mHandler;
   private BTStateReceiver btStateReceiver = null;
@@ -43,7 +43,7 @@ public class BLEAdmin {
     return INSTANCE;
   }
 
-  public Context getContext() {
+  public static Context getContext() {
     return mContext;
   }
 

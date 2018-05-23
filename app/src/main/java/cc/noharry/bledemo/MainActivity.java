@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
             .setDeviceName(new String[]{"LL0835","android"},true)
 //            .setDeviceMac(new String[]{"00:0E:0B:14:70:DE","24:0A:C4:10:A2:22"})
             .build();
+
         BLEAdmin.getINSTANCE(getApplication()).scan(config, new BleScanCallback() {
           @Override
           public void onScanStarted(boolean isStartSuccess) {

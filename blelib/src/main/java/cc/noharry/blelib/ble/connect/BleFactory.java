@@ -8,6 +8,7 @@ import cc.noharry.blelib.data.BleDevice;
  */
 
 public interface BleFactory {
+
   BleClient newInstance(BleDevice bleDevice);
   BleConnector getConnector();
 
