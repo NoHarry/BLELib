@@ -5,6 +5,7 @@ import cc.noharry.blelib.ble.scan.BleScanConfig;
 import cc.noharry.blelib.ble.scan.BleScanner;
 import cc.noharry.blelib.data.BleDevice;
 import cc.noharry.blelib.util.L;
+import cc.noharry.blelib.util.MethodUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +31,9 @@ public  class NearScanCallback {
   private List<BleDevice> mDeviceList;
   private BlockingQueue<BleDevice> mBleDevices;
   private NearLeScanDeviceCallback mNearLeScanDeviceCallback;
+  private static final int LEGACY_SCAN=1;
+  private static final int NEW_SCAN=2;
+  private int scanMode=0;
 
   public NearScanCallback(Context context,BleScanConfig config,BleScanCallback bleScanCallback,
       NearScanDeviceCallback nearScanDeviceCallback) {
@@ -37,6 +41,7 @@ public  class NearScanCallback {
     mBleScanConfig = config;
     mNearScanDeviceCallback=nearScanDeviceCallback;
     mContext=context;
+    scanMode=NEW_SCAN;
   }
 
   public NearScanCallback(Context context,BleScanConfig config,BleScanCallback bleScanCallback,
@@ -45,6 +50,7 @@ public  class NearScanCallback {
     mBleScanConfig = config;
     mNearLeScanDeviceCallback=nearScanDeviceCallback;
     mContext=context;
+    scanMode=LEGACY_SCAN;
   }
 
   public void onScanStarted(boolean isStartSuccess){
@@ -94,32 +100,17 @@ public  class NearScanCallback {
     }
 
   }
+
   private void handleStoreDevice(BleScanConfig bleScanConfig,
       BleDevice bleDevice) {
-    if (bleScanConfig.getDeviceNames()!=null){
-      String[] deviceNames = bleScanConfig.getDeviceNames();
-      String name = bleDevice.getBluetoothDevice().getName();
-      if (bleScanConfig.isFuzzy()){
-        for (String s:deviceNames){
-          if (name.contains(s)){
-            mBleScanCallback.onFoundDevice(bleDevice);
-            mBleDevices.offer(bleDevice);
-          }
-        }
-      }else {
-        for (String s:deviceNames){
-          if (name.equalsIgnoreCase(s)){
-            mBleScanCallback.onFoundDevice(bleDevice);
-            mBleDevices.offer(bleDevice);
-          }
-        }
-      }
-    }else {
+    boolean checkBleDevice =
+        scanMode==NEW_SCAN?
+            MethodUtils.checkBleDeviceNew(bleScanConfig, bleDevice):
+            MethodUtils.checkBleDevice(bleScanConfig,bleDevice);
+    if (checkBleDevice){
       mBleScanCallback.onFoundDevice(bleDevice);
       mBleDevices.offer(bleDevice);
     }
-
-
   }
 
   private void startTimeTask(){

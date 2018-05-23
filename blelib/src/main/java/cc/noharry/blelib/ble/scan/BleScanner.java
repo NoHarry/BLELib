@@ -1,5 +1,7 @@
 package cc.noharry.blelib.ble.scan;
 
+import static android.bluetooth.le.ScanSettings.SCAN_MODE_LOW_LATENCY;
+
 import android.annotation.TargetApi;
 import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanSettings;
@@ -64,7 +66,7 @@ public class BleScanner {
 
   private void handleScan(BleScanConfig config) {
     boolean startLeScan = BLEAdmin.getINSTANCE(mContext).getBluetoothAdapter()
-        .startLeScan(config.getUUIDS(), mNearLeScanDeviceCallback);
+        .startLeScan(mNearLeScanDeviceCallback);
     isScanning.set(startLeScan);
     mNearLeScanDeviceCallback.onScanStart(startLeScan);
   }
@@ -113,7 +115,8 @@ public class BleScanner {
       }
     }
     BLEAdmin.getINSTANCE(mContext).getBluetoothAdapter().getBluetoothLeScanner()
-        .startScan(list,new ScanSettings.Builder().build(),mScanDeviceCallback);
+        .startScan(list,new ScanSettings.Builder().setScanMode(SCAN_MODE_LOW_LATENCY)
+            .build(),mScanDeviceCallback);
     isScanning.set(true);
     mScanDeviceCallback.onScanStart(true);
   }

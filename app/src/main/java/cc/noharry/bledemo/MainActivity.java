@@ -24,12 +24,12 @@ public class MainActivity extends AppCompatActivity {
       @Override
       public void onClick(View v) {
         //0000ffe0-0000-1000-8000-00805f9b34fb
-        UUID[] uuids=new UUID[]{UUID.fromString("0000ffe0-0000-1000-8000-00805f9b34fb")};
+        UUID[] uuids=new UUID[]{UUID.fromString("0000ffe5-0000-1000-8000-00805f9b34fb"),UUID.fromString("0000ffe0-0000-1000-8000-00805f9b34fb")};
         BleScanConfig config=new BleScanConfig.Builder()
-//            .setUUID(uuids)
+            .setUUID(uuids)
             .setScanTime(5000)
-//            .setDeviceName(new String[]{"LL0"},true)
-//            .setDeviceMac(new String[]{"00:0E:0B:14:70:DE"})
+            .setDeviceName(new String[]{"LL0835","android"},true)
+//            .setDeviceMac(new String[]{"00:0E:0B:14:70:DE","24:0A:C4:10:A2:22"})
             .build();
         BLEAdmin.getINSTANCE(getApplication()).scan(config, new BleScanCallback() {
           @Override
