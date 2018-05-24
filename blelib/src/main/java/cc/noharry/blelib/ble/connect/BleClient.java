@@ -23,13 +23,6 @@ public class BleClient implements BleFactory{
 
   public BleClient(BleDevice bleDevice) {
     mBleDevice = bleDevice;
-
-  }
-
-
-  @Override
-  public  BleClient newInstance(BleDevice bleDevice) {
-    return new BleClient(bleDevice);
   }
 
   @Override
@@ -47,22 +40,15 @@ public class BleClient implements BleFactory{
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       gatt = mBleDevice.getBluetoothDevice().connectGatt(BLEAdmin.getContext(),
-          isAutoConnect, mGattCallback, BluetoothDevice.TRANSPORT_LE, preferredPhy, mHandler);
+          isAutoConnect, callback, BluetoothDevice.TRANSPORT_LE, preferredPhy, mHandler);
     } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
       gatt = mBleDevice.getBluetoothDevice().connectGatt(BLEAdmin.getContext(),
-          isAutoConnect, mGattCallback, BluetoothDevice.TRANSPORT_LE);
+          isAutoConnect, callback, BluetoothDevice.TRANSPORT_LE);
     } else {
       gatt = mBleDevice.getBluetoothDevice().connectGatt(BLEAdmin.getContext(),
-          isAutoConnect, mGattCallback);
+          isAutoConnect, callback);
     }
-    return null;
+    return gatt;
   }
 
-
-  private BleGattCallback mGattCallback=new BleGattCallback() {
-    @Override
-    public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-      super.onConnectionStateChange(gatt, status, newState);
-    }
-  };
 }

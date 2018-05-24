@@ -57,6 +57,7 @@ public class BleScanner {
         L.e("isScanning:"+isScanning.get());
         e.printStackTrace();
       }
+
       L.i("开启新扫描");
     }else {
         handleScan(config);

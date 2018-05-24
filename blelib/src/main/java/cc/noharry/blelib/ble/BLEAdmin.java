@@ -1,14 +1,13 @@
 package cc.noharry.blelib.ble;
 
-import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Build.VERSION_CODES;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import cc.noharry.blelib.ble.scan.BleScanConfig;
 import cc.noharry.blelib.ble.scan.BleScanner;
 import cc.noharry.blelib.callback.BleScanCallback;
@@ -45,6 +44,10 @@ public class BLEAdmin {
 
   public static Context getContext() {
     return mContext;
+  }
+
+  public boolean isScanning(){
+    return BleScanner.isScanning.get();
   }
 
   /**
@@ -112,7 +115,7 @@ public class BLEAdmin {
     return mBluetoothAdapter;
   }
 
-  public void scan(BleScanConfig config,BleScanCallback callback){
+  public void scan(@NonNull BleScanConfig config,@NonNull BleScanCallback callback){
       L.e("start scan");
     if (!BleScanner.isScanning.get()){
       BleScanner.getINSTANCE(getContext()).scan(config,callback);
@@ -120,7 +123,6 @@ public class BLEAdmin {
 
   }
 
-  @TargetApi(VERSION_CODES.LOLLIPOP)
   public void stopScan(){
     L.e("stop scan");
     BleScanner.getINSTANCE(getContext()).cancelScan();
