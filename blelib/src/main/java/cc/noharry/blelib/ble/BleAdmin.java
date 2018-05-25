@@ -6,14 +6,18 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build.VERSION_CODES;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import cc.noharry.blelib.ble.connect.BleClient;
+import android.support.annotation.RequiresApi;
+import cc.noharry.blelib.ble.connect.BleConnectorProxy;
+import cc.noharry.blelib.ble.connect.Task;
 import cc.noharry.blelib.ble.scan.BleScanConfig;
 import cc.noharry.blelib.ble.scan.BleScanner;
+import cc.noharry.blelib.callback.BleConnectCallback;
 import cc.noharry.blelib.callback.BleScanCallback;
+import cc.noharry.blelib.data.BleDevice;
 import cc.noharry.blelib.util.L;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author NoHarry
@@ -26,7 +30,9 @@ public class BleAdmin {
   private final BluetoothAdapter mBluetoothAdapter;
   private final Handler mHandler;
   private BTStateReceiver btStateReceiver = null;
-  public  ConcurrentHashMap<String,BleClient> clientMap=new ConcurrentHashMap<>();
+  private final MultipleBleController mMultipleBleController;
+  private final BleScanner mBleScanner;
+  private final BleConnectorProxy mBleConnectorProxy;
 
   private BleAdmin(Context context) {
     mContext = context.getApplicationContext();
@@ -34,6 +40,10 @@ public class BleAdmin {
     mBluetoothAdapter = bluetoothManager.getAdapter();
     mHandler = new Handler(mContext.getMainLooper());
     btStateReceiver = new BTStateReceiver();
+    mBleScanner = BleScanner.getINSTANCE(getContext());
+    mMultipleBleController = MultipleBleController.getInstance(mContext);
+    mBleConnectorProxy = BleConnectorProxy.getInstance(getContext());
+
   }
 
   public static BleAdmin getINSTANCE(Context context){
@@ -114,23 +124,47 @@ public class BleAdmin {
     }
   }
 
-
+  public MultipleBleController getMultipleBleController(){
+    return mMultipleBleController;
+  }
 
   public BluetoothAdapter getBluetoothAdapter() {
     return mBluetoothAdapter;
   }
 
-  public void scan(@NonNull BleScanConfig config,@NonNull BleScanCallback callback){
-      L.e("start scan");
-    if (!BleScanner.isScanning.get()){
-      BleScanner.getINSTANCE(getContext()).scan(config,callback);
-    }
+  public void connect(@NonNull BleDevice bleDevice,@NonNull boolean isAutoConnect
+      , @NonNull BleConnectCallback connectCallback){
+    mBleConnectorProxy.doConnect(bleDevice, isAutoConnect, connectCallback);
+  }
 
+
+  @RequiresApi(api = VERSION_CODES.O)
+  public void connect(@NonNull BleDevice bleDevice,@NonNull boolean isAutoConnect
+      ,@NonNull int preferredPhy, @NonNull BleConnectCallback connectCallback){
+    mBleConnectorProxy.doConnect(bleDevice, isAutoConnect, preferredPhy, connectCallback);
+  }
+
+
+  public void disconnect(@NonNull BleDevice bleDevice){
+    mBleConnectorProxy.doDisconnect(bleDevice);
+  }
+
+  public void addTask(BleDevice bleDevice,Task task){
+    mBleConnectorProxy.doTask(bleDevice,task);
+  }
+
+  public void scan(@NonNull BleScanConfig config,@NonNull BleScanCallback callback){
+    if (!BleScanner.isScanning.get()){
+      L.e("start scan");
+      mBleScanner.scan(config,callback);
+    }else {
+      L.e("already start scan");
+    }
   }
 
   public void stopScan(){
     L.e("stop scan");
-    BleScanner.getINSTANCE(getContext()).cancelScan();
+    mBleScanner.cancelScan();
   }
 
   private void registerBtStateReceiver(Context context) {

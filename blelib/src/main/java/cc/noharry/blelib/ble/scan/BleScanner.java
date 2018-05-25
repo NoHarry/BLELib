@@ -46,7 +46,7 @@ public class BleScanner {
     return INSTANCE;
   }
 
-  public void scan(final BleScanConfig config, final BleScanCallback callback){
+  public synchronized void scan(final BleScanConfig config, final BleScanCallback callback){
     mScanDeviceCallback = new NearScanDeviceCallback(mContext,config,callback);
     mNearLeScanDeviceCallback = new NearLeScanDeviceCallback(config,callback,mContext);
     //Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP

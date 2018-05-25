@@ -67,7 +67,6 @@ public  class NearScanCallback {
   }
 
   public void onFoundDevice(BleDevice bleDevice){
-
     handleStoreDevice(mBleScanConfig,bleDevice);
   }
 

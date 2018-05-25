@@ -53,6 +53,12 @@ public abstract class BleGattCallback extends BluetoothGattCallback{
   @Override
   public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
     runOnUiThread(() -> onConnectionStateChangeMain(gatt, status, newState));
+    /*runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        onConnectionStateChangeMain(gatt, status, newState);
+      }
+    });*/
   }
 
   @Override

@@ -126,6 +126,9 @@ public class MethodUtils {
       if (config.isFuzzy()){
         boolean isFuzzyNameFit=false;
         for (String s:deviceNames){
+          if (device.getName()==null){
+            return false;
+          }
           if (device.getName().contains(s)){
             isFuzzyNameFit=true;
            break;

@@ -1,6 +1,8 @@
-package cc.noharry.blelib.ble.connect;
+package cc.noharry.blelib.ble;
 
 import android.content.Context;
+import cc.noharry.blelib.ble.connect.BleClient;
+import cc.noharry.blelib.util.L;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -8,10 +10,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date 2018/05/25
  */
 
-public class MultipleBleController {
+ public class MultipleBleController {
   private Context mContext;
   private static MultipleBleController instance=null;
-  public ConcurrentHashMap<String,BleClient> clientMap=new ConcurrentHashMap<>();
+  private ConcurrentHashMap<String,BleClient> clientMap=new ConcurrentHashMap<>();
 
   private MultipleBleController(Context context) {
     mContext = context;
@@ -26,5 +28,10 @@ public class MultipleBleController {
       }
     }
     return instance;
+  }
+
+  public ConcurrentHashMap<String, BleClient> getClientMap() {
+    L.i("getClientMap:"+clientMap);
+    return clientMap;
   }
 }
