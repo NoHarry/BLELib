@@ -5,7 +5,7 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
-import cc.noharry.blelib.ble.BLEAdmin;
+import cc.noharry.blelib.ble.BleAdmin;
 import cc.noharry.blelib.ble.scan.BleScanConfig;
 import cc.noharry.blelib.callback.BleScanCallback;
 import cc.noharry.blelib.data.BleDevice;
@@ -31,8 +31,8 @@ public class MainActivity extends AppCompatActivity {
             .setDeviceName(new String[]{"LL0835","android"},true)
 //            .setDeviceMac(new String[]{"00:0E:0B:14:70:DE","24:0A:C4:10:A2:22"})
             .build();
-//        BLEAdmin.getINSTANCE(getApplication())
-        BLEAdmin.getINSTANCE(getApplication()).scan(config, new BleScanCallback() {
+//        BleAdmin.getINSTANCE(getApplication())
+        BleAdmin.getINSTANCE(getApplication()).scan(config, new BleScanCallback() {
           @Override
           public void onScanStarted(boolean isStartSuccess) {
             L.i("onScanStarted:"+isStartSuccess);
@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     findViewById(R.id.btn_stop_scan).setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View v) {
-        BLEAdmin.getINSTANCE(getApplicationContext()).stopScan();
+        BleAdmin.getINSTANCE(getApplicationContext()).stopScan();
       }
     });
   }

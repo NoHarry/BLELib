@@ -7,7 +7,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.RequiresApi;
-import cc.noharry.blelib.ble.BLEAdmin;
+import cc.noharry.blelib.ble.BleAdmin;
 import cc.noharry.blelib.callback.BleGattCallback;
 import cc.noharry.blelib.data.BleDevice;
 
@@ -23,6 +23,11 @@ public class BleClient implements BleFactory{
 
   public BleClient(BleDevice bleDevice) {
     mBleDevice = bleDevice;
+    MultipleBleController.getInstance(BleAdmin.getContext()).clientMap.put(getKey(),this);
+  }
+
+  public String getKey(){
+    return mBleDevice.getKey();
   }
 
   @Override
@@ -39,13 +44,13 @@ public class BleClient implements BleFactory{
   public synchronized BluetoothGatt connect(boolean isAutoConnect,int preferredPhy,BleGattCallback callback){
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      gatt = mBleDevice.getBluetoothDevice().connectGatt(BLEAdmin.getContext(),
+      gatt = mBleDevice.getBluetoothDevice().connectGatt(BleAdmin.getContext(),
           isAutoConnect, callback, BluetoothDevice.TRANSPORT_LE, preferredPhy, mHandler);
     } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      gatt = mBleDevice.getBluetoothDevice().connectGatt(BLEAdmin.getContext(),
+      gatt = mBleDevice.getBluetoothDevice().connectGatt(BleAdmin.getContext(),
           isAutoConnect, callback, BluetoothDevice.TRANSPORT_LE);
     } else {
-      gatt = mBleDevice.getBluetoothDevice().connectGatt(BLEAdmin.getContext(),
+      gatt = mBleDevice.getBluetoothDevice().connectGatt(BleAdmin.getContext(),
           isAutoConnect, callback);
     }
     return gatt;

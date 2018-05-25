@@ -9,7 +9,7 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.ParcelUuid;
-import cc.noharry.blelib.ble.BLEAdmin;
+import cc.noharry.blelib.ble.BleAdmin;
 import cc.noharry.blelib.callback.BleScanCallback;
 import cc.noharry.blelib.callback.NearLeScanDeviceCallback;
 import cc.noharry.blelib.callback.NearScanDeviceCallback;
@@ -66,7 +66,7 @@ public class BleScanner {
   }
 
   private void handleScan(BleScanConfig config) {
-    boolean startLeScan = BLEAdmin.getINSTANCE(mContext).getBluetoothAdapter()
+    boolean startLeScan = BleAdmin.getINSTANCE(mContext).getBluetoothAdapter()
         .startLeScan(mNearLeScanDeviceCallback);
     isScanning.set(startLeScan);
     mNearLeScanDeviceCallback.onScanStart(startLeScan);
@@ -74,11 +74,11 @@ public class BleScanner {
 
   public void stopScan(){
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-     BLEAdmin.getINSTANCE(mContext).getBluetoothAdapter()
+     BleAdmin.getINSTANCE(mContext).getBluetoothAdapter()
          .getBluetoothLeScanner().stopScan(mScanDeviceCallback);
      isScanning.set(false);
     }else {
-      BLEAdmin.getINSTANCE(mContext).getBluetoothAdapter()
+      BleAdmin.getINSTANCE(mContext).getBluetoothAdapter()
           .stopLeScan(mNearLeScanDeviceCallback);
       isScanning.set(false);
     }
@@ -115,7 +115,7 @@ public class BleScanner {
         list.add(filter);
       }
     }
-    BLEAdmin.getINSTANCE(mContext).getBluetoothAdapter().getBluetoothLeScanner()
+    BleAdmin.getINSTANCE(mContext).getBluetoothAdapter().getBluetoothLeScanner()
         .startScan(list,new ScanSettings.Builder().setScanMode(SCAN_MODE_LOW_LATENCY)
             .build(),mScanDeviceCallback);
     isScanning.set(true);

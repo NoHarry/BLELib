@@ -8,24 +8,27 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import cc.noharry.blelib.ble.connect.BleClient;
 import cc.noharry.blelib.ble.scan.BleScanConfig;
 import cc.noharry.blelib.ble.scan.BleScanner;
 import cc.noharry.blelib.callback.BleScanCallback;
 import cc.noharry.blelib.util.L;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author NoHarry
  * @date 2018/03/27
  */
 
-public class BLEAdmin {
-  private static BLEAdmin INSTANCE = null;
+public class BleAdmin {
+  private static BleAdmin INSTANCE = null;
   private static Context mContext = null;
   private final BluetoothAdapter mBluetoothAdapter;
   private final Handler mHandler;
   private BTStateReceiver btStateReceiver = null;
+  public  ConcurrentHashMap<String,BleClient> clientMap=new ConcurrentHashMap<>();
 
-  private BLEAdmin(Context context) {
+  private BleAdmin(Context context) {
     mContext = context.getApplicationContext();
     BluetoothManager bluetoothManager= (BluetoothManager) mContext.getSystemService(Context.BLUETOOTH_SERVICE);
     mBluetoothAdapter = bluetoothManager.getAdapter();
@@ -33,10 +36,10 @@ public class BLEAdmin {
     btStateReceiver = new BTStateReceiver();
   }
 
-  public static BLEAdmin getINSTANCE(Context context){
+  public static BleAdmin getINSTANCE(Context context){
     if (INSTANCE == null){
-      synchronized (BLEAdmin.class){
-        INSTANCE = new BLEAdmin(context);
+      synchronized (BleAdmin.class){
+        INSTANCE = new BleAdmin(context);
       }
     }
     return INSTANCE;
@@ -53,9 +56,9 @@ public class BLEAdmin {
   /**
    *
    * @param isEnableLog whther enable the debug log
-   * @return BLEAdmin
+   * @return BleAdmin
    */
-  public BLEAdmin setLogEnable(boolean isEnableLog){
+  public BleAdmin setLogEnable(boolean isEnableLog){
     if (isEnableLog){
       L.isDebug=true;
     }else {
@@ -110,6 +113,8 @@ public class BLEAdmin {
       mBluetoothAdapter.disable();
     }
   }
+
+
 
   public BluetoothAdapter getBluetoothAdapter() {
     return mBluetoothAdapter;
