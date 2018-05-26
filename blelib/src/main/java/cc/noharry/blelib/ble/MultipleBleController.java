@@ -2,7 +2,6 @@ package cc.noharry.blelib.ble;
 
 import android.content.Context;
 import cc.noharry.blelib.ble.connect.BleClient;
-import cc.noharry.blelib.util.L;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -31,7 +30,6 @@ import java.util.concurrent.ConcurrentHashMap;
   }
 
   public ConcurrentHashMap<String, BleClient> getClientMap() {
-    L.i("getClientMap:"+clientMap);
     return clientMap;
   }
 }

@@ -1,5 +1,6 @@
 package cc.noharry.blelib.util;
 
+import android.support.annotation.NonNull;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -68,5 +69,13 @@ public class ThreadPoolProxy {
     public void remove(Runnable task) {
         initThreadPoolExecutor();
         mExecutor.remove(task);
+    }
+
+    class LocalTheadFactory implements ThreadFactory {
+
+        @Override
+        public Thread newThread(@NonNull Runnable r) {
+            return null;
+        }
     }
 }

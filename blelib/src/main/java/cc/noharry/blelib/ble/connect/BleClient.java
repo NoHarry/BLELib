@@ -57,13 +57,13 @@ public class BleClient implements IBleOperation{
 
   @SuppressLint("NewApi")
   protected synchronized BluetoothGatt connect(boolean isAutoConnect,BleConnectCallback callback){
-      mBleConnectCallback=callback;
       return connect(isAutoConnect,BluetoothDevice.PHY_LE_1M_MASK,callback);
   }
 
   @RequiresApi(api = Build.VERSION_CODES.O)
   protected synchronized BluetoothGatt connect(boolean isAutoConnect,int preferredPhy,BleConnectCallback callback){
     mBleConnectCallback=callback;
+    L.i("connect");
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       gatt = mBleDevice.getBluetoothDevice().connectGatt(BleAdmin.getContext(),
           isAutoConnect, mBleGattCallback, BluetoothDevice.TRANSPORT_LE, preferredPhy, mHandler);
@@ -80,7 +80,6 @@ public class BleClient implements IBleOperation{
   protected synchronized void disconnect(){
     if (gatt!=null){
       gatt.disconnect();
-      isConnected.set(false);
       L.i("disconnect():"+MultipleBleController.getInstance(BleAdmin.getContext()).getClientMap());
     }
   }
@@ -101,7 +100,10 @@ public class BleClient implements IBleOperation{
         mBleConnectCallback.onDeviceConnected(getBleDevice());
         isConnected.set(true);
         BleClient.this.gatt.discoverServices();
-        mBleConnectorProxy.taskNotity(status);
+        mBleConnectorProxy.taskNotify(status);
+      }
+      if (newState==BluetoothProfile.STATE_DISCONNECTED){
+        isConnected.set(false);
       }
       L.i("onConnectionStateChangeMain"+" statu:"+status+" newState:"+newState);
     }
@@ -138,7 +140,7 @@ public class BleClient implements IBleOperation{
     public void onCharacteristicReadMain(BluetoothGatt gatt,
         BluetoothGattCharacteristic characteristic, int status) {
       L.i("onCharacteristicReadMain"+" statu:"+status+" characteristic:"+ Arrays.toString(characteristic.getValue()));
-        mBleConnectorProxy.taskNotity(status);
+        mBleConnectorProxy.taskNotify(status);
     }
 
     @Override
@@ -191,9 +193,18 @@ public class BleClient implements IBleOperation{
   }
 
   @Override
-  public void doTask(BleDevice device,Task task) {
-    handleTask(task);
+  public void doTask(Task task) {
+    L.i("doTask");
+    if (isConnected.get()){
+      handleTask(task);
+    }else {
+      mBleConnectorProxy.taskNotify(1);
+      L.e("设备未连接");
+    }
+
   }
+
+
 
   private void handleTask(Task task) {
     BluetoothGattService mBluetoothGattService;
@@ -208,11 +219,8 @@ public class BleClient implements IBleOperation{
     }
     switch (task.mType){
       case READ:
-        if (isConnected.get()){
           gatt.readCharacteristic(mBluetoothGattCharacteristic);
-        }else {
-          L.e("设备未连接");
-        }
+
 
         break;
       default:

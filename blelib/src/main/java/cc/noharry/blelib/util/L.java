@@ -32,43 +32,109 @@ public class L {
 
 	// 下面四个是默认tag的函数
 	public static void i(String msg) {
-		if (isDebug)
-			Log.i(TAG, msg);
+		i(TAG,msg);
 	}
 
 	public static void d(String msg) {
-		if (isDebug)
-			Log.d(TAG, msg);
+		d(TAG,msg);
 	}
 
 	public static void e(String msg) {
-		if (isDebug)
-			Log.e(TAG, msg);
+	  e(TAG,msg);
 	}
 
 	public static void v(String msg) {
-		if (isDebug)
-			Log.v(TAG, msg);
+	  v(TAG,msg);
 	}
 
 	// 下面是传入自定义tag的函数
 	public static void i(String tag, String msg) {
-		if (isDebug)
-			Log.i(tag, msg);
+		if (isDebug){
+			Log.i(tag,"┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────");
+			Log.i(tag,"|                                               BLELIB                ");
+			Log.i(tag,"|┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄");
+			Log.i(tag,"| Thread:"+Thread.currentThread().getName());
+			Log.i(tag,"|┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄");
+			Log.i(tag,"| "+targetStackTraceMSg());
+			Log.i(tag,"|┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄");
+			Log.i(tag,"| "+ msg);
+			Log.i(tag,"└────────────────────────────────────────────────────────────────────────────────────────────────────────────────");
+		}
+
 	}
 
 	public static void d(String tag, String msg) {
-		if (isDebug)
-			Log.i(tag, msg);
+		if (isDebug){
+			Log.d(tag,"┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────");
+			Log.d(tag,"|                                               BLELIB                ");
+			Log.d(tag,"|┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄");
+			Log.d(tag,"| Thread:"+Thread.currentThread().getName());
+			Log.d(tag,"|┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄");
+			Log.d(tag,"| "+targetStackTraceMSg());
+			Log.d(tag,"|┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄");
+			Log.d(tag,"| "+ msg);
+			Log.d(tag,"└────────────────────────────────────────────────────────────────────────────────────────────────────────────────");
+		}
+
 	}
 
 	public static void e(String tag, String msg) {
-		if (isDebug)
-			Log.i(tag, msg);
+		if (isDebug){
+			Log.e(tag,"┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────");
+			Log.e(tag,"|                                               BLELIB                ");
+			Log.e(tag,"|┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄");
+			Log.e(tag,"| Thread:"+Thread.currentThread().getName());
+			Log.e(tag,"|┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄");
+			Log.e(tag,"| "+targetStackTraceMSg());
+			Log.e(tag,"|┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄");
+			Log.e(tag,"| "+ msg);
+			Log.e(tag,"└────────────────────────────────────────────────────────────────────────────────────────────────────────────────");
+		}
+
 	}
 
 	public static void v(String tag, String msg) {
-		if (isDebug)
-			Log.i(tag, msg);
+		if (isDebug){
+			Log.v(tag,"┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────");
+			Log.v(tag,"|                                               BLELIB                ");
+			Log.v(tag,"|┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄");
+			Log.v(tag,"| Thread:"+Thread.currentThread().getName());
+			Log.v(tag,"|┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄");
+			Log.v(tag,"| "+targetStackTraceMSg());
+			Log.v(tag,"|┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄");
+			Log.v(tag,"| "+ msg);
+			Log.v(tag,"└────────────────────────────────────────────────────────────────────────────────────────────────────────────────");
+		}
+
 	}
+
+	private static String targetStackTraceMSg() {
+		StackTraceElement targetStackTraceElement = getTargetStackTraceElement();
+		if (targetStackTraceElement != null) {
+			return "At " + targetStackTraceElement.getClassName() + "." + targetStackTraceElement.getMethodName() +
+					"(" + targetStackTraceElement.getFileName() + ":" + targetStackTraceElement.getLineNumber() + ")";
+
+		} else {
+			return "";
+		}
+	}
+
+	private static StackTraceElement getTargetStackTraceElement() {
+		StackTraceElement targetStackTrace = null;
+		boolean shouldTrace = false;
+		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+
+		for (StackTraceElement stackTraceElement : stackTrace) {
+			boolean isLogMethod = stackTraceElement.getClassName().equals(L.class.getName());
+			if (shouldTrace && !isLogMethod) {
+				targetStackTrace = stackTraceElement;
+				break;
+			}
+			shouldTrace = isLogMethod;
+		}
+		return targetStackTrace;
+	}
+
+
+
 }

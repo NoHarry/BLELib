@@ -3,6 +3,7 @@ package cc.noharry.blelib.ble.connect;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
+import cc.noharry.blelib.data.BleDevice;
 
 /**
  * @author NoHarry
@@ -10,6 +11,7 @@ import android.bluetooth.BluetoothGattService;
  */
 
 public class ReadTask extends Task {
+  private BleDevice mBleDevice;
   private BluetoothGattService mBluetoothGattService;
   private BluetoothGattCharacteristic mBluetoothGattCharacteristic;
   private BluetoothGattDescriptor mBluetoothGattDescriptor;
@@ -18,17 +20,17 @@ public class ReadTask extends Task {
   private Type mType;
 
 
-  public ReadTask(Type type, BluetoothGattService bluetoothGattService,
+  public ReadTask(Type type, BleDevice bleDevice,BluetoothGattService bluetoothGattService,
       BluetoothGattCharacteristic bluetoothGattCharacteristic) {
-    super(type, bluetoothGattService, bluetoothGattCharacteristic);
+    super(type, bleDevice,bluetoothGattService, bluetoothGattCharacteristic);
   }
 
-  public ReadTask(Type type, BluetoothGattCharacteristic bluetoothGattCharacteristic,
+  public ReadTask(Type type, BleDevice bleDevice,BluetoothGattCharacteristic bluetoothGattCharacteristic,
       BluetoothGattDescriptor bluetoothGattDescriptor) {
-    super(type, bluetoothGattCharacteristic, bluetoothGattDescriptor);
+    super(type, bleDevice,bluetoothGattCharacteristic, bluetoothGattDescriptor);
   }
 
-  public ReadTask(Type type, String serviceUUID, String characteristicUUID) {
-    super(type, serviceUUID, characteristicUUID);
+  public ReadTask(Type type, BleDevice bleDevice,String serviceUUID, String characteristicUUID) {
+    super(type, bleDevice,serviceUUID, characteristicUUID);
   }
 }

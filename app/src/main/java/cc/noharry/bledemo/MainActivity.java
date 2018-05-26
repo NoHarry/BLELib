@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
   private List<BleDevice> mBleDevices=new ArrayList<>();
   private BleAdmin mBleAdmin;
   private BleDevice mBleDevice;
+  private BleDevice mDevice1;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -47,9 +48,9 @@ public class MainActivity extends AppCompatActivity {
         //0000ffe0-0000-1000-8000-00805f9b34fb
         UUID[] uuids=new UUID[]{UUID.fromString("0000ffe5-0000-1000-8000-00805f9b34fb"),UUID.fromString("0000ffe0-0000-1000-8000-00805f9b34fb")};
         BleScanConfig config=new BleScanConfig.Builder()
-            .setUUID(uuids)
+//            .setUUID(uuids)
 //            .setScanTime(5000)
-            .setDeviceName(new String[]{"LL0835","android"},true)
+//            .setDeviceName(new String[]{"LL0835","android"},true)
 //            .setDeviceMac(new String[]{"00:0E:0B:14:70:DE","24:0A:C4:10:A2:22"})
             .build();
 //        BleAdmin.getINSTANCE(getApplication())
@@ -88,45 +89,92 @@ public class MainActivity extends AppCompatActivity {
           if ("android test".equalsIgnoreCase(device.getName())){
             mBleDevice =device;
           }
+          if ("android test1".equalsIgnoreCase(device.getName())){
+            mDevice1 = device;
+          }
         }
         if (mBleDevice !=null){
-          mBleAdmin.connect(mBleDevice, false,
-              new BleConnectCallback() {
-                @Override
-                public void onDeviceConnecting(BleDevice bleDevice) {
-                  L.i("onDeviceConnecting");
-                }
+          new Thread(new Runnable() {
+            @Override
+            public void run() {
+              mBleAdmin.connect(mBleDevice, false,
+                  new BleConnectCallback() {
+                    @Override
+                    public void onDeviceConnecting(BleDevice bleDevice) {
+                      L.i("onDeviceConnecting");
+                    }
 
-                @Override
-                public void onDeviceConnected(BleDevice bleDevice) {
-                  L.i("onDeviceConnected");
-                }
+                    @Override
+                    public void onDeviceConnected(BleDevice bleDevice) {
+                      L.i("onDeviceConnected");
+                    }
 
-                @Override
-                public void onDeviceDisconnecting(BleDevice bleDevice) {
-                  L.i("onDeviceDisconnecting");
-                }
+                    @Override
+                    public void onDeviceDisconnecting(BleDevice bleDevice) {
+                      L.i("onDeviceDisconnecting");
+                    }
 
-                @Override
-                public void onDeviceDisconnected(BleDevice bleDevice) {
-                  L.i("onDeviceDisconnected");
-                }
+                    @Override
+                    public void onDeviceDisconnected(BleDevice bleDevice) {
+                      L.i("onDeviceDisconnected");
+                    }
 
-                @Override
-                public void onServicesDiscovered(BleDevice bleDevice) {
-                  L.i("onServicesDiscovered");
-                }
+                    @Override
+                    public void onServicesDiscovered(BleDevice bleDevice) {
+                      L.i("onServicesDiscovered");
+                    }
 
-                @Override
-                public void onDataSent(BleDevice bleDevice, byte[] data) {
-                  L.i("onDataSent");
-                }
+                    @Override
+                    public void onDataSent(BleDevice bleDevice, byte[] data) {
+                      L.i("onDataSent");
+                    }
 
-                @Override
-                public void onDataRecived(BleDevice bleDevice, byte[] data) {
-                  L.i("onDataRecived");
-                }
-              });
+                    @Override
+                    public void onDataRecived(BleDevice bleDevice, byte[] data) {
+                      L.i("onDataRecived");
+                    }
+                  });
+            }
+          }).start();
+
+        }
+        if (mDevice1!=null){
+          mBleAdmin.connect(mDevice1, false, new BleConnectCallback() {
+            @Override
+            public void onDeviceConnecting(BleDevice bleDevice) {
+              L.i("onDeviceConnecting1");
+            }
+
+            @Override
+            public void onDeviceConnected(BleDevice bleDevice) {
+              L.i("onDeviceConnected1");
+            }
+
+            @Override
+            public void onDeviceDisconnecting(BleDevice bleDevice) {
+              L.i("onDeviceDisconnecting1");
+            }
+
+            @Override
+            public void onDeviceDisconnected(BleDevice bleDevice) {
+              L.i("onDeviceDisconnected1");
+            }
+
+            @Override
+            public void onServicesDiscovered(BleDevice bleDevice) {
+              L.i("onServicesDiscovered1");
+            }
+
+            @Override
+            public void onDataSent(BleDevice bleDevice, byte[] data) {
+              L.i("onDataSent1");
+            }
+
+            @Override
+            public void onDataRecived(BleDevice bleDevice, byte[] data) {
+              L.i("onDataRecived1");
+            }
+          });
         }
       }
     });
@@ -136,7 +184,16 @@ public class MainActivity extends AppCompatActivity {
       @Override
       public void onClick(View v) {
         if (mBleDevice!=null){
-          mBleAdmin.disconnect(mBleDevice);
+          new Thread(new Runnable() {
+            @Override
+            public void run() {
+              mBleAdmin.disconnect(mBleDevice);
+            }
+          }).start();
+
+        }
+        if (mDevice1!=null){
+          mBleAdmin.disconnect(mDevice1);
         }
       }
     });
@@ -144,9 +201,25 @@ public class MainActivity extends AppCompatActivity {
     mBinding.btnRead.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View v) {
-        ReadTask readTask = Task.newReadTask("0000ffe0-0000-1000-8000-00805f9b34fb",
+        ReadTask readTask = Task.newReadTask(mBleDevice,"0000ffe5-0000-1000-8000-00805f9b34fb",
             "0000ffe2-0000-1000-8000-00805f9b34fb");
-        mBleAdmin.addTask(mBleDevice,readTask);
+        ReadTask readTask1 = Task.newReadTask(mDevice1,"0000ffe5-0000-1000-8000-00805f9b34fb",
+            "0000ffe2-0000-1000-8000-00805f9b34fb");
+        if (mBleDevice!=null){
+          mBleAdmin.addTask(readTask);
+        }
+
+//        mBleAdmin.addTask(readTask1);
+        if (mDevice1!=null){
+          new Thread(new Runnable() {
+            @Override
+            public void run() {
+              mBleAdmin.addTask(readTask1);
+            }
+          }).start();
+        }
+
+
       }
     });
   }

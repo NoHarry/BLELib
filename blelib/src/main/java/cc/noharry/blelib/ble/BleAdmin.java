@@ -149,8 +149,8 @@ public class BleAdmin {
     mBleConnectorProxy.doDisconnect(bleDevice);
   }
 
-  public void addTask(BleDevice bleDevice,Task task){
-    mBleConnectorProxy.doTask(bleDevice,task);
+  public void addTask(Task task){
+    mBleConnectorProxy.enqueue(task);
   }
 
   public void scan(@NonNull BleScanConfig config,@NonNull BleScanCallback callback){

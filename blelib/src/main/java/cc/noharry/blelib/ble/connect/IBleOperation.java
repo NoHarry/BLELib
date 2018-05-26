@@ -12,5 +12,5 @@ public interface IBleOperation {
   void doConnect(BleDevice bleDevice,boolean isAutoConnect,BleConnectCallback callback);
   void doConnect(BleDevice bleDevice,boolean isAutoConnect,int preferredPhy,BleConnectCallback callback);
   void doDisconnect(BleDevice bleDevice);
-  void doTask(BleDevice bleDevice,Task task);
+  void doTask(Task task);
 }
