@@ -1,5 +1,6 @@
 package cc.noharry.bledemo;
 
+import android.bluetooth.BluetoothGatt;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,8 +12,8 @@ import cc.noharry.blelib.ble.BleAdmin;
 import cc.noharry.blelib.ble.connect.ReadTask;
 import cc.noharry.blelib.ble.connect.Task;
 import cc.noharry.blelib.ble.scan.BleScanConfig;
-import cc.noharry.blelib.callback.BleConnectCallback;
 import cc.noharry.blelib.callback.BleScanCallback;
+import cc.noharry.blelib.callback.BleConnectCallback;
 import cc.noharry.blelib.data.BleDevice;
 import cc.noharry.blelib.util.L;
 import java.util.ArrayList;
@@ -101,37 +102,28 @@ public class MainActivity extends AppCompatActivity {
                   new BleConnectCallback() {
                     @Override
                     public void onDeviceConnecting(BleDevice bleDevice) {
-                      L.i("onDeviceConnecting");
+
                     }
 
                     @Override
                     public void onDeviceConnected(BleDevice bleDevice) {
-                      L.i("onDeviceConnected");
+
+                    }
+
+                    @Override
+                    public void onServicesDiscovered(BleDevice bleDevice, BluetoothGatt gatt,
+                        int status) {
+
                     }
 
                     @Override
                     public void onDeviceDisconnecting(BleDevice bleDevice) {
-                      L.i("onDeviceDisconnecting");
+
                     }
 
                     @Override
                     public void onDeviceDisconnected(BleDevice bleDevice) {
-                      L.i("onDeviceDisconnected");
-                    }
 
-                    @Override
-                    public void onServicesDiscovered(BleDevice bleDevice) {
-                      L.i("onServicesDiscovered");
-                    }
-
-                    @Override
-                    public void onDataSent(BleDevice bleDevice, byte[] data) {
-                      L.i("onDataSent");
-                    }
-
-                    @Override
-                    public void onDataRecived(BleDevice bleDevice, byte[] data) {
-                      L.i("onDataRecived");
                     }
                   });
             }
@@ -142,40 +134,32 @@ public class MainActivity extends AppCompatActivity {
           mBleAdmin.connect(mDevice1, false, new BleConnectCallback() {
             @Override
             public void onDeviceConnecting(BleDevice bleDevice) {
-              L.i("onDeviceConnecting1");
+
             }
 
             @Override
             public void onDeviceConnected(BleDevice bleDevice) {
-              L.i("onDeviceConnected1");
+
+            }
+
+            @Override
+            public void onServicesDiscovered(BleDevice bleDevice, BluetoothGatt gatt, int status) {
+
             }
 
             @Override
             public void onDeviceDisconnecting(BleDevice bleDevice) {
-              L.i("onDeviceDisconnecting1");
+
             }
 
             @Override
             public void onDeviceDisconnected(BleDevice bleDevice) {
-              L.i("onDeviceDisconnected1");
-            }
 
-            @Override
-            public void onServicesDiscovered(BleDevice bleDevice) {
-              L.i("onServicesDiscovered1");
-            }
-
-            @Override
-            public void onDataSent(BleDevice bleDevice, byte[] data) {
-              L.i("onDataSent1");
-            }
-
-            @Override
-            public void onDataRecived(BleDevice bleDevice, byte[] data) {
-              L.i("onDataRecived1");
             }
           });
         }
+
+
       }
     });
 

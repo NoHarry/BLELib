@@ -6,7 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.RequiresApi;
 import cc.noharry.blelib.ble.MultipleBleController;
-import cc.noharry.blelib.callback.BleConnectCallback;
+import cc.noharry.blelib.callback.BaseBleConnectCallback;
 import cc.noharry.blelib.data.BleDevice;
 import cc.noharry.blelib.exception.GattError;
 import cc.noharry.blelib.util.L;
@@ -79,7 +79,7 @@ public class BleConnectorProxy implements IBleOperation{
   }
 
   @Override
-  public void doConnect(BleDevice bleDevice, boolean isAutoConnect, BleConnectCallback callback) {
+  public void doConnect(BleDevice bleDevice, boolean isAutoConnect, BaseBleConnectCallback callback) {
     runOnUiThread(() -> getBleClient(bleDevice).connect(isAutoConnect,callback));
 
   }
@@ -87,7 +87,7 @@ public class BleConnectorProxy implements IBleOperation{
   @RequiresApi(api = VERSION_CODES.O)
   @Override
   public void doConnect(BleDevice bleDevice, boolean isAutoConnect, int preferredPhy,
-      BleConnectCallback callback) {
+      BaseBleConnectCallback callback) {
     runOnUiThread(() -> getBleClient(bleDevice).connect(isAutoConnect,preferredPhy,callback));
 
   }

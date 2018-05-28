@@ -3,6 +3,7 @@ package cc.noharry.blelib.ble.connect;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
+import cc.noharry.blelib.callback.TaskCallback;
 import cc.noharry.blelib.data.BleDevice;
 
 /**
@@ -20,6 +21,7 @@ public class Task<T>{
   public String mDescriptorUUID;
   public boolean isUseUUID=false;
   public BleDevice mBleDevice;
+  public TaskCallback callback;
 
   enum Type{
     WRITE,
@@ -33,7 +35,7 @@ public class Task<T>{
     WAIT_FOR_VALUE_CHANGE
   }
 
-  public Task(Type type, BleDevice bleDevice,BluetoothGattService bluetoothGattService,
+  protected Task(Type type, BleDevice bleDevice,BluetoothGattService bluetoothGattService,
       BluetoothGattCharacteristic bluetoothGattCharacteristic) {
     mType = type;
     mBleDevice=bleDevice;
@@ -42,7 +44,7 @@ public class Task<T>{
     isUseUUID=false;
   }
 
-  public Task(Type type, BleDevice bleDevice,BluetoothGattCharacteristic bluetoothGattCharacteristic,
+  protected Task(Type type, BleDevice bleDevice,BluetoothGattCharacteristic bluetoothGattCharacteristic,
       BluetoothGattDescriptor bluetoothGattDescriptor) {
     mType = type;
     mBleDevice=bleDevice;
@@ -51,12 +53,17 @@ public class Task<T>{
     isUseUUID=false;
   }
 
-  public Task(Type type, BleDevice bleDevice,String serviceUUID, String characteristicUUID) {
+  protected Task(Type type, BleDevice bleDevice,String serviceUUID, String characteristicUUID) {
     mType = type;
     mBleDevice=bleDevice;
     mServiceUUID = serviceUUID;
     mCharacteristicUUID = characteristicUUID;
     isUseUUID=true;
+  }
+
+  public Task with(TaskCallback callback){
+    this.callback=callback;
+    return this;
   }
 
 
@@ -76,6 +83,14 @@ public class Task<T>{
 
   public Type getType() {
     return mType;
+  }
+
+  public TaskCallback getCallback() {
+    return callback;
+  }
+
+  public void notityComplete(){
+
   }
 
   @Override

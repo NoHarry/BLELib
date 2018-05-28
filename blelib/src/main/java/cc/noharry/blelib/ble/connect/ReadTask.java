@@ -3,7 +3,9 @@ package cc.noharry.blelib.ble.connect;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
+import cc.noharry.blelib.callback.ReadCallback;
 import cc.noharry.blelib.data.BleDevice;
+import cc.noharry.blelib.data.Data;
 
 /**
  * @author NoHarry
@@ -20,6 +22,7 @@ public class ReadTask extends Task {
   private Type mType;
 
 
+
   public ReadTask(Type type, BleDevice bleDevice,BluetoothGattService bluetoothGattService,
       BluetoothGattCharacteristic bluetoothGattCharacteristic) {
     super(type, bleDevice,bluetoothGattService, bluetoothGattCharacteristic);
@@ -32,5 +35,13 @@ public class ReadTask extends Task {
 
   public ReadTask(Type type, BleDevice bleDevice,String serviceUUID, String characteristicUUID) {
     super(type, bleDevice,serviceUUID, characteristicUUID);
+  }
+
+  public ReadTask with(ReadCallback callback){
+    return this;
+  }
+
+  protected void notifyDataRecived(BleDevice bleDevice,Data data){
+
   }
 }

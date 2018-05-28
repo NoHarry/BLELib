@@ -14,7 +14,7 @@ import cc.noharry.blelib.ble.connect.BleConnectorProxy;
 import cc.noharry.blelib.ble.connect.Task;
 import cc.noharry.blelib.ble.scan.BleScanConfig;
 import cc.noharry.blelib.ble.scan.BleScanner;
-import cc.noharry.blelib.callback.BleConnectCallback;
+import cc.noharry.blelib.callback.BaseBleConnectCallback;
 import cc.noharry.blelib.callback.BleScanCallback;
 import cc.noharry.blelib.data.BleDevice;
 import cc.noharry.blelib.util.L;
@@ -133,14 +133,14 @@ public class BleAdmin {
   }
 
   public void connect(@NonNull BleDevice bleDevice,@NonNull boolean isAutoConnect
-      , @NonNull BleConnectCallback connectCallback){
+      , @NonNull BaseBleConnectCallback connectCallback){
     mBleConnectorProxy.doConnect(bleDevice, isAutoConnect, connectCallback);
   }
 
 
   @RequiresApi(api = VERSION_CODES.O)
   public void connect(@NonNull BleDevice bleDevice,@NonNull boolean isAutoConnect
-      ,@NonNull int preferredPhy, @NonNull BleConnectCallback connectCallback){
+      ,@NonNull int preferredPhy, @NonNull BaseBleConnectCallback connectCallback){
     mBleConnectorProxy.doConnect(bleDevice, isAutoConnect, preferredPhy, connectCallback);
   }
 
