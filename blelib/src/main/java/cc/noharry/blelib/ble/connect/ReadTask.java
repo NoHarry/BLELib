@@ -2,10 +2,11 @@ package cc.noharry.blelib.ble.connect;
 
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
-import android.bluetooth.BluetoothGattService;
+import cc.noharry.blelib.ble.BleAdmin;
 import cc.noharry.blelib.callback.ReadCallback;
 import cc.noharry.blelib.data.BleDevice;
 import cc.noharry.blelib.data.Data;
+import cc.noharry.blelib.exception.GattError;
 
 /**
  * @author NoHarry
@@ -13,35 +14,52 @@ import cc.noharry.blelib.data.Data;
  */
 
 public class ReadTask extends Task {
-  private BleDevice mBleDevice;
-  private BluetoothGattService mBluetoothGattService;
-  private BluetoothGattCharacteristic mBluetoothGattCharacteristic;
-  private BluetoothGattDescriptor mBluetoothGattDescriptor;
-  private String mServiceUUID;
-  private String mCharacteristicUUID;
-  private Type mType;
+  private ReadCallback mReadCallback;
+  private BleConnectorProxy mBleConnectorProxy;
 
 
-
-  public ReadTask(Type type, BleDevice bleDevice,BluetoothGattService bluetoothGattService,
+  protected ReadTask(Type type, BleDevice bleDevice,
       BluetoothGattCharacteristic bluetoothGattCharacteristic) {
-    super(type, bleDevice,bluetoothGattService, bluetoothGattCharacteristic);
+    super(type, bleDevice, bluetoothGattCharacteristic);
+    mBleConnectorProxy = BleConnectorProxy.getInstance(BleAdmin.getContext());
   }
 
-  public ReadTask(Type type, BleDevice bleDevice,BluetoothGattCharacteristic bluetoothGattCharacteristic,
+  protected ReadTask(Type type, BleDevice bleDevice,
       BluetoothGattDescriptor bluetoothGattDescriptor) {
-    super(type, bleDevice,bluetoothGattCharacteristic, bluetoothGattDescriptor);
+    super(type, bleDevice, bluetoothGattDescriptor);
+    mBleConnectorProxy = BleConnectorProxy.getInstance(BleAdmin.getContext());
   }
 
-  public ReadTask(Type type, BleDevice bleDevice,String serviceUUID, String characteristicUUID) {
+  protected ReadTask(Type type, BleDevice bleDevice,String serviceUUID, String characteristicUUID) {
     super(type, bleDevice,serviceUUID, characteristicUUID);
+    mBleConnectorProxy = BleConnectorProxy.getInstance(BleAdmin.getContext());
   }
 
   public ReadTask with(ReadCallback callback){
+    mReadCallback=callback;
     return this;
   }
 
   protected void notifyDataRecived(BleDevice bleDevice,Data data){
+    if (mReadCallback!=null){
+      mReadCallback.onDataRecived(bleDevice, data);
+    }
+
+  }
+
+  @Override
+  protected void notityComplete(BleDevice bleDevice) {
+    if (mReadCallback!=null){
+      mReadCallback.onOperationCompleted(bleDevice);
+    }
+
+  }
+
+  @Override
+  protected void notifyError(BleDevice bleDevice, int statuCode) {
+    if (mReadCallback!=null){
+      mReadCallback.onFail(bleDevice, statuCode, GattError.parse(statuCode));
+    }
 
   }
 }

@@ -17,6 +17,7 @@ import cc.noharry.blelib.ble.MultipleBleController;
 import cc.noharry.blelib.callback.BaseBleConnectCallback;
 import cc.noharry.blelib.callback.BaseBleGattCallback;
 import cc.noharry.blelib.data.BleDevice;
+import cc.noharry.blelib.data.Data;
 import cc.noharry.blelib.exception.GattError;
 import cc.noharry.blelib.util.L;
 import java.util.Arrays;
@@ -35,6 +36,9 @@ public class BleClient implements IBleOperation{
   private BaseBleConnectCallback mBleConnectCallback;
   private AtomicBoolean isConnected=new AtomicBoolean(false);
   private final BleConnectorProxy mBleConnectorProxy;
+  private Task mCurrentTask;
+  private AtomicBoolean isOperating=new AtomicBoolean(false);
+
 
   public BleClient(BleDevice bleDevice) {
     mBleDevice = bleDevice;
@@ -144,6 +148,15 @@ public class BleClient implements IBleOperation{
         BluetoothGattCharacteristic characteristic, int status) {
       mBleConnectCallback.onCharacteristicWriteBase(getBleDevice(),gatt,characteristic,status);
       L.i("onCharacteristicWriteMain"+" statu:"+status+" characteristic:"+characteristic);
+//      mBleConnectorProxy.taskNotify(status);
+      WriteTask readTask= (WriteTask) mCurrentTask;
+      if (GattError.GATT_SUCCESS==status){
+        Data data=new Data();
+        data.setValue(characteristic.getValue());
+        readTask.notifyDataSent(getBleDevice(),data);
+      }else {
+        readTask.notifyError(getBleDevice(),status);
+      }
     }
 
     @Override
@@ -151,7 +164,15 @@ public class BleClient implements IBleOperation{
         BluetoothGattCharacteristic characteristic, int status) {
       mBleConnectCallback.onCharacteristicReadBase(getBleDevice(),gatt,characteristic,status);
       L.i("onCharacteristicReadMain"+" statu:"+status+" characteristic:"+ Arrays.toString(characteristic.getValue()));
-        mBleConnectorProxy.taskNotify(status);
+//        mBleConnectorProxy.taskNotify(status);
+        ReadTask readTask= (ReadTask) mCurrentTask;
+        if (GattError.GATT_SUCCESS==status){
+          Data data=new Data();
+          data.setValue(characteristic.getValue());
+          readTask.notifyDataRecived(getBleDevice(),data);
+        }else {
+          readTask.notifyError(getBleDevice(),status);
+        }
 
     }
 
@@ -216,7 +237,7 @@ public class BleClient implements IBleOperation{
   @Override
   public void doTask(Task task) {
     L.i("doTask");
-    if (isConnected.get()){
+    if (isConnected.get()&&!isOperating.get()){
       handleTask(task);
     }else {
       mBleConnectorProxy.taskNotify(1);
@@ -231,21 +252,63 @@ public class BleClient implements IBleOperation{
     BluetoothGattService mBluetoothGattService;
     BluetoothGattCharacteristic mBluetoothGattCharacteristic;
     BluetoothGattDescriptor mBluetoothGattDescriptor;
-    if (task.isUseUUID){
-      mBluetoothGattService=gatt.getService(UUID.fromString(task.mServiceUUID));
-      mBluetoothGattCharacteristic=mBluetoothGattService.getCharacteristic(UUID.fromString(task.mCharacteristicUUID));
+    mCurrentTask=task;
+    isOperating.set(true);
+    if (mCurrentTask.isUseUUID){
+      mBluetoothGattService=gatt.getService(UUID.fromString(mCurrentTask.mServiceUUID));
+      mBluetoothGattCharacteristic=mBluetoothGattService.getCharacteristic(UUID.fromString(mCurrentTask.mCharacteristicUUID));
     }else {
-      mBluetoothGattService=task.mBluetoothGattService;
-      mBluetoothGattCharacteristic=task.mBluetoothGattCharacteristic;
+      mBluetoothGattService=mCurrentTask.mBluetoothGattService;
+      mBluetoothGattCharacteristic=mCurrentTask.mBluetoothGattCharacteristic;
     }
-    switch (task.mType){
+    boolean isOperationSuccess=false;
+    switch (mCurrentTask.mType){
       case READ:
-          gatt.readCharacteristic(mBluetoothGattCharacteristic);
-
+        isOperationSuccess= handleRead(mBluetoothGattCharacteristic);
+        L.e("Read:"+isOperationSuccess);
+        break;
+      case WRITE:
+        isOperationSuccess=handleWrite(mBluetoothGattCharacteristic);
 
         break;
       default:
     }
+    isOperating.set(false);
+    mBleConnectorProxy.taskNotify(0);
+    if (isOperationSuccess){
+      task.notityComplete(getBleDevice());
+    }else {
+      task.notifyError(getBleDevice(),GattError.LOCAL_GATT_OPERATION_FAIL);
+    }
+  }
+
+  private boolean handleWrite(BluetoothGattCharacteristic mBluetoothGattCharacteristic) {
+    if (gatt==null||mBluetoothGattCharacteristic==null){
+      return false;
+    }
+    //not check permissions because it's always return 0
+    //see:https://stackoverflow.com/questions/23674668/android-bluetooth-low-energy-characteristic-getpermissions-returns-0
+    int properties = mBluetoothGattCharacteristic.getProperties();
+    if ((properties&(BluetoothGattCharacteristic.PROPERTY_WRITE
+        | BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE))==0){
+      return false;
+    }
+    WriteTask writeTask= (WriteTask) mCurrentTask;
+    mBluetoothGattCharacteristic.setValue(writeTask.getData());
+    return gatt.writeCharacteristic(mBluetoothGattCharacteristic);
+  }
+
+  private boolean handleRead(BluetoothGattCharacteristic mBluetoothGattCharacteristic) {
+    if (gatt==null||mBluetoothGattCharacteristic==null){
+      return false;
+    }
+    //not check permissions because it's always return 0
+    //see:https://stackoverflow.com/questions/23674668/android-bluetooth-low-energy-characteristic-getpermissions-returns-0
+    int properties = mBluetoothGattCharacteristic.getProperties();
+    if ((properties&BluetoothGattCharacteristic.PROPERTY_READ)==0){
+      return false;
+    }
+    return gatt.readCharacteristic(mBluetoothGattCharacteristic);
   }
 
   private void handleConnStatu(int statuCode){

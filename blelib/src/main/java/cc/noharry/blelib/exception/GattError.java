@@ -77,6 +77,8 @@ public class GattError {
 	public static final int GATT_CONN_LMP_TIMEOUT          =     0x22;     	/* 0x22 connection fail for LMP response tout */
 	public static final int GATT_CONN_CANCEL               =     0x0100;    /* 0x0100 L2CAP connection cancelled  */
 
+
+	public static final int LOCAL_GATT_OPERATION_FAIL = -1;
 	/**
 	 * Converts the connection status given by the {@link android.bluetooth.BluetoothGattCallback#onConnectionStateChange(BluetoothGatt, int, int)} to error name.
 	 * @param error the status number
@@ -194,6 +196,8 @@ public class GattError {
 				return "GATT VALUE OUT OF RANGE";
 			case 0x0101:
 				return "TOO MANY OPEN CONNECTIONS";
+			case LOCAL_GATT_OPERATION_FAIL:
+				return "LOCAL GATT OPERATION FAIL";
 			default:
 				return "UNKNOWN (" + error + ")";
 		}
