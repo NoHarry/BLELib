@@ -48,7 +48,17 @@
     android:text="write"
     android:id="@+id/btn_write"
     />
-
-
+  <Button
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="enable notify"
+    android:id="@+id/btn_enable_notify"
+    />
+  <Button
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="disable notify"
+    android:id="@+id/btn_disable_notify"
+    />
 </LinearLayout>
 </layout>

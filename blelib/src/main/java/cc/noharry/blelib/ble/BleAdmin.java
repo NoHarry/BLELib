@@ -154,12 +154,17 @@ public class BleAdmin {
   }
 
   public void scan(@NonNull BleScanConfig config,@NonNull BleScanCallback callback){
-    if (!BleScanner.isScanning.get()){
-      L.e("start scan");
-      mBleScanner.scan(config,callback);
+    if (isEnable()){
+      if (!BleScanner.isScanning.get()){
+        L.e("start scan");
+        mBleScanner.scan(config,callback);
+      }else {
+        L.e("already start scan");
+      }
     }else {
-      L.e("already start scan");
+      L.e("Bluetooth not enabled");
     }
+
   }
 
   public void stopScan(){

@@ -13,8 +13,9 @@ import cc.noharry.blelib.ble.connect.ReadTask;
 import cc.noharry.blelib.ble.connect.Task;
 import cc.noharry.blelib.ble.connect.WriteTask;
 import cc.noharry.blelib.ble.scan.BleScanConfig;
-import cc.noharry.blelib.callback.BleScanCallback;
 import cc.noharry.blelib.callback.BleConnectCallback;
+import cc.noharry.blelib.callback.BleScanCallback;
+import cc.noharry.blelib.callback.DataChangeCallback;
 import cc.noharry.blelib.callback.ReadCallback;
 import cc.noharry.blelib.callback.WriteCallback;
 import cc.noharry.blelib.data.BleDevice;
@@ -60,7 +61,10 @@ public class MainActivity extends AppCompatActivity {
 //            .setDeviceMac(new String[]{"00:0E:0B:14:70:DE","24:0A:C4:10:A2:22"})
             .build();
 //        BleAdmin.getINSTANCE(getApplication())
-        mBleAdmin.scan(config, new BleScanCallback() {
+
+        mBleAdmin.scan(
+            config
+            , new BleScanCallback() {
           @Override
           public void onScanStarted(boolean isStartSuccess) {
             L.i("onScanStarted:"+isStartSuccess);
@@ -107,28 +111,28 @@ public class MainActivity extends AppCompatActivity {
                   new BleConnectCallback() {
                     @Override
                     public void onDeviceConnecting(BleDevice bleDevice) {
-
+                      L.i("onDeviceConnecting "+bleDevice);
                     }
 
                     @Override
                     public void onDeviceConnected(BleDevice bleDevice) {
-
+                      L.i("onDeviceConnected "+bleDevice);
                     }
 
                     @Override
                     public void onServicesDiscovered(BleDevice bleDevice, BluetoothGatt gatt,
                         int status) {
-
+                      L.i("onServicesDiscovered "+bleDevice);
                     }
 
                     @Override
                     public void onDeviceDisconnecting(BleDevice bleDevice) {
-
+                      L.i("onDeviceDisconnecting "+bleDevice);
                     }
 
                     @Override
                     public void onDeviceDisconnected(BleDevice bleDevice) {
-
+                      L.i("onDeviceDisconnected "+bleDevice);
                     }
                   });
             }
@@ -139,27 +143,27 @@ public class MainActivity extends AppCompatActivity {
           mBleAdmin.connect(mDevice1, false, new BleConnectCallback() {
             @Override
             public void onDeviceConnecting(BleDevice bleDevice) {
-
+              L.i("onDeviceConnecting1 "+bleDevice);
             }
 
             @Override
             public void onDeviceConnected(BleDevice bleDevice) {
-
+              L.i("onDeviceConnected1 "+bleDevice);
             }
 
             @Override
             public void onServicesDiscovered(BleDevice bleDevice, BluetoothGatt gatt, int status) {
-
+              L.i("onServicesDiscovered1 "+bleDevice);
             }
 
             @Override
             public void onDeviceDisconnecting(BleDevice bleDevice) {
-
+              L.i("onDeviceDisconnecting1 "+bleDevice);
             }
 
             @Override
             public void onDeviceDisconnected(BleDevice bleDevice) {
-
+              L.i("onDeviceDisconnected1 "+bleDevice);
             }
           });
         }
@@ -198,13 +202,18 @@ public class MainActivity extends AppCompatActivity {
           }
 
           @Override
-          public void onOperationCompleted(BleDevice bleDevice) {
-            L.i("onOperationCompleted"+" device:"+bleDevice);
+          public void onOperationSuccess(BleDevice bleDevice) {
+            L.i("onOperationSuccess"+" device:"+bleDevice);
           }
 
           @Override
           public void onFail(BleDevice bleDevice, int statuCode, String message) {
             L.i("onFail"+" device:"+bleDevice+" statuCode:"+statuCode+" message:"+ message);
+          }
+
+          @Override
+          public void onComplete(BleDevice bleDevice) {
+            L.i("onComplete"+" device:"+bleDevice);
           }
         });
         ReadTask readTask1 = Task.newReadTask(mDevice1,"0000ffe5-0000-1000-8000-00805f9b34fb",
@@ -214,14 +223,20 @@ public class MainActivity extends AppCompatActivity {
             L.i("onDataRecived1"+" device:"+bleDevice+" data:"+ Arrays.toString(data.getValue()));
           }
 
+
           @Override
-          public void onOperationCompleted(BleDevice bleDevice) {
-            L.i("onOperationCompleted1"+" device:"+bleDevice);
+          public void onOperationSuccess(BleDevice bleDevice) {
+            L.i("onOperationSuccess1"+" device:"+bleDevice);
           }
 
           @Override
           public void onFail(BleDevice bleDevice, int statuCode, String message) {
             L.i("onFail1"+" device:"+bleDevice+" statuCode:"+statuCode+" message:"+ message);
+          }
+
+          @Override
+          public void onComplete(BleDevice bleDevice) {
+            L.i("onComplete1"+" device:"+bleDevice);
           }
         });
         if (mBleDevice!=null){
@@ -253,13 +268,18 @@ public class MainActivity extends AppCompatActivity {
           }
 
           @Override
-          public void onOperationCompleted(BleDevice bleDevice) {
-            L.i("onOperationCompleted "+" bleDevice:"+bleDevice);
+          public void onOperationSuccess(BleDevice bleDevice) {
+            L.i("onOperationSuccess "+" bleDevice:"+bleDevice);
           }
 
           @Override
           public void onFail(BleDevice bleDevice, int statuCode, String message) {
             L.i("onFail "+" bleDevice:"+bleDevice+" statuCode:"+statuCode+" message:"+message);
+          }
+
+          @Override
+          public void onComplete(BleDevice bleDevice) {
+            L.i("onComplete"+" device:"+bleDevice);
           }
         });
         WriteTask writeTask1 = Task.newWriteTask(mDevice1, "0000ffe5-0000-1000-8000-00805f9b34fb",
@@ -270,13 +290,18 @@ public class MainActivity extends AppCompatActivity {
           }
 
           @Override
-          public void onOperationCompleted(BleDevice bleDevice) {
-            L.i("onOperationCompleted1 "+" bleDevice:"+bleDevice);
+          public void onOperationSuccess(BleDevice bleDevice) {
+            L.i("onOperationSucces1 "+" bleDevice:"+bleDevice);
           }
 
           @Override
           public void onFail(BleDevice bleDevice, int statuCode, String message) {
             L.i("onFail1 "+" bleDevice:"+bleDevice+" statuCode:"+statuCode+" message:"+message);
+          }
+
+          @Override
+          public void onComplete(BleDevice bleDevice) {
+            L.i("onComplete1"+" device:"+bleDevice);
           }
         });
 
@@ -285,6 +310,64 @@ public class MainActivity extends AppCompatActivity {
         }
         if (mDevice1!=null){
           mBleAdmin.addTask(writeTask1);
+        }
+      }
+    });
+
+    mBinding.btnEnableNotify.setOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        WriteTask enableTask = Task.newEnableNotificationsTask(mBleDevice, "0000ffe5-0000-1000-8000-00805f9b34fb",
+            "0000ffe2-0000-1000-8000-00805f9b34fb").with(new DataChangeCallback() {
+          @Override
+          public void onDataChange(BleDevice bleDevice, Data data) {
+            L.i("onDataChange "+" bleDevice:"+bleDevice+" data:"+Arrays.toString(data.getValue()));
+          }
+
+          @Override
+          public void onOperationSuccess(BleDevice bleDevice) {
+            L.i("onOperationSuccess "+" bleDevice:"+bleDevice);
+          }
+
+          @Override
+          public void onFail(BleDevice bleDevice, int statuCode, String message) {
+            L.i("onFail "+" bleDevice:"+bleDevice+" statuCode:"+statuCode+" message:"+message);
+          }
+
+          @Override
+          public void onComplete(BleDevice bleDevice) {
+            L.i("onComplete "+" bleDevice:"+bleDevice);
+          }
+        });
+        WriteTask enableTask1 = Task.newEnableNotificationsTask(mDevice1, "0000ffe5-0000-1000-8000-00805f9b34fb",
+            "0000ffe2-0000-1000-8000-00805f9b34fb").with(new DataChangeCallback() {
+          @Override
+          public void onDataChange(BleDevice bleDevice, Data data) {
+            L.i("onDataChange1 "+" bleDevice:"+bleDevice+" data:"+Arrays.toString(data.getValue()));
+          }
+
+          @Override
+          public void onOperationSuccess(BleDevice bleDevice) {
+            L.i("onOperationSuccess1 "+" bleDevice:"+bleDevice);
+          }
+
+          @Override
+          public void onFail(BleDevice bleDevice, int statuCode, String message) {
+            L.i("onFail1 "+" bleDevice:"+bleDevice+" statuCode:"+statuCode+" message:"+message);
+          }
+
+          @Override
+          public void onComplete(BleDevice bleDevice) {
+            L.i("onComplete1 "+" bleDevice:"+bleDevice);
+          }
+        });
+
+        if (mBleDevice!=null){
+          mBleAdmin.addTask(enableTask);
+        }
+
+        if (mDevice1!=null){
+          mBleAdmin.addTask(enableTask1);
         }
       }
     });

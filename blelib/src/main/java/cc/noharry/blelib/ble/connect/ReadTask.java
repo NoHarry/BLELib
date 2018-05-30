@@ -41,24 +41,30 @@ public class ReadTask extends Task {
   }
 
   protected void notifyDataRecived(BleDevice bleDevice,Data data){
+    mBleConnectorProxy.taskNotify(0);
     if (mReadCallback!=null){
+
       mReadCallback.onDataRecived(bleDevice, data);
+      mReadCallback.onComplete(bleDevice);
     }
 
   }
 
   @Override
-  protected void notityComplete(BleDevice bleDevice) {
+  protected void notitySuccess(BleDevice bleDevice) {
     if (mReadCallback!=null){
-      mReadCallback.onOperationCompleted(bleDevice);
+      mReadCallback.onOperationSuccess(bleDevice);
     }
 
   }
 
   @Override
   protected void notifyError(BleDevice bleDevice, int statuCode) {
+    mBleConnectorProxy.taskNotify(statuCode);
     if (mReadCallback!=null){
+
       mReadCallback.onFail(bleDevice, statuCode, GattError.parse(statuCode));
+      mReadCallback.onComplete(bleDevice);
     }
 
   }

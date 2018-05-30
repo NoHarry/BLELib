@@ -87,6 +87,16 @@ public class Task<T>{
     return new WriteTask(Type.WRITE,bleDevice,serviceUUID,characteristicUUID,data);
   }
 
+  public static WriteTask newWriteTask(BleDevice bleDevice,String serviceUUID
+      , String characteristicUUID,byte[] data,int writeType){
+    return new WriteTask(Type.WRITE,bleDevice,serviceUUID,characteristicUUID,data,writeType);
+  }
+
+  public static WriteTask newEnableNotificationsTask(BleDevice bleDevice,String serviceUUID
+      , String characteristicUUID){
+    return new WriteTask(Type.ENABLE_NOTIFICATIONS,bleDevice,serviceUUID,characteristicUUID);
+  }
+
   public BleDevice getBleDevice() {
     return mBleDevice;
   }
@@ -99,13 +109,19 @@ public class Task<T>{
     return callback;
   }
 
-  protected void notityComplete(BleDevice bleDevice){
-    callback.onOperationCompleted(bleDevice);
+  protected void notitySuccess(BleDevice bleDevice){
+    callback.onOperationSuccess(bleDevice);
+    if(mType==Type.ENABLE_NOTIFICATIONS){
+      mBleConnectorProxy.taskNotify(0);
+      callback.onComplete(bleDevice);
+    }
   }
 
   protected void notifyError(BleDevice bleDevice,int statuCode){
-    callback.onFail(bleDevice,statuCode, GattError.parse(statuCode));
     mBleConnectorProxy.taskNotify(statuCode);
+    callback.onFail(bleDevice,statuCode, GattError.parse(statuCode));
+    callback.onComplete(bleDevice);
+
   }
 
   @Override

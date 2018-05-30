@@ -79,6 +79,7 @@ public class GattError {
 
 
 	public static final int LOCAL_GATT_OPERATION_FAIL = -1;
+	public static final int LOCAL_GATT_OPERATION_DEVICE_DISCONNECTED = -2;
 	/**
 	 * Converts the connection status given by the {@link android.bluetooth.BluetoothGattCallback#onConnectionStateChange(BluetoothGatt, int, int)} to error name.
 	 * @param error the status number
@@ -198,6 +199,9 @@ public class GattError {
 				return "TOO MANY OPEN CONNECTIONS";
 			case LOCAL_GATT_OPERATION_FAIL:
 				return "LOCAL GATT OPERATION FAIL";
+			case LOCAL_GATT_OPERATION_DEVICE_DISCONNECTED:
+				return "LOCAL GATT OPERATION DEVICE DISCONNECTED";
+
 			default:
 				return "UNKNOWN (" + error + ")";
 		}

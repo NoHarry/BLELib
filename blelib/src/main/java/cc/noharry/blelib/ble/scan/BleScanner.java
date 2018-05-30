@@ -31,7 +31,7 @@ public class BleScanner {
   public static AtomicBoolean isScanning=new AtomicBoolean(false);
   private NearLeScanDeviceCallback mNearLeScanDeviceCallback;
 
-  private BleScanner(Context context) {
+  private  BleScanner(Context context) {
     mContext = context;
   }
 
@@ -115,9 +115,13 @@ public class BleScanner {
         list.add(filter);
       }
     }
-    BleAdmin.getINSTANCE(mContext).getBluetoothAdapter().getBluetoothLeScanner()
-        .startScan(list,new ScanSettings.Builder().setScanMode(SCAN_MODE_LOW_LATENCY)
-            .build(),mScanDeviceCallback);
+    BleAdmin
+        .getINSTANCE(mContext)
+        .getBluetoothAdapter()
+        .getBluetoothLeScanner()
+        .startScan(list
+            ,new ScanSettings.Builder().setScanMode(SCAN_MODE_LOW_LATENCY).build()
+            ,mScanDeviceCallback);
     isScanning.set(true);
     mScanDeviceCallback.onScanStart(true);
   }

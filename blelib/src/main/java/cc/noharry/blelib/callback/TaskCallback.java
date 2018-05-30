@@ -8,6 +8,7 @@ import cc.noharry.blelib.data.BleDevice;
  */
 
 public interface TaskCallback {
-  void onOperationCompleted(BleDevice bleDevice);
+  void onOperationSuccess(BleDevice bleDevice);
   void onFail(BleDevice bleDevice,int statuCode,String message);
+  void onComplete(BleDevice bleDevice);
 }
