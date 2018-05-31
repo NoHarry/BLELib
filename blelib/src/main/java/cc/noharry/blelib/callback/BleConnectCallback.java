@@ -31,7 +31,7 @@ public abstract class BleConnectCallback extends BaseBleConnectCallback {
   public abstract void onDeviceConnected(BleDevice bleDevice);
   public abstract void onServicesDiscovered(BleDevice bleDevice,BluetoothGatt gatt, int status);
   public abstract void onDeviceDisconnecting(BleDevice bleDevice);
-  public abstract void onDeviceDisconnected(BleDevice bleDevice);
+  public abstract void onDeviceDisconnected(BleDevice bleDevice,int status);
 
 
 
@@ -120,8 +120,8 @@ public abstract class BleConnectCallback extends BaseBleConnectCallback {
   }
 
   @Override
-  public void onDeviceDisconnectedBase(BleDevice bleDevice) {
-    runOnUiThread(()->onDeviceDisconnected(bleDevice));
+  public void onDeviceDisconnectedBase(BleDevice bleDevice,int status) {
+    runOnUiThread(()->onDeviceDisconnected(bleDevice,status));
   }
 
 

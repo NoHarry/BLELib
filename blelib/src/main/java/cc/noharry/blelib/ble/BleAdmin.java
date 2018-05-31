@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import cc.noharry.blelib.ble.connect.BleConnectorProxy;
+import cc.noharry.blelib.ble.connect.MultipleBleController;
 import cc.noharry.blelib.ble.connect.Task;
 import cc.noharry.blelib.ble.scan.BleScanConfig;
 import cc.noharry.blelib.ble.scan.BleScanner;
@@ -170,6 +171,14 @@ public class BleAdmin {
   public void stopScan(){
     L.e("stop scan");
     mBleScanner.cancelScan();
+  }
+
+  public void removeAllTask(){
+    mBleConnectorProxy.clear();
+  }
+
+  public int getConnectionState(BleDevice bleDevice){
+    return mBleConnectorProxy.getConnectionState(bleDevice);
   }
 
   private void registerBtStateReceiver(Context context) {

@@ -139,7 +139,7 @@ import cc.noharry.blelib.data.BleDevice;
   }
 
   @Override
-  public void onDeviceDisconnectedBase(BleDevice bleDevice) {
+  public void onDeviceDisconnectedBase(BleDevice bleDevice,int status) {
 
   }
 

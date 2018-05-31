@@ -60,5 +60,11 @@
     android:text="disable notify"
     android:id="@+id/btn_disable_notify"
     />
+  <Button
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="get connected device"
+    android:id="@+id/btn_get_connected_device"
+    />
 </LinearLayout>
 </layout>

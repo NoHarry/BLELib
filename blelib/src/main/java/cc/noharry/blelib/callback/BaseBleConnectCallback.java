@@ -36,6 +36,6 @@ public abstract class BaseBleConnectCallback {
   public abstract void onDeviceConnectingBase(BleDevice bleDevice);
   public abstract void onDeviceConnectedBase(BleDevice bleDevice);
   public abstract void onDeviceDisconnectingBase(BleDevice bleDevice);
-  public abstract void onDeviceDisconnectedBase(BleDevice bleDevice);
+  public abstract void onDeviceDisconnectedBase(BleDevice bleDevice,int status);
 
 }

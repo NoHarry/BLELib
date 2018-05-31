@@ -1,8 +1,11 @@
-package cc.noharry.blelib.ble;
+package cc.noharry.blelib.ble.connect;
 
 import android.content.Context;
-import cc.noharry.blelib.ble.connect.BleClient;
+import cc.noharry.blelib.data.BleDevice;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * @author NoHarry
@@ -12,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
  public class MultipleBleController {
   private Context mContext;
   private static MultipleBleController instance=null;
-  private ConcurrentHashMap<String,BleClient> clientMap=new ConcurrentHashMap<>();
+  private ConcurrentMap<String,BleClient> clientMap=new ConcurrentHashMap<>();
 
   private MultipleBleController(Context context) {
     mContext = context;
@@ -29,7 +32,18 @@ import java.util.concurrent.ConcurrentHashMap;
     return instance;
   }
 
-  public ConcurrentHashMap<String, BleClient> getClientMap() {
+  protected ConcurrentMap<String, BleClient> getClientMap() {
     return clientMap;
+  }
+
+  public List<BleDevice> getConnectedDevice(){
+    List<BleDevice> result=new ArrayList<>();
+    for (String s:clientMap.keySet()){
+      BleClient bleClient = clientMap.get(s);
+      if (bleClient.getIsConnected().get()){
+        result.add(bleClient.getBleDevice());
+      }
+    }
+    return result;
   }
 }

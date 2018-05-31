@@ -13,7 +13,7 @@ import cc.noharry.blelib.exception.GattError;
  * @date 2018/05/24
  */
 
-public class Task<T>{
+public class Task{
   protected   Type mType;
   protected BluetoothGattService mBluetoothGattService;
   protected BluetoothGattCharacteristic mBluetoothGattCharacteristic;

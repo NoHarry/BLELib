@@ -5,7 +5,6 @@ import android.os.Build.VERSION_CODES;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.RequiresApi;
-import cc.noharry.blelib.ble.MultipleBleController;
 import cc.noharry.blelib.callback.BaseBleConnectCallback;
 import cc.noharry.blelib.data.BleDevice;
 import cc.noharry.blelib.exception.GattError;
@@ -49,10 +48,6 @@ public class BleConnectorProxy implements IBleOperation{
           } catch (InterruptedException e) {
             e.printStackTrace();
           }
-          /*if (!mBlockingDeque.isEmpty()&&!isOperating.get()){
-            doTask(mBlockingDeque.poll());
-          }*/
-
         }
       }
     }).start();
@@ -102,6 +97,15 @@ public class BleConnectorProxy implements IBleOperation{
   public void doTask(Task task) {
     isOperating.set(true);
     runOnUiThread(()->getBleClient(task.getBleDevice()).doTask(task));
+  }
+
+
+  public void clear(){
+    mBlockingDeque.clear();
+  }
+
+  public int getConnectionState(BleDevice bleDevice){
+    return getBleClient(bleDevice).getCurrentConnectionState();
   }
 
   private BleClient getBleClient(BleDevice bleDevice) {

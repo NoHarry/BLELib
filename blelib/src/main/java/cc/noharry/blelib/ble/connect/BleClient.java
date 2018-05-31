@@ -13,7 +13,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.RequiresApi;
 import cc.noharry.blelib.ble.BleAdmin;
-import cc.noharry.blelib.ble.MultipleBleController;
 import cc.noharry.blelib.ble.connect.Task.Type;
 import cc.noharry.blelib.callback.BaseBleConnectCallback;
 import cc.noharry.blelib.callback.BaseBleGattCallback;
@@ -40,6 +39,7 @@ public class BleClient implements IBleOperation{
   private AtomicBoolean isOperating=new AtomicBoolean(false);
   private final static UUID CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
   private WriteTask mCurrentDataChangeTask;
+  private int mCurrentConnectionState=BluetoothProfile.STATE_DISCONNECTED;
 
 
   public BleClient(BleDevice bleDevice) {
@@ -106,6 +106,7 @@ public class BleClient implements IBleOperation{
     @Override
     public void onConnectionStateChangeMain(BluetoothGatt gatt, int status, int newState) {
       mBleConnectCallback.onConnectionStateChangeBase(getBleDevice(),gatt,status,newState);
+      mCurrentConnectionState=newState;
       if (status == BluetoothGatt.GATT_SUCCESS && newState == BluetoothProfile.STATE_CONNECTED){
         isConnected.set(true);
         BleClient.this.gatt.discoverServices();
@@ -115,7 +116,7 @@ public class BleClient implements IBleOperation{
       if (newState==BluetoothProfile.STATE_DISCONNECTED){
         isConnected.set(false);
         mBleConnectorProxy.taskNotify(status);
-        mBleConnectCallback.onDeviceDisconnectedBase(getBleDevice());
+        mBleConnectCallback.onDeviceDisconnectedBase(getBleDevice(),status);
       }
       if (GattError.isConnectionError(status)){
         handleConnStatu(status);
@@ -364,5 +365,9 @@ public class BleClient implements IBleOperation{
 
   private void handleGattStatu(int statuCode){
     L.e("handleStatu:"+ GattError.parse(statuCode));
+  }
+
+  protected int getCurrentConnectionState() {
+    return mCurrentConnectionState;
   }
 }

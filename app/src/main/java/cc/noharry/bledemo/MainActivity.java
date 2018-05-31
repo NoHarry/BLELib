@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onDeviceDisconnected(BleDevice bleDevice) {
+                    public void onDeviceDisconnected(BleDevice bleDevice,int status) {
                       L.i("onDeviceDisconnected "+bleDevice);
                     }
                   });
@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onDeviceDisconnected(BleDevice bleDevice) {
+            public void onDeviceDisconnected(BleDevice bleDevice,int status) {
               L.i("onDeviceDisconnected1 "+bleDevice);
             }
           });
@@ -371,5 +371,13 @@ public class MainActivity extends AppCompatActivity {
         }
       }
     });
+    mBinding.btnGetConnectedDevice.setOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        List<BleDevice> connectedDevice = mBleAdmin.getMultipleBleController().getConnectedDevice();
+        L.v("connectedDevice:"+connectedDevice);
+      }
+    });
+
   }
 }
