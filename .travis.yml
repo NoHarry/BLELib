@@ -1,9 +1,27 @@
-language: android
-android:
-  components:
-    - build-tools-27.0.1
-    - android-27
-    - extra-android-m2repository
-    - extra-android-support
-script:
-  - ./gradlew assembleRelease
+{
+  "os": "linux",
+  "jdk": "oraclejdk8",
+  "dist": "trusty",
+  "group": "stable",
+  "script": [
+    "./gradlew clean",
+    "./gradlew assembleDebug"
+  ],
+  "android": {
+    "licenses": [
+      ".+"
+    ],
+    "components": [
+      "tools",
+      "platform-tools",
+      "build-tools-27.0.1",
+      "extra-android-m2repository",
+      "extra-google-android-support",
+      "android-27"
+    ]
+  },
+  "language": "android",
+  "before_install": [
+    "yes | sdkmanager \"platforms;android-27\""
+  ]
+}
