@@ -5,6 +5,7 @@ buildscript {
     repositories {
         google()
         jcenter()
+
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.0.1'
@@ -19,6 +20,7 @@ buildscript {
 
 allprojects {
     repositories {
+        maven { url "https://jitpack.io" }
         google()
         jcenter()
     }
@@ -26,4 +28,16 @@ allprojects {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+ext {
+    supportLibVersion = "27.1.1"
+    espressoVersion = "2.2.2"
+    navigationVersion = "1.0.0-alpha01"
+    constraintLayoutVersion = "1.1.0"
+    lifecycleVersion="1.1.1"
+    baseRecyclerViewAdapterVersion="2.9.30"
+    runner="1.0.1"
+    espressoCore="3.0.1"
+    juntiVersion="4.12"
 }

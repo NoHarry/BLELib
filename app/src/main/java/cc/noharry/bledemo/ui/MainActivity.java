@@ -1,4 +1,4 @@
-package cc.noharry.bledemo;
+package cc.noharry.bledemo.ui;
 
 import android.bluetooth.BluetoothGatt;
 import android.databinding.DataBindingUtil;
@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
+import cc.noharry.bledemo.R;
 import cc.noharry.bledemo.databinding.ActivityMainBinding;
 import cc.noharry.blelib.ble.BleAdmin;
 import cc.noharry.blelib.ble.connect.ReadTask;
