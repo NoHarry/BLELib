@@ -1,11 +1,14 @@
 package cc.noharry.blelib.callback;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import cc.noharry.blelib.ble.scan.BleScanConfig;
 import cc.noharry.blelib.ble.scan.BleScanner;
 import cc.noharry.blelib.data.BleDevice;
 import cc.noharry.blelib.util.L;
 import cc.noharry.blelib.util.MethodUtils;
+import cc.noharry.blelib.util.ThreadPoolProxyFactory;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +37,15 @@ public  class NearScanCallback {
   private static final int LEGACY_SCAN=1;
   private static final int NEW_SCAN=2;
   private int scanMode=0;
+  private Handler mHandler=new Handler(Looper.getMainLooper());
+
+  private void runOnUiThread(Runnable runnable){
+    if (Looper.myLooper()==Looper.getMainLooper()){
+      runnable.run();
+    }else {
+      mHandler.post(runnable);
+    }
+  }
 
   public NearScanCallback(Context context,BleScanConfig config,BleScanCallback bleScanCallback,
       NearScanDeviceCallback nearScanDeviceCallback) {
@@ -102,14 +114,44 @@ public  class NearScanCallback {
 
   private void handleStoreDevice(BleScanConfig bleScanConfig,
       BleDevice bleDevice) {
-    boolean checkBleDevice =
+    /*boolean checkBleDevice =
         scanMode==NEW_SCAN?
             MethodUtils.checkBleDeviceNew(bleScanConfig, bleDevice):
             MethodUtils.checkBleDevice(bleScanConfig,bleDevice);
+    L.i("handleStoreDevice");
     if (checkBleDevice){
-      mBleScanCallback.onFoundDevice(bleDevice);
-      mBleDevices.offer(bleDevice);
-    }
+      runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          L.i("handleStoreDevice1");
+          mBleScanCallback.onFoundDevice(bleDevice);
+          mBleDevices.offer(bleDevice);
+        }
+      });
+
+    }*/
+    ThreadPoolProxyFactory.getScanThreadPoolProxy().submit(new Runnable() {
+      @Override
+      public void run() {
+        boolean checkBleDevice =
+            scanMode==NEW_SCAN?
+                MethodUtils.checkBleDeviceNew(bleScanConfig, bleDevice):
+                MethodUtils.checkBleDevice(bleScanConfig,bleDevice);
+        L.i("handleStoreDevice");
+        if (checkBleDevice){
+          runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              L.i("handleStoreDevice1");
+              mBleScanCallback.onFoundDevice(bleDevice);
+              mBleDevices.offer(bleDevice);
+            }
+          });
+
+        }
+      }
+    });
+
   }
 
   private void startTimeTask(){

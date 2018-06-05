@@ -10,27 +10,22 @@ import cc.noharry.bledemo.R;
 import cc.noharry.bledemo.data.Device;
 import cc.noharry.bledemo.databinding.ItemDeviceBinding;
 import cc.noharry.bledemo.ui.adapter.DeviceAdapter.MyViewHolder;
-import java.util.ArrayList;
+import cc.noharry.bledemo.util.L;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author NoHarry
  * @date 2018/06/01
  */
 public class DeviceAdapter extends RecyclerView.Adapter<MyViewHolder> {
-  private Map<String,Device> mDeviceMap;
   private Context mContext;
-  private List<Device> mDeviceList=new ArrayList<>();
+  private List<Device> mDeviceList;
 
-  public DeviceAdapter(Map<String, Device> deviceMap, Context context) {
-    mDeviceMap = deviceMap;
+
+
+  public DeviceAdapter(Context context, List<Device> deviceList) {
     mContext = context;
-    mDeviceList.clear();
-    List<String> key=new ArrayList<>(mDeviceMap.keySet());
-    for (String s:key){
-      mDeviceList.add(mDeviceMap.get(s));
-    }
+    mDeviceList = deviceList;
   }
 
   @NonNull
@@ -42,6 +37,9 @@ public class DeviceAdapter extends RecyclerView.Adapter<MyViewHolder> {
 
   @Override
   public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+//    mKeyList=new ArrayList<>(mDeviceMap.keySet());
+
+//    holder.binding.setDevice(mDeviceMap.get(mKeyList.get(position)));
     holder.binding.setDevice(mDeviceList.get(position));
     holder.binding.executePendingBindings();
   }
@@ -52,14 +50,40 @@ public class DeviceAdapter extends RecyclerView.Adapter<MyViewHolder> {
     return mDeviceList.size();
   }
 
+  public void notifyDataChange(Device device){
+    String key = device.getKey().get();
+
+    for (int i=0;i<mDeviceList.size();i++){
+      boolean checkUpdate = key != null && (key
+          .equals(mDeviceList.get(i).getKey().get()));
+      L.i("checkUpdate"+checkUpdate);
+      if (checkUpdate){
+        L.i("更新:"+device);
+        notifyItemChanged(i);
+      }
+    }
+  }
+
+  public void notifyDataInsert(Device device){
+    String key = device.getKey().get();
+
+    for (int i=0;i<mDeviceList.size();i++){
+      boolean checkNew = key != null && (key
+          .equals(mDeviceList.get(i).getKey().get()));
+      L.i("checkNew"+checkNew);
+      if (checkNew){
+        L.i("添加："+device);
+        notifyItemInserted(i);
+      }
+    }
+  }
+
   public class MyViewHolder extends RecyclerView.ViewHolder{
     public ItemDeviceBinding binding;
     public MyViewHolder(ItemDeviceBinding binding) {
       super(binding.getRoot());
       this.binding=binding;
-
     }
-
     public ItemDeviceBinding getBinding() {
       return binding;
     }

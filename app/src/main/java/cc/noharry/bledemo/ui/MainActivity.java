@@ -36,6 +36,10 @@ public class MainActivity extends AppCompatActivity {
   private BleDevice mBleDevice;
   private BleDevice mDevice1;
 
+  /*static {
+    AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+  }*/
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);

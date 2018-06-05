@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+  android:drawable="@drawable/ic_alarm_on"
+  >
+  <target
+    android:animation="@animator/alarm_off_on"
+    android:name="alarm_on"/>
+</animated-vector>

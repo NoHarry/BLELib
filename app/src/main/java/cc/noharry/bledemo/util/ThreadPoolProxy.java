@@ -1,22 +1,20 @@
-package cc.noharry.blelib.util;
+package cc.noharry.bledemo.util;
 
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class ThreadPoolProxy {
 
     ThreadPoolExecutor mExecutor;
     private int mCorePoolSize;
     private int mMaximumPoolSize;
-    private String name;
 
 
     /**
@@ -24,13 +22,8 @@ public class ThreadPoolProxy {
      * @param maximumPoolSize 最大线程数
      */
     public ThreadPoolProxy(int corePoolSize, int maximumPoolSize) {
-       this(corePoolSize,maximumPoolSize,"");
-    }
-
-    public ThreadPoolProxy(int corePoolSize, int maximumPoolSize, String name) {
         mCorePoolSize = corePoolSize;
         mMaximumPoolSize = maximumPoolSize;
-        this.name = name;
     }
 
     /**
@@ -44,7 +37,7 @@ public class ThreadPoolProxy {
                     long keepAliveTime = 3000;
                     TimeUnit unit = TimeUnit.MILLISECONDS;
                     BlockingQueue<Runnable> workQueue = new LinkedBlockingDeque<>();
-                    ThreadFactory threadFactory = new LocalTheadFactory(name);
+                    ThreadFactory threadFactory = Executors.defaultThreadFactory();
                     RejectedExecutionHandler handler = new ThreadPoolExecutor.DiscardPolicy();
 
                     mExecutor = new ThreadPoolExecutor(mCorePoolSize, mMaximumPoolSize, keepAliveTime, unit, workQueue,
@@ -78,37 +71,11 @@ public class ThreadPoolProxy {
         mExecutor.remove(task);
     }
 
-    static class LocalTheadFactory implements ThreadFactory {
-        private static final AtomicInteger poolNumber = new AtomicInteger(1);
-        private final ThreadGroup group;
-        private final AtomicInteger threadNumber = new AtomicInteger(1);
-        private final String namePrefix;
-        private final boolean daemoThread;
-
-        public LocalTheadFactory(){
-
-            this("",false);
-        }
-
-        public LocalTheadFactory(String namePrefix){
-            this(namePrefix,false);
-        }
-
-        public LocalTheadFactory(String namePrefix,boolean daemo) {
-            this.namePrefix = TextUtils.isEmpty(namePrefix)
-                ?"blelib-pool-"+poolNumber.getAndIncrement()+"-thread-"
-                :"blelib-pool-"+poolNumber.getAndIncrement()+"-"+namePrefix+"-thread-";
-            SecurityManager s = System.getSecurityManager();
-            group=(s!=null)?s.getThreadGroup():Thread.currentThread().getThreadGroup();
-            daemoThread=daemo;
-        }
+    class LocalTheadFactory implements ThreadFactory {
 
         @Override
         public Thread newThread(@NonNull Runnable r) {
-            String name=namePrefix+threadNumber.getAndIncrement();
-            Thread thread=new Thread(group,r,name,0);
-            thread.setDaemon(daemoThread);
-            return thread;
+            return null;
         }
     }
 }

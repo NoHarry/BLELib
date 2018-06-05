@@ -3,9 +3,13 @@ package cc.noharry.bledemo.ui;
 import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
+import android.graphics.drawable.AnimatedVectorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,9 +24,13 @@ import cc.noharry.bledemo.databinding.FragmentHomeBinding;
 import cc.noharry.bledemo.ui.adapter.DeviceAdapter;
 import cc.noharry.bledemo.ui.toolbar.IWithoutBack;
 import cc.noharry.bledemo.util.L;
+import cc.noharry.bledemo.util.ThreadPoolProxyFactory;
 import cc.noharry.bledemo.viewmodel.HomeViewmodel;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 public class HomeFragment extends Fragment implements IWithoutBack {
@@ -39,6 +47,11 @@ public class HomeFragment extends Fragment implements IWithoutBack {
   private HomeViewmodel mHomeViewmodel;
   private Map<String,Device> mDeviceMap=new HashMap<>();
   private DeviceAdapter mAdapter;
+  private Handler mHandler=new Handler(Looper.getMainLooper());
+  private List<Device> mDeviceList=new ArrayList<>();
+  private AnimatedVectorDrawable mVectorDrawable;
+  private AtomicBoolean isBleOpen=new AtomicBoolean(false);
+  private AnimatedVectorDrawable mVectorDrawable1;
 
 
   public HomeFragment() {
@@ -78,6 +91,21 @@ public class HomeFragment extends Fragment implements IWithoutBack {
     mBinding.btTest.setOnClickListener(
         (v)->Navigation.findNavController(v)
             .navigate(R.id.action_homeFragment_to_detailFragment));
+
+    mBinding.btScan.setOnClickListener((v -> doClock()));
+  }
+
+  private void doClock() {
+
+    if (isBleOpen.get()){
+      mBinding.ivClock.setImageDrawable(mVectorDrawable1);
+      mVectorDrawable1.start();
+      isBleOpen.set(false);
+    }else {
+      mBinding.ivClock.setImageDrawable(mVectorDrawable);
+      mVectorDrawable.start();
+      isBleOpen.set(true);
+    }
   }
 
   @Override
@@ -85,32 +113,80 @@ public class HomeFragment extends Fragment implements IWithoutBack {
       Bundle savedInstanceState) {
     // Inflate the layout for this fragment
     mBinding=DataBindingUtil.inflate(inflater,R.layout.fragment_home,container,false);
+    initView();
     initData();
     initEvent();
     initObserver();
-    initView();
+
     return mBinding.getRoot();
   }
 
   private void initView() {
-    mAdapter = new DeviceAdapter(mDeviceMap,getActivity());
+    mAdapter = new DeviceAdapter(getActivity(),mDeviceList);
     LinearLayoutManager linearLayoutManager=new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false);
+    mBinding.homeRv.addItemDecoration(new DividerItemDecoration(getActivity(),LinearLayoutManager.VERTICAL));
     mBinding.homeRv.setLayoutManager(linearLayoutManager);
     mBinding.homeRv.setAdapter(mAdapter);
+    mVectorDrawable = (AnimatedVectorDrawable) getActivity().getDrawable(R.drawable.ic_bluetooth_animated);
+    mVectorDrawable1 = (AnimatedVectorDrawable) getActivity()
+        .getDrawable(R.drawable.ic_bluetooth_animated);
+
+
   }
 
   private void initObserver() {
     mHomeViewmodel.getFoundDevice().observe(this, new Observer<Device>() {
       @Override
       public void onChanged(@Nullable Device device) {
-        /*if (mDeviceMap.containsKey(device.getKey())){
+        L.i("observe") ;
+        ThreadPoolProxyFactory.getUpdateThreadPoolProxy().submit(new Runnable() {
+          @Override
+          public void run() {
+            updateData(device);
+          }
+        });
 
-        }*/
-        L.i("observe");
-        mDeviceMap.put(device.getKey().get(),device);
-        mAdapter.notifyDataSetChanged();
+//
       }
     });
+  }
+
+  private void updateData(Device device) {
+    String key = device.getKey().get();
+    L.i("updateData:"+device);
+    L.i("mDeviceList:"+mDeviceList+" key:"+key);
+    if (mDeviceList.isEmpty()){
+      mHandler.post(new Runnable() {
+        @Override
+        public void run() {
+          mDeviceList.add(device);
+          mAdapter.notifyItemInserted(0);
+
+        }
+      });
+
+    }else {
+      if (!mDeviceList.contains(device)){
+        mHandler.post(new Runnable() {
+          @Override
+          public void run() {
+            mDeviceList.add(device);
+            mAdapter.notifyItemInserted(mDeviceList.size());
+          }
+        });
+
+      }else if (mDeviceList.contains(device)){
+        mHandler.post(new Runnable() {
+          @Override
+          public void run() {
+            int i = mDeviceList.indexOf(device);
+            mDeviceList.set(i,device);
+            mAdapter.notifyItemChanged(i);
+          }
+        });
+      }
+
+    }
   }
 
   private void initData() {
@@ -128,10 +204,18 @@ public class HomeFragment extends Fragment implements IWithoutBack {
     switch (item.getItemId()){
       case R.id.menu_scan:
         L.i("menu click");
+        clearData();
         mHomeViewmodel.scan();
+
         break;
     }
     return super.onOptionsItemSelected(item);
+  }
+
+  private void clearData() {
+    int size = mDeviceList.size();
+    mDeviceList.clear();
+    mAdapter.notifyItemRangeRemoved(0,size);
   }
 
   @Override

@@ -1,4 +1,4 @@
-package cc.noharry.blelib.util;
+package cc.noharry.bledemo.util;
 
 public class ThreadPoolProxyFactory {
     static ThreadPoolProxy mNormalThreadPoolProxy;
@@ -17,14 +17,15 @@ public class ThreadPoolProxyFactory {
         return mNormalThreadPoolProxy;
     }
 
-    public static ThreadPoolProxy getScanThreadPoolProxy() {
+    public static ThreadPoolProxy getUpdateThreadPoolProxy() {
         if (mNormalThreadPoolProxy == null) {
             synchronized (ThreadPoolProxyFactory.class) {
                 if (mNormalThreadPoolProxy == null) {
-                    mNormalThreadPoolProxy = new ThreadPoolProxy(3, 3,"scan");
+                    mNormalThreadPoolProxy = new ThreadPoolProxy(1, 1);
                 }
             }
         }
         return mNormalThreadPoolProxy;
     }
+
 }
