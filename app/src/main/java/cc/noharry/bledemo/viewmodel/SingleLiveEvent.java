@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package cc.noharry.bledemo;
+package cc.noharry.bledemo.viewmodel;
 
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.MutableLiveData;

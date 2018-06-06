@@ -153,8 +153,8 @@ public class HomeFragment extends Fragment implements IWithoutBack {
 
   private void updateData(Device device) {
     String key = device.getKey().get();
-    L.i("updateData:"+device);
-    L.i("mDeviceList:"+mDeviceList+" key:"+key);
+//    L.i("updateData:"+device);
+//    L.i("mDeviceList:"+mDeviceList+" key:"+key);
     if (mDeviceList.isEmpty()){
       mHandler.post(new Runnable() {
         @Override
@@ -208,6 +208,7 @@ public class HomeFragment extends Fragment implements IWithoutBack {
         mHomeViewmodel.scan();
 
         break;
+      default:
     }
     return super.onOptionsItemSelected(item);
   }

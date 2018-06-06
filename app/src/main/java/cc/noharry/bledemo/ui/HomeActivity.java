@@ -1,8 +1,10 @@
 package cc.noharry.bledemo.ui;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -15,17 +17,51 @@ import cc.noharry.bledemo.R;
 import cc.noharry.bledemo.databinding.ActivityHomeBinding;
 import cc.noharry.bledemo.ui.toolbar.IWithBack;
 import cc.noharry.bledemo.ui.toolbar.IWithoutBack;
+import cc.noharry.bledemo.util.L;
+import cc.noharry.bledemo.util.Log;
 import cc.noharry.bledemo.viewmodel.HomeViewmodel;
 import cc.noharry.bledemo.viewmodel.ViewModelFactory;
 
 public class HomeActivity extends AppCompatActivity {
   private ActivityHomeBinding mBinding;
+  private HomeViewmodel mHomeViewmodel;
+  private LogDialog mDialog;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     mBinding=DataBindingUtil.setContentView(this,R.layout.activity_home);
     initFragmentLifeCycle();
+    initData();
+    initObserver();
+    initFb();
   }
+
+  private void initData() {
+    mHomeViewmodel = obtainViewModel(this);
+  }
+
+  private void initObserver() {
+    mHomeViewmodel.getLog().observe(this, new Observer<Log>() {
+      @Override
+      public void onChanged(@Nullable Log log) {
+        if (mDialog!=null){
+          mDialog.addLog(log);
+        }
+      }
+    });
+  }
+
+  private void initFb() {
+    mBinding.fab.setOnClickListener((v)->showDialog());
+  }
+
+  private void showDialog() {
+    mDialog = new LogDialog(this);
+    mHomeViewmodel.displayLog();
+    mDialog.show();
+  }
+
 
   private void initFragmentLifeCycle() {
     setSupportActionBar(mBinding.includeToolbar.appToolbar);

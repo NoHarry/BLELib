@@ -6,4 +6,16 @@
   <color name="colorToolBar">#3F51B5</color>
   <color name="white">#FFFFFF</color>
   <color name="transparent">#00000000</color>
+
+
+
+  <color name="black">#000000</color>
+  <color name="panel">#696969</color>
+  <color name="red">#FF0033</color>
+  <color name="blue">#333399</color>
+  <color name="green">#99CC33</color>
+  <color name="grey">#CCCCCC</color>
+  <color name="yellow">#FFCC00</color>
+  <color name="purple">#996699</color>
+  <color name="blue2">#0099cc</color>
 </resources>
