@@ -34,6 +34,9 @@ public class BleAdmin {
   private final MultipleBleController mMultipleBleController;
   private final BleScanner mBleScanner;
   private final BleConnectorProxy mBleConnectorProxy;
+  public static final int LOG_STYLE_DEFAULT=0;
+  public static final int LOG_STYLE_LOGGER=1;
+
 
   private BleAdmin(Context context) {
     mContext = context.getApplicationContext();
@@ -75,6 +78,11 @@ public class BleAdmin {
     }else {
       L.isDebug=false;
     }
+    return this;
+  }
+
+  public BleAdmin setLogStyle(int logStyle){
+    L.logStyle=logStyle;
     return this;
   }
 

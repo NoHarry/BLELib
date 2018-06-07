@@ -6,6 +6,6 @@
   android:height="24dp">
   <path
     android:name="bluetooth_connect"
-    android:fillColor="#FF000000"
+    android:fillColor="#FFFFFF"
     android:pathData="@string/bluetooth_connect_path"/>
 </vector>

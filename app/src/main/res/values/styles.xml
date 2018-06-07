@@ -13,5 +13,10 @@
     <item name="android:actionMenuTextColor">@android:color/white</item>
     <item name="android:textColor">@android:color/white</item>
   </style>
-
+  <style name="button_detail" parent="AppTheme">
+    <item name="colorButtonNormal">@color/deep_green</item>
+  </style>
+  <style name="button_conn" parent="AppTheme">
+    <item name="colorButtonNormal">@color/blue2</item>
+  </style>
 </resources>

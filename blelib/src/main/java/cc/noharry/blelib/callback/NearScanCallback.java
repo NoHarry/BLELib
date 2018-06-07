@@ -137,12 +137,10 @@ public  class NearScanCallback {
             scanMode==NEW_SCAN?
                 MethodUtils.checkBleDeviceNew(bleScanConfig, bleDevice):
                 MethodUtils.checkBleDevice(bleScanConfig,bleDevice);
-        L.i("handleStoreDevice");
         if (checkBleDevice){
           runOnUiThread(new Runnable() {
             @Override
             public void run() {
-              L.i("handleStoreDevice1");
               mBleScanCallback.onFoundDevice(bleDevice);
               mBleDevices.offer(bleDevice);
             }

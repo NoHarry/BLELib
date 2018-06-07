@@ -3,34 +3,102 @@
   xmlns:android="http://schemas.android.com/apk/res/android"
   >
 <data>
+  <import type="android.view.View"/>
   <variable
     name="device"
     type="cc.noharry.bledemo.data.Device"/>
 </data>
 
-<LinearLayout
-  android:orientation="vertical"
-  android:layout_width="match_parent"
-  android:layout_height="wrap_content"
-  android:id="@+id/item_ll"
-  >
-  <TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:id="@+id/item_name"
-    android:text="@{device.name}"
-    />
-  <TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:id="@+id/item_mac"
-    android:text="@{device.mac}"
-    />
-  <TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:id="@+id/item_rssi"
-    android:text='@{""+device.rssi+"db"}'
-    />
-</LinearLayout>
+  <RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <RelativeLayout
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:background="@drawable/shape_ic_round"
+      android:id="@+id/rl_icon"
+      android:layout_centerVertical="true"
+      android:layout_marginLeft="10dp"
+      >
+      <!--android:src="@{device.state==device.DISCONNECTED?@drawable/ic_bluetooth_disconnected : @drawable/ic_bluetooth}"-->
+      <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_bluetooth_disconnected"
+        android:layout_centerInParent="true"
+        android:id="@+id/item_iv_ic"
+        />
+    </RelativeLayout>
+    <LinearLayout
+      android:orientation="vertical"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:id="@+id/item_ll"
+      android:layout_toRightOf="@id/rl_icon"
+      >
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/item_name"
+        android:text="@{device.name}"
+        />
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/item_mac"
+        android:text="@{device.mac}"
+        />
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/item_rssi"
+        android:text='@{""+device.rssi+"db"}'
+        />
+    </LinearLayout>
+    <Button
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignParentRight="true"
+      android:id="@+id/btn_connect"
+      android:text="connect"
+      android:textColor="@color/white"
+      android:layout_centerVertical="true"
+      android:theme="@style/button_conn"
+      android:visibility="@{device.state==device.DISCONNECTED?View.VISIBLE : View.GONE}"
+      />
+    <Button
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignParentRight="true"
+      android:id="@+id/btn_disconnect"
+      android:text="disconnect"
+      android:textColor="@color/white"
+      android:layout_centerVertical="true"
+      android:theme="@style/button_conn"
+      android:visibility="@{device.state==device.CONNECTED?View.VISIBLE : View.GONE}"
+      />
+    <Button
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignParentRight="true"
+      android:id="@+id/btn_connecting"
+      android:text="connecting"
+      android:textColor="@color/white"
+      android:layout_centerVertical="true"
+      android:theme="@style/button_conn"
+      android:visibility="@{device.state==device.CONNECTING?View.VISIBLE : View.GONE}"
+      />
+    <ImageButton
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:id="@+id/btn_detail"
+      android:src="@drawable/baseline_input_white_24"
+      android:layout_toLeftOf="@id/btn_disconnect"
+      android:layout_marginRight="10dp"
+      android:layout_centerVertical="true"
+      android:theme="@style/button_conn"
+      android:visibility="@{device.state==device.CONNECTED?View.VISIBLE : View.GONE}"
+      />
+  </RelativeLayout>
+
 </layout>

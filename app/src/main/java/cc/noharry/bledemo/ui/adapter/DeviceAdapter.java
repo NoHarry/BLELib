@@ -2,9 +2,12 @@ package cc.noharry.bledemo.ui.adapter;
 
 import android.content.Context;
 import android.databinding.DataBindingUtil;
+import android.graphics.drawable.AnimatedVectorDrawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import cc.noharry.bledemo.R;
 import cc.noharry.bledemo.data.Device;
@@ -32,18 +35,63 @@ public class DeviceAdapter extends RecyclerView.Adapter<MyViewHolder> {
   @Override
   public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
     ItemDeviceBinding binding=DataBindingUtil.inflate(LayoutInflater.from(mContext), R.layout.item_device,parent,false);
-    return new MyViewHolder(binding);
+    MyViewHolder viewHolder=new MyViewHolder(binding);
+
+    return viewHolder;
   }
 
   @Override
   public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-//    mKeyList=new ArrayList<>(mDeviceMap.keySet());
+    Device device = mDeviceList.get(position);
+    AnimatedVectorDrawable normal=(AnimatedVectorDrawable) mContext.getDrawable(R.drawable.ic_bluetooth_animated);
 
-//    holder.binding.setDevice(mDeviceMap.get(mKeyList.get(position)));
+    switch (device.state.get()){
+      case Device.CONNECTED:
+        holder.binding.itemIvIc.setImageResource(R.drawable.ic_bluetooth_connected);
+        break;
+      case Device.DISCONNECTED:
+        holder.binding.itemIvIc.setImageResource(R.drawable.ic_bluetooth_disconnected);
+        break;
+      case Device.CONNECTING:
+        holder.binding.itemIvIc.setImageDrawable(normal);
+        normal.start();
+        break;
+
+    }
+    holder.binding.btnDetail.setOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        mConnectClickListener.onDetailClick(position,holder.binding.btnDetail,device);
+      }
+    });
+    holder.binding.btnConnect.setOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        mConnectClickListener.onConnectClick(position,device);
+      }
+    });
+
+    holder.binding.btnDisconnect.setOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        mConnectClickListener.onDisconnectClick(position,device);
+      }
+    });
     holder.binding.setDevice(mDeviceList.get(position));
     holder.binding.executePendingBindings();
   }
 
+
+  private OnConnectClickListener mConnectClickListener=null;
+  public interface OnConnectClickListener{
+    void onConnectClick(int position,Device device);
+    void onDisconnectClick(int position,Device device);
+    void onDetailClick(int position,View view,Device device);
+  }
+
+  public void setOnConnectBtnClickListener(OnConnectClickListener listener){
+    mConnectClickListener=listener;
+  }
 
   @Override
   public int getItemCount() {

@@ -5,16 +5,7 @@
   android:width="24dp"
   android:height="24dp">
   <path
-    android:name="bluetooth"
-    android:fillColor="#FFFFFF"
-    android:pathData="@string/bluetooth_path"/>
-  <!--<group
-    android:name="group_bluetooth"
-    >
-
-  </group>-->
-  <path
     android:name="bluetooth_connect"
     android:fillColor="#FFFFFF"
-    android:pathData="@string/bluetooth_connect_path"/>
+    android:pathData="@string/bluetooth_path"/>
 </vector>

@@ -19,12 +19,12 @@ public class LogUtil {
     WARN,
     ERROR
   }
-  public interface logCallback{
+  public interface LogCallback{
     void onLog(Log log);
     }
-  private logCallback mLogCallback=null;
+  private LogCallback mLogCallback=null;
 
-  public static void readLog(final logCallback callback)  {
+  public static void readLog(final LogCallback callback)  {
 //    Log.i("INFO", "start connectLog");
 
     new Thread(new Runnable() {

@@ -22,6 +22,7 @@ import cc.noharry.bledemo.R;
 import cc.noharry.bledemo.data.Device;
 import cc.noharry.bledemo.databinding.FragmentHomeBinding;
 import cc.noharry.bledemo.ui.adapter.DeviceAdapter;
+import cc.noharry.bledemo.ui.adapter.DeviceAdapter.OnConnectClickListener;
 import cc.noharry.bledemo.ui.toolbar.IWithoutBack;
 import cc.noharry.bledemo.util.L;
 import cc.noharry.bledemo.util.ThreadPoolProxyFactory;
@@ -87,26 +88,7 @@ public class HomeFragment extends Fragment implements IWithoutBack {
 
   }
 
-  private void initEvent() {
-    mBinding.btTest.setOnClickListener(
-        (v)->Navigation.findNavController(v)
-            .navigate(R.id.action_homeFragment_to_detailFragment));
 
-    mBinding.btScan.setOnClickListener((v -> doClock()));
-  }
-
-  private void doClock() {
-
-    if (isBleOpen.get()){
-      mBinding.ivClock.setImageDrawable(mVectorDrawable1);
-      mVectorDrawable1.start();
-      isBleOpen.set(false);
-    }else {
-      mBinding.ivClock.setImageDrawable(mVectorDrawable);
-      mVectorDrawable.start();
-      isBleOpen.set(true);
-    }
-  }
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -115,7 +97,6 @@ public class HomeFragment extends Fragment implements IWithoutBack {
     mBinding=DataBindingUtil.inflate(inflater,R.layout.fragment_home,container,false);
     initView();
     initData();
-    initEvent();
     initObserver();
 
     return mBinding.getRoot();
@@ -131,14 +112,32 @@ public class HomeFragment extends Fragment implements IWithoutBack {
     mVectorDrawable1 = (AnimatedVectorDrawable) getActivity()
         .getDrawable(R.drawable.ic_bluetooth_animated);
 
+    mAdapter.setOnConnectBtnClickListener(new OnConnectClickListener() {
+      @Override
+      public void onConnectClick(int position, Device device) {
+        mHomeViewmodel.connect(device);
 
+      }
+
+      @Override
+      public void onDisconnectClick(int position, Device device) {
+        mHomeViewmodel.disConnect(device);
+      }
+
+      @Override
+      public void onDetailClick(int position, View view, Device device) {
+        Navigation.findNavController(view)
+            .navigate(R.id.action_homeFragment_to_detailFragment);
+      }
+
+
+    });
   }
 
   private void initObserver() {
     mHomeViewmodel.getFoundDevice().observe(this, new Observer<Device>() {
       @Override
       public void onChanged(@Nullable Device device) {
-        L.i("observe") ;
         ThreadPoolProxyFactory.getUpdateThreadPoolProxy().submit(new Runnable() {
           @Override
           public void run() {
