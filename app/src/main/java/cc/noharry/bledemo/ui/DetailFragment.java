@@ -1,16 +1,26 @@
 package cc.noharry.bledemo.ui;
 
 
+import android.arch.lifecycle.Observer;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import cc.noharry.bledemo.R;
+import cc.noharry.bledemo.data.Device;
 import cc.noharry.bledemo.databinding.FragmentDetailBinding;
 import cc.noharry.bledemo.ui.toolbar.IWithBack;
+import cc.noharry.bledemo.util.L;
+import cc.noharry.bledemo.viewmodel.HomeViewmodel;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class DetailFragment extends Fragment implements IWithBack {
@@ -25,6 +35,8 @@ public class DetailFragment extends Fragment implements IWithBack {
   private String mParam2;
 
   private FragmentDetailBinding mBinding;
+  private HomeViewmodel mHomeViewmodel;
+  private Device mDevice;
 
   public DetailFragment() {
     // Required empty public constructor
@@ -62,8 +74,55 @@ public class DetailFragment extends Fragment implements IWithBack {
       Bundle savedInstanceState) {
     // Inflate the layout for this fragment
     mBinding=DataBindingUtil.inflate(inflater,R.layout.fragment_detail,container,false);
-
+    initData();
+    initObserver();
     return mBinding.getRoot();
+  }
+
+  private void initObserver() {
+    mHomeViewmodel.getCurrentDevice().observe(this, new Observer<Device>() {
+      @Override
+      public void onChanged(@Nullable Device device) {
+        L.i("DetailFragment:"+device);
+        mDevice = device;
+        BluetoothGatt bluetoothGatt = device.getGatt().get();
+        if (bluetoothGatt!=null){
+          for (BluetoothGattService service:bluetoothGatt.getServices()){
+            L.i("BluetoothGattService:"+service.getUuid().toString());
+            for (BluetoothGattCharacteristic characteristic:service.getCharacteristics()){
+              int properties = characteristic.getProperties();
+              L.i("characteristic:"+characteristic.getUuid().toString()+" properties:"+getProperties(properties));
+            }
+          }
+
+        }
+      }
+    });
+
+
+  }
+
+  private List<String> getProperties(int properties){
+    List<String> result=new ArrayList<>();
+    if ((properties&(BluetoothGattCharacteristic.PROPERTY_NOTIFY))!=0){
+      result.add("NOTIFY");
+    }
+    if ((properties&(BluetoothGattCharacteristic.PROPERTY_INDICATE))!=0){
+      result.add("INDICATE");
+    }
+    if ((properties&(BluetoothGattCharacteristic.PROPERTY_READ))!=0){
+      result.add("READ");
+    }
+    if ((properties&(BluetoothGattCharacteristic.PROPERTY_WRITE))!=0){
+      result.add("WRITE");
+    }
+
+    return result;
+
+  }
+
+  private void initData() {
+    mHomeViewmodel = HomeActivity.obtainViewModel(getActivity());
   }
 
 

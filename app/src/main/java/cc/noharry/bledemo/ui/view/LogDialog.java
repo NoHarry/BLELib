@@ -1,4 +1,4 @@
-package cc.noharry.bledemo.ui;
+package cc.noharry.bledemo.ui.view;
 
 import android.app.Dialog;
 import android.content.Context;

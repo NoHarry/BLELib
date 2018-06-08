@@ -1,5 +1,6 @@
 package cc.noharry.bledemo.data;
 
+import android.bluetooth.BluetoothGatt;
 import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
 import android.os.Parcel;
@@ -17,6 +18,7 @@ public class Device implements Parcelable {
   public ObservableInt state;
   public ObservableInt rssi;
   public BleDevice mBleDevice;
+  public ObservableField<BluetoothGatt> gatt;
   public static final int CONNECTING=0;
   public static final int CONNECTED=1;
   public static final int DISCONNECTED=2;
@@ -28,6 +30,7 @@ public class Device implements Parcelable {
     mac=new ObservableField<>(bleDevice.getMac());
     rssi=new ObservableInt(bleDevice.getRssi());
     state=new ObservableInt(DISCONNECTED);
+    gatt=new ObservableField<>();
   }
 
 
@@ -97,15 +100,24 @@ public class Device implements Parcelable {
     this.state.set(state);
   }
 
+  public ObservableField<BluetoothGatt> getGatt() {
+    return gatt;
+  }
+
+  public void setGatt(BluetoothGatt gatt) {
+    this.gatt.set(gatt);
+  }
+
   @Override
   public String toString() {
     return "Device{" +
-        "key=" + key +
-        ", name=" + name +
-        ", mac=" + mac +
-        ", state=" + state +
-        ", rssi=" + rssi +
+        "key=" + key.get() +
+        ", name=" + name.get() +
+        ", mac=" + mac.get() +
+        ", state=" + state.get() +
+        ", rssi=" + rssi.get() +
         ", mBleDevice=" + mBleDevice +
+        ", gatt=" + gatt.get() +
         '}';
   }
 

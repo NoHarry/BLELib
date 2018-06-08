@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
@@ -98,8 +99,18 @@ public class HomeFragment extends Fragment implements IWithoutBack {
     initView();
     initData();
     initObserver();
-
+    initEvent();
     return mBinding.getRoot();
+  }
+
+  private void initEvent() {
+    mBinding.homeSwipe.setOnRefreshListener(new OnRefreshListener() {
+      @Override
+      public void onRefresh() {
+        scan();
+      }
+    });
+
   }
 
   private void initView() {
@@ -108,6 +119,7 @@ public class HomeFragment extends Fragment implements IWithoutBack {
     mBinding.homeRv.addItemDecoration(new DividerItemDecoration(getActivity(),LinearLayoutManager.VERTICAL));
     mBinding.homeRv.setLayoutManager(linearLayoutManager);
     mBinding.homeRv.setAdapter(mAdapter);
+//    ((DefaultItemAnimator) mBinding.homeRv.getItemAnimator()).setSupportsChangeAnimations(false);
     mVectorDrawable = (AnimatedVectorDrawable) getActivity().getDrawable(R.drawable.ic_bluetooth_animated);
     mVectorDrawable1 = (AnimatedVectorDrawable) getActivity()
         .getDrawable(R.drawable.ic_bluetooth_animated);
@@ -126,6 +138,7 @@ public class HomeFragment extends Fragment implements IWithoutBack {
 
       @Override
       public void onDetailClick(int position, View view, Device device) {
+        mHomeViewmodel.getCurrentDevice().setValue(device);
         Navigation.findNavController(view)
             .navigate(R.id.action_homeFragment_to_detailFragment);
       }
@@ -148,6 +161,7 @@ public class HomeFragment extends Fragment implements IWithoutBack {
 //
       }
     });
+
   }
 
   private void updateData(Device device) {
@@ -160,7 +174,7 @@ public class HomeFragment extends Fragment implements IWithoutBack {
         public void run() {
           mDeviceList.add(device);
           mAdapter.notifyItemInserted(0);
-
+          mHomeViewmodel.getDeviceList().setValue(mDeviceList);
         }
       });
 
@@ -171,6 +185,7 @@ public class HomeFragment extends Fragment implements IWithoutBack {
           public void run() {
             mDeviceList.add(device);
             mAdapter.notifyItemInserted(mDeviceList.size());
+            mHomeViewmodel.getDeviceList().setValue(mDeviceList);
           }
         });
 
@@ -181,6 +196,7 @@ public class HomeFragment extends Fragment implements IWithoutBack {
             int i = mDeviceList.indexOf(device);
             mDeviceList.set(i,device);
             mAdapter.notifyItemChanged(i);
+            mHomeViewmodel.getDeviceList().setValue(mDeviceList);
           }
         });
       }
@@ -190,6 +206,8 @@ public class HomeFragment extends Fragment implements IWithoutBack {
 
   private void initData() {
     mHomeViewmodel = HomeActivity.obtainViewModel(getActivity());
+    mBinding.setHomeViewModel(mHomeViewmodel);
+    mHomeViewmodel.getDeviceList().setValue(mDeviceList);
   }
 
   @Override
@@ -203,13 +221,22 @@ public class HomeFragment extends Fragment implements IWithoutBack {
     switch (item.getItemId()){
       case R.id.menu_scan:
         L.i("menu click");
-        clearData();
-        mHomeViewmodel.scan();
+        if (mHomeViewmodel.isScanning.get()){
+          mHomeViewmodel.stopScan();
+        }else {
+          scan();
+        }
+
 
         break;
       default:
     }
     return super.onOptionsItemSelected(item);
+  }
+
+  private void scan() {
+    clearData();
+    mHomeViewmodel.scan();
   }
 
   private void clearData() {

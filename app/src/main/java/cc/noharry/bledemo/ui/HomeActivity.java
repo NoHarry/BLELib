@@ -17,7 +17,7 @@ import cc.noharry.bledemo.R;
 import cc.noharry.bledemo.databinding.ActivityHomeBinding;
 import cc.noharry.bledemo.ui.toolbar.IWithBack;
 import cc.noharry.bledemo.ui.toolbar.IWithoutBack;
-import cc.noharry.bledemo.util.L;
+import cc.noharry.bledemo.ui.view.LogDialog;
 import cc.noharry.bledemo.util.Log;
 import cc.noharry.bledemo.viewmodel.HomeViewmodel;
 import cc.noharry.bledemo.viewmodel.ViewModelFactory;
@@ -39,6 +39,7 @@ public class HomeActivity extends AppCompatActivity {
 
   private void initData() {
     mHomeViewmodel = obtainViewModel(this);
+
   }
 
   private void initObserver() {
