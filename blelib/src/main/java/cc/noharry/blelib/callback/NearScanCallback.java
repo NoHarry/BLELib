@@ -1,10 +1,14 @@
 package cc.noharry.blelib.callback;
 
 import android.content.Context;
-import cc.noharry.blelib.ble.BleScanConfig;
-import cc.noharry.blelib.ble.BleScanner;
+import android.os.Handler;
+import android.os.Looper;
+import cc.noharry.blelib.ble.scan.BleScanConfig;
+import cc.noharry.blelib.ble.scan.BleScanner;
 import cc.noharry.blelib.data.BleDevice;
 import cc.noharry.blelib.util.L;
+import cc.noharry.blelib.util.MethodUtils;
+import cc.noharry.blelib.util.ThreadPoolProxyFactory;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +33,19 @@ public  class NearScanCallback {
   private ScheduledExecutorService mExecutorService;
   private List<BleDevice> mDeviceList;
   private BlockingQueue<BleDevice> mBleDevices;
+  private NearLeScanDeviceCallback mNearLeScanDeviceCallback;
+  private static final int LEGACY_SCAN=1;
+  private static final int NEW_SCAN=2;
+  private int scanMode=0;
+  private Handler mHandler=new Handler(Looper.getMainLooper());
+
+  private void runOnUiThread(Runnable runnable){
+    if (Looper.myLooper()==Looper.getMainLooper()){
+      runnable.run();
+    }else {
+      mHandler.post(runnable);
+    }
+  }
 
   public NearScanCallback(Context context,BleScanConfig config,BleScanCallback bleScanCallback,
       NearScanDeviceCallback nearScanDeviceCallback) {
@@ -36,6 +53,16 @@ public  class NearScanCallback {
     mBleScanConfig = config;
     mNearScanDeviceCallback=nearScanDeviceCallback;
     mContext=context;
+    scanMode=NEW_SCAN;
+  }
+
+  public NearScanCallback(Context context,BleScanConfig config,BleScanCallback bleScanCallback,
+      NearLeScanDeviceCallback nearScanDeviceCallback) {
+    mBleScanCallback = bleScanCallback;
+    mBleScanConfig = config;
+    mNearLeScanDeviceCallback=nearScanDeviceCallback;
+    mContext=context;
+    scanMode=LEGACY_SCAN;
   }
 
   public void onScanStarted(boolean isStartSuccess){
@@ -52,8 +79,7 @@ public  class NearScanCallback {
   }
 
   public void onFoundDevice(BleDevice bleDevice){
-    mBleScanCallback.onFoundDevice(bleDevice);
-    handleStoreDevice(bleDevice);
+    handleStoreDevice(mBleScanConfig,bleDevice);
   }
 
 
@@ -85,8 +111,45 @@ public  class NearScanCallback {
     }
 
   }
-  private void handleStoreDevice(BleDevice bleDevice) {
-    mBleDevices.offer(bleDevice);
+
+  private void handleStoreDevice(BleScanConfig bleScanConfig,
+      BleDevice bleDevice) {
+    /*boolean checkBleDevice =
+        scanMode==NEW_SCAN?
+            MethodUtils.checkBleDeviceNew(bleScanConfig, bleDevice):
+            MethodUtils.checkBleDevice(bleScanConfig,bleDevice);
+    L.i("handleStoreDevice");
+    if (checkBleDevice){
+      runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          L.i("handleStoreDevice1");
+          mBleScanCallback.onFoundDevice(bleDevice);
+          mBleDevices.offer(bleDevice);
+        }
+      });
+
+    }*/
+    ThreadPoolProxyFactory.getScanThreadPoolProxy().submit(new Runnable() {
+      @Override
+      public void run() {
+        boolean checkBleDevice =
+            scanMode==NEW_SCAN?
+                MethodUtils.checkBleDeviceNew(bleScanConfig, bleDevice):
+                MethodUtils.checkBleDevice(bleScanConfig,bleDevice);
+        if (checkBleDevice){
+          runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              mBleScanCallback.onFoundDevice(bleDevice);
+              mBleDevices.offer(bleDevice);
+            }
+          });
+
+        }
+      }
+    });
+
   }
 
   private void startTimeTask(){

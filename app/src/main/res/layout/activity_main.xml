@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<layout
   xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools"
+  >
+
+
+<LinearLayout
   android:layout_width="match_parent"
   android:layout_height="match_parent"
   android:orientation="vertical"
-  tools:context="cc.noharry.bledemo.MainActivity">
+  tools:context="cc.noharry.bledemo.ui.MainActivity">
 <Button
   android:layout_width="match_parent"
   android:layout_height="wrap_content"
@@ -20,6 +24,47 @@
     android:text="stop scan"
     android:id="@+id/btn_stop_scan"
     />
-
-
+  <Button
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="connect"
+    android:id="@+id/btn_connect"
+    />
+  <Button
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="disconnect"
+    android:id="@+id/btn_disconnect"
+    />
+  <Button
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="read"
+    android:id="@+id/btn_read"
+    />
+  <Button
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="write"
+    android:id="@+id/btn_write"
+    />
+  <Button
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="enable notify"
+    android:id="@+id/btn_enable_notify"
+    />
+  <Button
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="disable notify"
+    android:id="@+id/btn_disable_notify"
+    />
+  <Button
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="get connected device"
+    android:id="@+id/btn_get_connected_device"
+    />
 </LinearLayout>
+</layout>

@@ -1,0 +1,7 @@
+@startuml
+start
+:开启蓝牙;
+:开始扫描;
+
+end
+@enduml

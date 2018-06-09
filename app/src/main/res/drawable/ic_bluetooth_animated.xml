@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+  android:drawable="@drawable/ic_bluetooth"
+
+  >
+  <target
+    android:animation="@animator/bluetooth_connecting"
+    android:name="bluetooth_connect"/>
+</animated-vector>
+
