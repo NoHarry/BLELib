@@ -3,7 +3,6 @@ package cc.noharry.bledemo.ui;
 import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
-import android.graphics.drawable.AnimatedVectorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -51,9 +50,7 @@ public class HomeFragment extends Fragment implements IWithoutBack {
   private DeviceAdapter mAdapter;
   private Handler mHandler=new Handler(Looper.getMainLooper());
   private List<Device> mDeviceList=new ArrayList<>();
-  private AnimatedVectorDrawable mVectorDrawable;
   private AtomicBoolean isBleOpen=new AtomicBoolean(false);
-  private AnimatedVectorDrawable mVectorDrawable1;
 
 
   public HomeFragment() {
@@ -120,9 +117,6 @@ public class HomeFragment extends Fragment implements IWithoutBack {
     mBinding.homeRv.setLayoutManager(linearLayoutManager);
     mBinding.homeRv.setAdapter(mAdapter);
 //    ((DefaultItemAnimator) mBinding.homeRv.getItemAnimator()).setSupportsChangeAnimations(false);
-    mVectorDrawable = (AnimatedVectorDrawable) getActivity().getDrawable(R.drawable.ic_bluetooth_animated);
-    mVectorDrawable1 = (AnimatedVectorDrawable) getActivity()
-        .getDrawable(R.drawable.ic_bluetooth_animated);
 
     mAdapter.setOnConnectBtnClickListener(new OnConnectClickListener() {
       @Override

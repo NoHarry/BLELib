@@ -28,4 +28,15 @@ public class ThreadPoolProxyFactory {
         return mNormalThreadPoolProxy;
     }
 
+    public static ThreadPoolProxy getLogThreadPoolProxy() {
+        if (mNormalThreadPoolProxy == null) {
+            synchronized (ThreadPoolProxyFactory.class) {
+                if (mNormalThreadPoolProxy == null) {
+                    mNormalThreadPoolProxy = new ThreadPoolProxy(1, 1);
+                }
+            }
+        }
+        return mNormalThreadPoolProxy;
+    }
+
 }

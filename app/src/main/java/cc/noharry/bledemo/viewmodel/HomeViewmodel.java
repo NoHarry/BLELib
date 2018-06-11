@@ -3,6 +3,8 @@ package cc.noharry.bledemo.viewmodel;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
 import android.databinding.ObservableBoolean;
 import android.os.Handler;
 import android.os.Looper;
@@ -14,9 +16,11 @@ import cc.noharry.bledemo.util.LogUtil;
 import cc.noharry.bledemo.util.LogUtil.LogCallback;
 import cc.noharry.blelib.ble.BleAdmin;
 import cc.noharry.blelib.ble.scan.BleScanConfig;
+import cc.noharry.blelib.callback.BaseBleConnectCallback;
 import cc.noharry.blelib.callback.BleConnectCallback;
 import cc.noharry.blelib.callback.BleScanCallback;
 import cc.noharry.blelib.data.BleDevice;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,8 +40,10 @@ public class HomeViewmodel extends AndroidViewModel {
   private LogCallback mLogCallback;
   private BleScanCallback mBleScanCallback;
   private BleConnectCallback mBleConnectCallback;
+  private List<Log> mLogList=new ArrayList<>();
   public static final int SCANNING=0;
   public static final int NOT_SCAN=1;
+  private BaseBleConnectCallback mBaseBleConnectCallback;
 
 
   private void runOnUiThread(Runnable runnable){
@@ -51,6 +57,7 @@ public class HomeViewmodel extends AndroidViewModel {
   public HomeViewmodel(@NonNull Application application) {
     super(application);
     initCallback();
+
   }
 
   private void initCallback() {
@@ -58,8 +65,10 @@ public class HomeViewmodel extends AndroidViewModel {
       @Override
       public void onLog(Log log) {
         runOnUiThread(()->mLog.setValue(log));
+//        mLogList.add(log);
       }
     };
+    L.i("HomeViewmodel:"+this+" mLogCallback:"+mLogCallback);
     mBleScanCallback = new BleScanCallback() {
       @Override
       public void onScanStarted(boolean isStartSuccess) {
@@ -81,7 +90,7 @@ public class HomeViewmodel extends AndroidViewModel {
         L.i("onScanCompleted:"+isScanning.get());
       }
     };
-    mBleConnectCallback = new BleConnectCallback() {
+  /*  mBleConnectCallback = new BleConnectCallback() {
       @Override
       public void onDeviceConnecting(BleDevice bleDevice) {
         Device device=new Device(bleDevice);
@@ -140,9 +149,136 @@ public class HomeViewmodel extends AndroidViewModel {
         }catch (NullPointerException e){
         }
       }
+    };*/
+
+    mBaseBleConnectCallback = new BaseBleConnectCallback() {
+      @Override
+      public void onConnectionStateChangeBase(BleDevice bleDevice, BluetoothGatt gatt, int status,
+          int newState) {
+
+      }
+
+      @Override
+      public void onServicesDiscoveredBase(BleDevice bleDevice, BluetoothGatt gatt, int status) {
+        Device device=new Device(bleDevice);
+        device.setState(Device.CONNECTED);
+        device.setGatt(gatt);
+        foundDevice.setValue(device);
+        try {
+          if (checkSameDevice(bleDevice,currentDevice.getValue().getBleDevice())){
+            currentDevice.setValue(device);
+          }
+        }catch (NullPointerException e){
+        }
+      }
+
+      @Override
+      public void onDescriptorReadBase(BleDevice bleDevice, BluetoothGatt gatt,
+          BluetoothGattDescriptor descriptor, int status) {
+
+      }
+
+      @Override
+      public void onDescriptorWriteBase(BleDevice bleDevice, BluetoothGatt gatt,
+          BluetoothGattDescriptor descriptor, int status) {
+
+      }
+
+      @Override
+      public void onCharacteristicWriteBase(BleDevice bleDevice, BluetoothGatt gatt,
+          BluetoothGattCharacteristic characteristic, int status) {
+
+      }
+
+      @Override
+      public void onCharacteristicReadBase(BleDevice bleDevice, BluetoothGatt gatt,
+          BluetoothGattCharacteristic characteristic, int status) {
+
+      }
+
+      @Override
+      public void onCharacteristicChangedBase(BleDevice bleDevice, BluetoothGatt gatt,
+          BluetoothGattCharacteristic characteristic) {
+
+      }
+
+      @Override
+      public void onReadRemoteRssiBase(BleDevice bleDevice, BluetoothGatt gatt, int rssi,
+          int status) {
+
+      }
+
+      @Override
+      public void onReliableWriteCompletedBase(BleDevice bleDevice, BluetoothGatt gatt,
+          int status) {
+
+      }
+
+      @Override
+      public void onMtuChangedBase(BleDevice bleDevice, BluetoothGatt gatt, int mtu, int status) {
+
+      }
+
+      @Override
+      public void onPhyReadBase(BleDevice bleDevice, BluetoothGatt gatt, int txPhy, int rxPhy,
+          int status) {
+
+      }
+
+      @Override
+      public void onPhyUpdateBase(BleDevice bleDevice, BluetoothGatt gatt, int txPhy, int rxPhy,
+          int status) {
+
+      }
+
+      @Override
+      public void onDeviceConnectingBase(BleDevice bleDevice) {
+        Device device=new Device(bleDevice);
+        device.setState(Device.CONNECTING);
+        foundDevice.setValue(device);
+        try {
+          if (checkSameDevice(bleDevice,currentDevice.getValue().getBleDevice())){
+            currentDevice.setValue(device);
+          }
+        }catch (NullPointerException e){
+        }
+      }
+
+      @Override
+      public void onDeviceConnectedBase(BleDevice bleDevice) {
+        Device device=new Device(bleDevice);
+        device.setState(Device.CONNECTED);
+        foundDevice.setValue(device);
+        try {
+          if (checkSameDevice(bleDevice,currentDevice.getValue().getBleDevice())){
+            currentDevice.setValue(device);
+          }
+        }catch (NullPointerException e){
+        }
+      }
+
+      @Override
+      public void onDeviceDisconnectingBase(BleDevice bleDevice) {
+
+      }
+
+      @Override
+      public void onDeviceDisconnectedBase(BleDevice bleDevice, int status) {
+        Device device=new Device(bleDevice);
+        device.setState(Device.DISCONNECTED);
+        foundDevice.setValue(device);
+        try {
+          if (checkSameDevice(bleDevice,currentDevice.getValue().getBleDevice())){
+            currentDevice.setValue(device);
+          }
+        }catch (NullPointerException e){
+        }
+      }
     };
+  }
 
-
+  public void clearLog(){
+    mLogList.clear();
   }
 
   private boolean checkSameDevice(BleDevice bleDevice1,BleDevice bleDevice2){
@@ -177,7 +313,7 @@ public class HomeViewmodel extends AndroidViewModel {
           .getINSTANCE(getApplication())
           .connect(device.getBleDevice()
               , false
-              ,mBleConnectCallback);
+              , mBaseBleConnectCallback);
     }
 
   }
@@ -209,5 +345,9 @@ public class HomeViewmodel extends AndroidViewModel {
 
   public SingleLiveEvent<List<Device>> getDeviceList() {
     return deviceList;
+  }
+
+  public List<Log> getLogList() {
+    return mLogList;
   }
 }

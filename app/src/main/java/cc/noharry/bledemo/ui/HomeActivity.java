@@ -39,7 +39,7 @@ public class HomeActivity extends AppCompatActivity {
 
   private void initData() {
     mHomeViewmodel = obtainViewModel(this);
-
+    mBinding.setViewmodel(mHomeViewmodel);
   }
 
   private void initObserver() {
@@ -58,7 +58,7 @@ public class HomeActivity extends AppCompatActivity {
   }
 
   private void showDialog() {
-    mDialog = new LogDialog(this);
+    mDialog = new LogDialog(this,this,mHomeViewmodel.getLogList());
     mHomeViewmodel.displayLog();
     mDialog.show();
   }
