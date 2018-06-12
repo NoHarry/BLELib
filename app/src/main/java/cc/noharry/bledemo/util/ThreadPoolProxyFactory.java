@@ -2,6 +2,8 @@ package cc.noharry.bledemo.util;
 
 public class ThreadPoolProxyFactory {
     static ThreadPoolProxy mNormalThreadPoolProxy;
+    static ThreadPoolProxy mUpdateThreadPoolProxy;
+    static ThreadPoolProxy mLogThreadPoolProxy;
 
     /**
      * 得到普通线程池代理对象mNormalThreadPoolProxy
@@ -18,25 +20,25 @@ public class ThreadPoolProxyFactory {
     }
 
     public static ThreadPoolProxy getUpdateThreadPoolProxy() {
-        if (mNormalThreadPoolProxy == null) {
+        if (mUpdateThreadPoolProxy == null) {
             synchronized (ThreadPoolProxyFactory.class) {
-                if (mNormalThreadPoolProxy == null) {
-                    mNormalThreadPoolProxy = new ThreadPoolProxy(1, 1);
+                if (mUpdateThreadPoolProxy == null) {
+                    mUpdateThreadPoolProxy = new ThreadPoolProxy(1, 1);
                 }
             }
         }
-        return mNormalThreadPoolProxy;
+        return mUpdateThreadPoolProxy;
     }
 
     public static ThreadPoolProxy getLogThreadPoolProxy() {
-        if (mNormalThreadPoolProxy == null) {
+        if (mLogThreadPoolProxy == null) {
             synchronized (ThreadPoolProxyFactory.class) {
-                if (mNormalThreadPoolProxy == null) {
-                    mNormalThreadPoolProxy = new ThreadPoolProxy(1, 1);
+                if (mLogThreadPoolProxy == null) {
+                    mLogThreadPoolProxy = new ThreadPoolProxy(1, 1);
                 }
             }
         }
-        return mNormalThreadPoolProxy;
+        return mLogThreadPoolProxy;
     }
 
 }

@@ -24,6 +24,7 @@ import cc.noharry.bledemo.databinding.FragmentHomeBinding;
 import cc.noharry.bledemo.ui.adapter.DeviceAdapter;
 import cc.noharry.bledemo.ui.adapter.DeviceAdapter.OnConnectClickListener;
 import cc.noharry.bledemo.ui.toolbar.IWithoutBack;
+import cc.noharry.bledemo.ui.view.LogDialog;
 import cc.noharry.bledemo.util.L;
 import cc.noharry.bledemo.util.ThreadPoolProxyFactory;
 import cc.noharry.bledemo.viewmodel.HomeViewmodel;
@@ -41,7 +42,6 @@ public class HomeFragment extends Fragment implements IWithoutBack {
   private static final String ARG_PARAM1 = "param1";
   private static final String ARG_PARAM2 = "param2";
 
-  // TODO: Rename and change types of parameters
   private String mParam1;
   private String mParam2;
   private FragmentHomeBinding mBinding;
@@ -51,6 +51,9 @@ public class HomeFragment extends Fragment implements IWithoutBack {
   private Handler mHandler=new Handler(Looper.getMainLooper());
   private List<Device> mDeviceList=new ArrayList<>();
   private AtomicBoolean isBleOpen=new AtomicBoolean(false);
+  private HomeActivity mParent;
+  private LogDialog mDialog;
+  private MenuItem mItem;
 
 
   public HomeFragment() {
@@ -83,7 +86,7 @@ public class HomeFragment extends Fragment implements IWithoutBack {
       mParam1 = getArguments().getString(ARG_PARAM1);
       mParam2 = getArguments().getString(ARG_PARAM2);
     }
-
+      L.v("onCreate");
   }
 
 
@@ -97,6 +100,7 @@ public class HomeFragment extends Fragment implements IWithoutBack {
     initData();
     initObserver();
     initEvent();
+    L.v("onCreateView");
     return mBinding.getRoot();
   }
 
@@ -107,7 +111,7 @@ public class HomeFragment extends Fragment implements IWithoutBack {
         scan();
       }
     });
-
+    mParent = (HomeActivity)getActivity();
   }
 
   private void initView() {
@@ -148,6 +152,7 @@ public class HomeFragment extends Fragment implements IWithoutBack {
         ThreadPoolProxyFactory.getUpdateThreadPoolProxy().submit(new Runnable() {
           @Override
           public void run() {
+//            L.e("更新:"+device);
             updateData(device);
           }
         });
@@ -208,6 +213,7 @@ public class HomeFragment extends Fragment implements IWithoutBack {
   public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
     super.onCreateOptionsMenu(menu, inflater);
     inflater.inflate(R.menu.home_menu,menu);
+    mItem = menu.findItem(R.id.menu_scan);
   }
 
   @Override
@@ -248,6 +254,7 @@ public class HomeFragment extends Fragment implements IWithoutBack {
   public void onDetach() {
     super.onDetach();
   }
+
 
 
 }

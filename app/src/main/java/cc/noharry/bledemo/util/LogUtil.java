@@ -59,7 +59,7 @@ public class LogUtil {
               System.out.println("log:"+log.getContent());
               continue;
             }*/
-            if (str.contains(String.valueOf(pid))){
+            if (str.contains(String.valueOf(pid))&&callback!=null){
               Level level = getLevel(str);
               log=new Log(level,str);
               callback.onLog(log);

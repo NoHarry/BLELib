@@ -18,7 +18,6 @@ import cc.noharry.bledemo.databinding.ActivityHomeBinding;
 import cc.noharry.bledemo.ui.toolbar.IWithBack;
 import cc.noharry.bledemo.ui.toolbar.IWithoutBack;
 import cc.noharry.bledemo.ui.view.LogDialog;
-import cc.noharry.bledemo.util.Log;
 import cc.noharry.bledemo.viewmodel.HomeViewmodel;
 import cc.noharry.bledemo.viewmodel.ViewModelFactory;
 
@@ -43,23 +42,51 @@ public class HomeActivity extends AppCompatActivity {
   }
 
   private void initObserver() {
-    mHomeViewmodel.getLog().observe(this, new Observer<Log>() {
+    /*mHomeViewmodel.getLog().observe(this, new Observer<Log>() {
       @Override
       public void onChanged(@Nullable Log log) {
         if (mDialog!=null){
-          mDialog.addLog(log);
+          if (mDialog.isShowing()){
+//            mDialog.addLog(log);
+            mDialog.notifyLog();
+          }
+
         }
       }
     });
+    */
+    mHomeViewmodel.getLogSize().observe(this, new Observer<Integer>() {
+      @Override
+      public void onChanged(@Nullable Integer integer) {
+        if (mDialog!=null){
+          mDialog.notifyLog(integer.intValue());
+        }
+      }
+    });
+    /*mHomeViewmodel.getFoundDevice().observe(this, new Observer<Device>() {
+      @Override
+      public void onChanged(@Nullable Device device) {
+        L.i("ACTIVITY:"+device);
+      }
+    });*/
   }
 
   private void initFb() {
-    mBinding.fab.setOnClickListener((v)->showDialog());
+    mBinding.fab.setOnClickListener((v)-> showDialog());
+  }
+
+  public interface OnFabClickListener{
+    void onFabClick();
+  }
+
+  private OnFabClickListener mFabClickListener=null;
+  public void setOnFabClickListener(OnFabClickListener listener){
+    mFabClickListener=listener;
   }
 
   private void showDialog() {
     mDialog = new LogDialog(this,this,mHomeViewmodel.getLogList());
-    mHomeViewmodel.displayLog();
+//    mHomeViewmodel.displayLog();
     mDialog.show();
   }
 

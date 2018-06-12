@@ -29,7 +29,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:' + rootProject.supportLibVersion
     implementation 'com.android.support.constraint:constraint-layout:' + rootProject.constraintLayoutVersion
-    implementation 'com.android.support:support-v4:27.1.1'
+    implementation 'com.android.support:support-v4:'+ rootProject.supportLibVersion
     testImplementation 'junit:junit:' + rootProject.juntiVersion
     androidTestImplementation 'com.android.support.test:runner:' + rootProject.runner
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:' + rootProject.espressoCore

@@ -11,14 +11,15 @@
 
   <RelativeLayout
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="88dp">
     <RelativeLayout
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:background="@drawable/shape_ic_round"
       android:id="@+id/rl_icon"
-      android:layout_centerVertical="true"
-      android:layout_marginLeft="10dp"
+      android:layout_marginLeft="16dp"
+      android:layout_marginTop="16dp"
+      android:layout_marginRight="16dp"
       >
       <!--android:src="@{device.state==device.DISCONNECTED?@drawable/ic_bluetooth_disconnected : @drawable/ic_bluetooth}"-->
       <ImageView
@@ -38,13 +39,14 @@
       >
       <TextView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="28dp"
         android:id="@+id/item_name"
+        android:gravity="bottom"
         android:text="@{device.name}"
         />
       <TextView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="20dp"
         android:id="@+id/item_mac"
         android:text="@{device.mac}"
         />
@@ -63,6 +65,7 @@
       android:text="connect"
       android:textColor="@color/white"
       android:layout_centerVertical="true"
+      android:layout_marginRight="16dp"
       android:theme="@style/button_conn"
       android:visibility="@{device.state==device.DISCONNECTED?View.VISIBLE : View.GONE}"
       />
@@ -74,6 +77,7 @@
       android:text="disconnect"
       android:textColor="@color/white"
       android:layout_centerVertical="true"
+      android:layout_marginRight="16dp"
       android:theme="@style/button_conn"
       android:visibility="@{device.state==device.CONNECTED?View.VISIBLE : View.GONE}"
       />
@@ -85,6 +89,7 @@
       android:text="connecting"
       android:textColor="@color/white"
       android:layout_centerVertical="true"
+      android:layout_marginRight="16dp"
       android:theme="@style/button_conn"
       android:visibility="@{device.state==device.CONNECTING?View.VISIBLE : View.GONE}"
       />

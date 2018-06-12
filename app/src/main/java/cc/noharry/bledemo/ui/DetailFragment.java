@@ -4,6 +4,7 @@ package cc.noharry.bledemo.ui;
 import android.arch.lifecycle.Observer;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
@@ -92,6 +93,9 @@ public class DetailFragment extends Fragment implements IWithBack {
             for (BluetoothGattCharacteristic characteristic:service.getCharacteristics()){
               int properties = characteristic.getProperties();
               L.i("characteristic:"+characteristic.getUuid().toString()+" properties:"+getProperties(properties));
+              for (BluetoothGattDescriptor descriptor:characteristic.getDescriptors()){
+                L.i("descriptor:"+descriptor.getUuid()+" per:"+descriptor.getPermissions());
+              }
             }
           }
 

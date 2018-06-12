@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView.LayoutManager;
 import cc.noharry.bledemo.R;
 import cc.noharry.bledemo.databinding.DialogLogBinding;
 import cc.noharry.bledemo.ui.adapter.LogAdapter;
+import cc.noharry.bledemo.util.L;
 import cc.noharry.bledemo.util.Log;
 import java.util.List;
 
@@ -27,6 +28,7 @@ public class LogDialog extends Dialog {
   private DialogLogBinding mBinding;
   private LogAdapter mAdapter;
   private RecyclerView mRecyclerView;
+
 
   public LogDialog(@NonNull Context context, Activity activity,
       List<Log> logList) {
@@ -62,6 +64,7 @@ public class LogDialog extends Dialog {
     initRV();
   }
 
+
   private void initRV() {
     mAdapter = new LogAdapter(mContext,mLogList);
     LayoutManager layoutManager=new LinearLayoutManager(mContext,LinearLayoutManager.VERTICAL,false);
@@ -69,28 +72,29 @@ public class LogDialog extends Dialog {
     mRecyclerView.setLayoutManager(layoutManager);
   }
 
+  @Override
+  protected void onStart() {
+    super.onStart();
+    if (mRecyclerView!=null){
+      mRecyclerView.scrollToPosition(mLogList.size());
+    }
+    L.i("");
+  }
+
   public void addLog(Log log){
-   /* TextView textView=new TextView(mContext);
-    textView.setText(log.getContent());
-    switch (log.getLevel()){
-      case ERROR:
-        textView.setTextColor(mContext.getResources().getColor(R.color.red));
-        break;
-      case INFO:
-        textView.setTextColor(mContext.getResources().getColor(R.color.green));
-        break;
-      case DEBUG:
-        textView.setTextColor(mContext.getResources().getColor(R.color.blue));
-        break;
-      case WARN:
-        textView.setTextColor(mContext.getResources().getColor(R.color.yellow));
-        break;
-    }*/
 
     mLogList.add(log);
     mAdapter.notifyItemInserted(mLogList.size());
     mRecyclerView.scrollToPosition(mLogList.size());
-//    mAdapter.notifyDataSetChanged();
-//    mLl.addView(textView);
+  }
+
+  public void notifyLog(){
+    mAdapter.notifyItemInserted(mLogList.size());
+    mRecyclerView.scrollToPosition(mLogList.size());
+  }
+
+  public void notifyLog(int position){
+    mAdapter.notifyItemInserted(position);
+    mRecyclerView.scrollToPosition(position);
   }
 }

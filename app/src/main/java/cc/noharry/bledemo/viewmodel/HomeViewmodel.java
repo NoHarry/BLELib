@@ -32,9 +32,11 @@ public class HomeViewmodel extends AndroidViewModel {
   private final SingleLiveEvent<Log> mLog=new SingleLiveEvent<>();
   private final SingleLiveEvent<Device> currentDevice=new SingleLiveEvent<>();
   private final SingleLiveEvent<Integer> currentDeviceState=new SingleLiveEvent<>();
-
+  private final SingleLiveEvent<Integer> logSize=new SingleLiveEvent<>();
   private final SingleLiveEvent<List<Device>> deviceList=new SingleLiveEvent<>();
   public final ObservableBoolean isScanning=new ObservableBoolean(false);
+  private final SingleLiveEvent<Integer> scanState=new SingleLiveEvent<>();
+  public final ObservableBoolean isDialogShowing=new ObservableBoolean(false);
 //  public final SingleLiveEvent<Boolean> isScanning=new SingleLiveEvent<>();
   private Handler mHandler=new Handler(Looper.getMainLooper());
   private LogCallback mLogCallback;
@@ -57,15 +59,19 @@ public class HomeViewmodel extends AndroidViewModel {
   public HomeViewmodel(@NonNull Application application) {
     super(application);
     initCallback();
-
+    displayLog();
   }
 
   private void initCallback() {
     mLogCallback = new LogCallback() {
       @Override
       public void onLog(Log log) {
-        runOnUiThread(()->mLog.setValue(log));
-//        mLogList.add(log);
+        /*if (isDialogShowing.get()){
+          runOnUiThread(()->mLog.setValue(log));
+        }*/
+        mLogList.add(log);
+        runOnUiThread(()->logSize.setValue(mLogList.size()));
+
       }
     };
     L.i("HomeViewmodel:"+this+" mLogCallback:"+mLogCallback);
@@ -242,6 +248,7 @@ public class HomeViewmodel extends AndroidViewModel {
           }
         }catch (NullPointerException e){
         }
+        L.e("连接中:"+foundDevice.getValue());
       }
 
       @Override
@@ -249,12 +256,14 @@ public class HomeViewmodel extends AndroidViewModel {
         Device device=new Device(bleDevice);
         device.setState(Device.CONNECTED);
         foundDevice.setValue(device);
+
         try {
           if (checkSameDevice(bleDevice,currentDevice.getValue().getBleDevice())){
             currentDevice.setValue(device);
           }
         }catch (NullPointerException e){
         }
+
       }
 
       @Override
@@ -273,6 +282,7 @@ public class HomeViewmodel extends AndroidViewModel {
           }
         }catch (NullPointerException e){
         }
+        L.e("断开连接:"+foundDevice.getValue());
       }
     };
   }
@@ -328,6 +338,7 @@ public class HomeViewmodel extends AndroidViewModel {
   public void displayLog(){
     LogUtil.clearLog();
     LogUtil.readLog(mLogCallback);
+//    LogUtil.readLog(null);
   }
 
   public SingleLiveEvent<Device> getCurrentDevice() {
@@ -345,6 +356,11 @@ public class HomeViewmodel extends AndroidViewModel {
 
   public SingleLiveEvent<List<Device>> getDeviceList() {
     return deviceList;
+  }
+
+
+  public SingleLiveEvent<Integer> getLogSize() {
+    return logSize;
   }
 
   public List<Log> getLogList() {
