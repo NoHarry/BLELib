@@ -160,6 +160,19 @@ public class HomeFragment extends Fragment implements IWithoutBack {
 //
       }
     });
+    mHomeViewmodel.getScanState().observe(this, new Observer<Integer>() {
+      @Override
+      public void onChanged(@Nullable Integer integer) {
+        switch (integer){
+          case HomeViewmodel.SCANNING:
+            mItem.setTitle(getString(R.string.menu_stop_scan));
+            break;
+          case HomeViewmodel.NOT_SCAN:
+            mItem.setTitle(getString(R.string.menu_scan));
+            break;
+        }
+      }
+    });
 
   }
 

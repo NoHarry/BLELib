@@ -9,4 +9,6 @@
   <string name="menu_scan">SCAN</string>
   <string name="menu_scanning">SCANNING</string>
   <string name="menu_stop_scan">STOP SCAN</string>
+  <string name="menu_connect">Connect</string>
+  <string name="menu_disconnect">Disconnect</string>
 </resources>

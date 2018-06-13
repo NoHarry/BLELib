@@ -87,6 +87,11 @@ public class Task{
     return new WriteTask(Type.WRITE,bleDevice,serviceUUID,characteristicUUID,data);
   }
 
+  public static WriteTask newWriteTask(BleDevice bleDevice
+      ,BluetoothGattCharacteristic characteristic,byte[] data){
+    return new WriteTask(Type.WRITE,bleDevice,characteristic,data);
+  }
+
   public static WriteTask newWriteTask(BleDevice bleDevice,String serviceUUID
       , String characteristicUUID,byte[] data,int writeType){
     return new WriteTask(Type.WRITE,bleDevice,serviceUUID,characteristicUUID,data,writeType);

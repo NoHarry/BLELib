@@ -13,5 +13,6 @@
   <string name="menu_scan">扫描</string>
   <string name="menu_scanning">扫描中</string>
   <string name="menu_stop_scan">停止扫描</string>
-
+  <string name="menu_connect">连接</string>
+  <string name="menu_disconnect">断开连接</string>
 </resources>

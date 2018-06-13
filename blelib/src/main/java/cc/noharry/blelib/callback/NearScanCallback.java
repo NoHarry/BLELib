@@ -157,9 +157,16 @@ public  class NearScanCallback {
     mExecutorService.schedule(new Runnable() {
       @Override
       public void run() {
-        BleScanner.getINSTANCE(mContext).stopScan();
-        onScanCompleted(mDeviceList);
-        L.e("定时停止");
+
+        runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            BleScanner.getINSTANCE(mContext).stopScan();
+            onScanCompleted(mDeviceList);
+            L.e("定时停止");
+          }
+        });
+
       }
     },mBleScanConfig.getScanTime(),TimeUnit.MILLISECONDS);
 

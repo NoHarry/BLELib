@@ -15,12 +15,19 @@ import cc.noharry.bledemo.util.Log;
 import cc.noharry.bledemo.util.LogUtil;
 import cc.noharry.bledemo.util.LogUtil.LogCallback;
 import cc.noharry.blelib.ble.BleAdmin;
+import cc.noharry.blelib.ble.connect.ReadTask;
+import cc.noharry.blelib.ble.connect.Task;
+import cc.noharry.blelib.ble.connect.WriteTask;
 import cc.noharry.blelib.ble.scan.BleScanConfig;
 import cc.noharry.blelib.callback.BaseBleConnectCallback;
 import cc.noharry.blelib.callback.BleConnectCallback;
 import cc.noharry.blelib.callback.BleScanCallback;
+import cc.noharry.blelib.callback.ReadCallback;
+import cc.noharry.blelib.callback.WriteCallback;
 import cc.noharry.blelib.data.BleDevice;
+import cc.noharry.blelib.data.Data;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -37,6 +44,7 @@ public class HomeViewmodel extends AndroidViewModel {
   public final ObservableBoolean isScanning=new ObservableBoolean(false);
   private final SingleLiveEvent<Integer> scanState=new SingleLiveEvent<>();
   public final ObservableBoolean isDialogShowing=new ObservableBoolean(false);
+  private final SingleLiveEvent<Integer> valueChange=new SingleLiveEvent<>();
 //  public final SingleLiveEvent<Boolean> isScanning=new SingleLiveEvent<>();
   private Handler mHandler=new Handler(Looper.getMainLooper());
   private LogCallback mLogCallback;
@@ -80,6 +88,7 @@ public class HomeViewmodel extends AndroidViewModel {
       public void onScanStarted(boolean isStartSuccess) {
 
         isScanning.set(true);
+        scanState.setValue(SCANNING);
         L.i("onScanStarted:"+isScanning.get());
       }
 
@@ -93,6 +102,7 @@ public class HomeViewmodel extends AndroidViewModel {
       public void onScanCompleted(List<BleDevice> deviceList) {
 
         isScanning.set(false);
+        scanState.setValue(NOT_SCAN);
         L.i("onScanCompleted:"+isScanning.get());
       }
     };
@@ -193,19 +203,22 @@ public class HomeViewmodel extends AndroidViewModel {
       @Override
       public void onCharacteristicWriteBase(BleDevice bleDevice, BluetoothGatt gatt,
           BluetoothGattCharacteristic characteristic, int status) {
-
+        L.i("onCharacteristicWriteBase:"+Arrays.toString(characteristic.getValue()));
+        valueChange.setValue(0);
       }
 
       @Override
       public void onCharacteristicReadBase(BleDevice bleDevice, BluetoothGatt gatt,
           BluetoothGattCharacteristic characteristic, int status) {
-
+        L.i("onCharacteristicReadBase:"+Arrays.toString(characteristic.getValue()));
+        valueChange.setValue(0);
       }
 
       @Override
       public void onCharacteristicChangedBase(BleDevice bleDevice, BluetoothGatt gatt,
           BluetoothGattCharacteristic characteristic) {
-
+        L.i("onCharacteristicChangedBase:"+Arrays.toString(characteristic.getValue()));
+        valueChange.setValue(0);
       }
 
       @Override
@@ -291,6 +304,60 @@ public class HomeViewmodel extends AndroidViewModel {
     mLogList.clear();
   }
 
+
+  public void read(Device device,BluetoothGattCharacteristic characteristic){
+    ReadTask task = Task.newReadTask(device.getBleDevice(), characteristic)
+        .with(new ReadCallback() {
+          @Override
+          public void onDataRecived(BleDevice bleDevice, Data data) {
+            L.i("onDataRecived:" + Arrays.toString(data.getValue()));
+          }
+
+          @Override
+          public void onOperationSuccess(BleDevice bleDevice) {
+            L.i("onOperationSuccess");
+
+          }
+
+          @Override
+          public void onFail(BleDevice bleDevice, int statuCode, String message) {
+            L.e("onFail:" + message);
+          }
+
+          @Override
+          public void onComplete(BleDevice bleDevice) {
+            L.i("onComplete");
+          }
+        });
+    BleAdmin.getINSTANCE(getApplication()).addTask(task);
+  }
+
+  public void write(Device device,BluetoothGattCharacteristic characteristic,byte[] data){
+    WriteTask task = Task.newWriteTask(device.getBleDevice(), characteristic, data)
+        .with(new WriteCallback() {
+          @Override
+          public void onDataSent(BleDevice bleDevice, Data data) {
+            L.i("onDataSent:"+Arrays.toString(data.getValue()));
+          }
+
+          @Override
+          public void onOperationSuccess(BleDevice bleDevice) {
+            L.i("onOperationSuccess");
+          }
+
+          @Override
+          public void onFail(BleDevice bleDevice, int statuCode, String message) {
+            L.e("onFail:"+message);
+          }
+
+          @Override
+          public void onComplete(BleDevice bleDevice) {
+            L.i("onComplete");
+          }
+        });
+    BleAdmin.getINSTANCE(getApplication()).addTask(task);
+  }
+
   private boolean checkSameDevice(BleDevice bleDevice1,BleDevice bleDevice2){
     return (bleDevice1.getKey()!=null)&&(bleDevice2.getKey()!=null)
         &&(bleDevice1.getKey().equalsIgnoreCase(bleDevice2.getKey()));
@@ -361,6 +428,14 @@ public class HomeViewmodel extends AndroidViewModel {
 
   public SingleLiveEvent<Integer> getLogSize() {
     return logSize;
+  }
+
+  public SingleLiveEvent<Integer> getScanState() {
+    return scanState;
+  }
+
+  public SingleLiveEvent<Integer> getValueChange() {
+    return valueChange;
   }
 
   public List<Log> getLogList() {
