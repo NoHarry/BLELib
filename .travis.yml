@@ -1,29 +1,25 @@
-{
-  "os": "linux",
-  "jdk": "oraclejdk8",
-  "dist": "trusty",
-  "group": "stable",
-  "script": [
-    "./gradlew clean",
-    "./gradlew assembleDebug"
-  ],
-  "android": {
-    "licenses": [
-      - 'android-sdk-preview-license-.+'
-      - 'android-sdk-license-.+'
-      - 'google-gdk-license-.+'
-    ],
-    "components": [
-      "tools",
-      "platform-tools",
-      "build-tools-27.0.1",
-      "extra-android-m2repository",
-      "extra-google-android-support",
-      "android-27"
-    ]
-  },
-  "language": "android",
-  "before_install": [
-    "yes | sdkmanager \"platforms;android-27\""
-  ]
-}
+language: android
+jdk: oraclejdk8
+sudo: false
+
+android:
+  components:
+    - tools
+    - platform-tools
+    - build-tools-27.0.1
+    - android-27
+    - add-on
+    - extra
+
+  licenses:
+    - 'android-sdk-license-.+'
+
+  notifications:
+    email: false
+
+before_install:
+    - yes | $ANDROID_HOME/tools/bin/sdkmanager "build-tools;27.0.1"
+
+script:
+  - ./gradlew assembleDebug
+
