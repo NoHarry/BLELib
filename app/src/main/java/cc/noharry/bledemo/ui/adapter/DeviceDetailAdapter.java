@@ -79,7 +79,8 @@ public class DeviceDetailAdapter extends BaseMultiItemQuickAdapter<MultiItemEnti
       helper.setText(R.id.tv_characteristic_properties
           ,getProperties(characteristic
               .getBluetoothGattCharacteristic().getProperties()).toString());
-      helper.setText(R.id.tv_characteristic_value,Arrays.toString(characteristic.getBluetoothGattCharacteristic().getValue()));
+      helper.setText(R.id.tv_characteristic_value,Arrays.toString(characteristic
+          .getBluetoothGattCharacteristic().getValue()));
 //      L.i("characteristic:"+Arrays.toString(characteristic.getBluetoothGattCharacteristic().getValue()));
       setToolVisiable(helper,characteristic
           .getBluetoothGattCharacteristic().getProperties());
@@ -171,7 +172,7 @@ public class DeviceDetailAdapter extends BaseMultiItemQuickAdapter<MultiItemEnti
 
   }
 
-  public void setToolVisiable(BaseViewHolder helper,int properties){
+  private void setToolVisiable(BaseViewHolder helper,int properties){
     List<String> list = getProperties(properties);
     ImageView write=helper.itemView.findViewById(R.id.iv_characteristic_write);
     ImageView read=helper.itemView.findViewById(R.id.iv_characteristic_read);
@@ -188,8 +189,7 @@ public class DeviceDetailAdapter extends BaseMultiItemQuickAdapter<MultiItemEnti
     }
   }
 
-  public void setToolGone(BaseViewHolder helper){
-//    List<String> list = getProperties(properties);
+  private void setToolGone(BaseViewHolder helper){
     ImageView write=helper.itemView.findViewById(R.id.iv_characteristic_write);
     ImageView read=helper.itemView.findViewById(R.id.iv_characteristic_read);
     write.setVisibility(View.GONE);
