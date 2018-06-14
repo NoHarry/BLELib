@@ -8,11 +8,11 @@
     "./gradlew assembleDebug"
   ],
   "android": {
-    "licenses":
+    "licenses": [
       - 'android-sdk-preview-license-.+'
       - 'android-sdk-license-.+'
       - 'google-gdk-license-.+'
-    ,
+    ],
     "components": [
       "tools",
       "platform-tools",
