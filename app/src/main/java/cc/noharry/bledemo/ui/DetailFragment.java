@@ -28,6 +28,7 @@ import cc.noharry.bledemo.databinding.FragmentDetailBinding;
 import cc.noharry.bledemo.ui.adapter.DeviceDetailAdapter;
 import cc.noharry.bledemo.ui.adapter.DeviceDetailAdapter.OnCharacteristicClickListener;
 import cc.noharry.bledemo.ui.toolbar.IWithBack;
+import cc.noharry.bledemo.ui.view.WriteDialog;
 import cc.noharry.bledemo.util.L;
 import cc.noharry.bledemo.viewmodel.HomeViewmodel;
 import com.chad.library.adapter.base.entity.MultiItemEntity;
@@ -54,6 +55,7 @@ public class DetailFragment extends Fragment implements IWithBack {
   private DeviceDetailAdapter mAdapter;
   private MenuItem mItem;
   private AtomicBoolean isConnect=new AtomicBoolean(false);
+  private WriteDialog mDialog;
 
   public DetailFragment() {
     // Required empty public constructor
@@ -129,6 +131,7 @@ public class DetailFragment extends Fragment implements IWithBack {
   }
 
   private void initView() {
+    initDialog();
     LinearLayoutManager layoutManager=new LinearLayoutManager(getActivity()
         ,LinearLayoutManager.VERTICAL,false);
     mAdapter = new DeviceDetailAdapter(mList);
@@ -146,9 +149,16 @@ public class DetailFragment extends Fragment implements IWithBack {
 
       @Override
       public void onWrite(BluetoothGattCharacteristic characteristic, View view, int position) {
+        if (mDialog!=null){
+          mDialog.show();
+        }
         mHomeViewmodel.write(mDevice,characteristic,"123".getBytes());
       }
     });
+  }
+
+  private void initDialog() {
+    mDialog = new WriteDialog(getActivity());
   }
 
   private void initObserver() {

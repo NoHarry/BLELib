@@ -11,4 +11,6 @@
   <string name="menu_stop_scan">STOP SCAN</string>
   <string name="menu_connect">Connect</string>
   <string name="menu_disconnect">Disconnect</string>
+  <string name="dialog_send">Send</string>
+  <string name="dialog_cancel">Cancel</string>
 </resources>

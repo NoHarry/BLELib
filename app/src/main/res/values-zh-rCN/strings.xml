@@ -15,4 +15,6 @@
   <string name="menu_stop_scan">停止扫描</string>
   <string name="menu_connect">连接</string>
   <string name="menu_disconnect">断开连接</string>
+  <string name="dialog_send">发送</string>
+  <string name="dialog_cancel">取消</string>
 </resources>
