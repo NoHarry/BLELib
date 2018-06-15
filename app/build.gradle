@@ -25,6 +25,7 @@ android {
     }
 }
 
+
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:' + rootProject.supportLibVersion
@@ -42,4 +43,10 @@ dependencies {
     annotationProcessor "android.arch.lifecycle:compiler:" + rootProject.lifecycleVersion
     implementation 'android.arch.lifecycle:extensions:' + rootProject.lifecycleVersion
 
+}
+
+
+if (!project.rootProject.file('local.properties').exists()) {
+    apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+    apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
 }
