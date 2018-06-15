@@ -19,6 +19,7 @@ sudo: required #The build runs out of memory and is killed if we use the contain
 
 before_install:
   - yes | sdkmanager "platforms;android-27"
+  - yes | sdkmanager "platforms;android-26"
 
 script:
   - ./gradlew clean buildgradlew assembleRelease
