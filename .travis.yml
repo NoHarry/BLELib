@@ -3,24 +3,18 @@ jdk: oraclejdk8
 sudo: false
 
 android:
-  components:
+components:
     - tools
     - platform-tools
     - build-tools-27.0.1
     - android-27
-    - add-on
-    - extra
-
-  licenses:
-    - 'android-sdk-license-.+'
-
-  notifications:
-    email: false
-
+    - extra-android-m2repository
+    - extra-android-support
 before_install:
-    - yes | $ANDROID_HOME/tools/bin/sdkmanager "build-tools;27.0.1"
-    - yes | $ANDROID_HOME/tools/bin/sdkmanager "build-tools;26.0.2"
+  - chmod +x gradlew
+  - mkdir "$ANDROID_HOME/licenses" || true
+  # Hack to accept Android licenses
+  - yes | sdkmanager "platforms;android-27"
 
 script:
-  - ./gradlew assembleDebug
-
+  - ./gradlew assembleRelease
