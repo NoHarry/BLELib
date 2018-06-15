@@ -190,6 +190,7 @@ public class DetailFragment extends Fragment implements IWithBack {
               }
             }
             mList.add(deviceService);
+
           }
 
         }
