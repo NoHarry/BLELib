@@ -67,7 +67,9 @@ public class LogDialog extends Dialog {
 
   private void initRV() {
     mAdapter = new LogAdapter(mContext,mLogList);
-    LayoutManager layoutManager=new LinearLayoutManager(mContext,LinearLayoutManager.VERTICAL,false);
+    LayoutManager layoutManager=new LinearLayoutManager(mContext
+        ,LinearLayoutManager.VERTICAL
+        ,false);
     mRecyclerView.setAdapter(mAdapter);
     mRecyclerView.setLayoutManager(layoutManager);
   }

@@ -54,12 +54,13 @@ public class LogUtil {
           String str = null;
           Log log=null;
           while((str = bufferedReader.readLine())!=null){
-            clearLog();
+//            clearLog();
             /*if (log!=null&&str.equals(log.getContent())){
               System.out.println("log:"+log.getContent());
               continue;
             }*/
-            if (str.contains(String.valueOf(pid))&&callback!=null){
+            if (str.contains(String.valueOf(pid))&&(str.contains(L.TAG)||str.contains(
+                cc.noharry.blelib.util.L.TAG))&&callback!=null){
               Level level = getLevel(str);
               log=new Log(level,str);
               callback.onLog(log);

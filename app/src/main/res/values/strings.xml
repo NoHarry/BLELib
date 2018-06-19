@@ -13,4 +13,12 @@
   <string name="menu_disconnect">Disconnect</string>
   <string name="dialog_send">Send</string>
   <string name="dialog_cancel">Cancel</string>
+  <string name="hex_num">abcdefABCDEF0123456789</string>
+  <string name="dialog_text">0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz</string>
+  <string name="btn_connect">Connect</string>
+  <string name="btn_connecting">Connecting</string>
+  <string name="btn_disconnect">Disconnect</string>
+
+  <string name="editext_hint_hex_error">Please enter a hexadecimal string</string>
+  <string name="editext_hint_hex">e.g:ab0a equals 0xab,0x0a</string>
 </resources>

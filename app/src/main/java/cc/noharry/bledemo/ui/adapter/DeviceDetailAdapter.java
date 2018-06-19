@@ -8,11 +8,11 @@ import cc.noharry.bledemo.R;
 import cc.noharry.bledemo.data.DeviceCharacteristic;
 import cc.noharry.bledemo.data.DeviceDescriptor;
 import cc.noharry.bledemo.data.DeviceService;
+import cc.noharry.bledemo.util.MethodUtils;
 import com.chad.library.adapter.base.BaseMultiItemQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.chad.library.adapter.base.entity.MultiItemEntity;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -79,8 +79,9 @@ public class DeviceDetailAdapter extends BaseMultiItemQuickAdapter<MultiItemEnti
       helper.setText(R.id.tv_characteristic_properties
           ,getProperties(characteristic
               .getBluetoothGattCharacteristic().getProperties()).toString());
-      helper.setText(R.id.tv_characteristic_value,Arrays.toString(characteristic
-          .getBluetoothGattCharacteristic().getValue()));
+      helper.setText(R.id.tv_characteristic_value
+          ,MethodUtils.getHexString(characteristic
+              .getBluetoothGattCharacteristic().getValue()));
 //      L.i("characteristic:"+Arrays.toString(characteristic.getBluetoothGattCharacteristic().getValue()));
       setToolVisiable(helper,characteristic
           .getBluetoothGattCharacteristic().getProperties());
@@ -192,8 +193,11 @@ public class DeviceDetailAdapter extends BaseMultiItemQuickAdapter<MultiItemEnti
   private void setToolGone(BaseViewHolder helper){
     ImageView write=helper.itemView.findViewById(R.id.iv_characteristic_write);
     ImageView read=helper.itemView.findViewById(R.id.iv_characteristic_read);
-    write.setVisibility(View.GONE);
-    read.setVisibility(View.GONE);
+    if (write!=null&&read!=null){
+      write.setVisibility(View.GONE);
+      read.setVisibility(View.GONE);
+    }
+
   }
 
 

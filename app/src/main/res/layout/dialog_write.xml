@@ -17,14 +17,30 @@
       android:layout_marginLeft="16dp"
       android:id="@+id/dialog_write_content_title"
       />
-    <EditText
+    <android.support.design.widget.TextInputLayout
+      android:layout_width="180dp"
+      android:layout_height="wrap_content"
+      android:layout_toRightOf="@id/dialog_write_content_title"
+      android:id="@+id/dialog_write_content_container"
+      android:layout_marginTop="35dp"
+      android:layout_marginLeft="16dp"
+      android:labelFor="@+id/dialog_write_content"
+      >
+      <android.support.design.widget.TextInputEditText
+        android:layout_width="180dp"
+        android:layout_height="wrap_content"
+        android:id="@id/dialog_write_content"
+        />
+    </android.support.design.widget.TextInputLayout>
+    <!--<EditText
       android:layout_width="180dp"
       android:layout_height="wrap_content"
       android:layout_toRightOf="@id/dialog_write_content_title"
       android:id="@+id/dialog_write_content"
       android:layout_marginTop="40dp"
       android:layout_marginLeft="16dp"
-      />
+      android:digits="@string/hex_num"
+      />-->
     <Spinner
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
@@ -37,9 +53,9 @@
      android:layout_width="40dp"
      android:layout_height="30dp"
      android:text="@string/dialog_send"
-     android:layout_below="@id/dialog_write_content"
-     android:layout_marginTop="30dp"
+     android:layout_marginTop="80dp"
      android:layout_marginRight="30dp"
+     android:layout_below="@id/dialog_write_spinner"
      android:background="?attr/selectableItemBackgroundBorderless"
      android:gravity="center"
      android:id="@+id/dialog_write_send"
@@ -49,8 +65,8 @@
       android:layout_width="50dp"
       android:layout_height="30dp"
       android:text="@string/dialog_cancel"
-      android:layout_below="@id/dialog_write_content"
-      android:layout_marginTop="30dp"
+      android:layout_below="@id/dialog_write_spinner"
+      android:layout_marginTop="80dp"
       android:layout_toLeftOf="@id/dialog_write_send"
       android:layout_toStartOf="@id/dialog_write_send"
       android:layout_marginRight="30dp"

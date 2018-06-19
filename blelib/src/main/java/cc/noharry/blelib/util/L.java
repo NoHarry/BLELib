@@ -30,7 +30,7 @@ public class L {
 	// 是否需要打印bug
 	public static boolean isDebug = true;
 	public static int logStyle=0;
-	private static final String TAG = "BLELIB";
+	public static final String TAG = "BLELIB";
 
 	// 下面四个是默认tag的函数
 	public static void i(String msg) {

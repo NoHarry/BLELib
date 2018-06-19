@@ -1,6 +1,7 @@
 package cc.noharry.bledemo.ui;
 
 
+import android.app.Dialog;
 import android.arch.lifecycle.Observer;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
@@ -29,6 +30,7 @@ import cc.noharry.bledemo.ui.adapter.DeviceDetailAdapter;
 import cc.noharry.bledemo.ui.adapter.DeviceDetailAdapter.OnCharacteristicClickListener;
 import cc.noharry.bledemo.ui.toolbar.IWithBack;
 import cc.noharry.bledemo.ui.view.WriteDialog;
+import cc.noharry.bledemo.ui.view.WriteDialog.WriteDialogListener;
 import cc.noharry.bledemo.util.L;
 import cc.noharry.bledemo.viewmodel.HomeViewmodel;
 import com.chad.library.adapter.base.entity.MultiItemEntity;
@@ -56,6 +58,11 @@ public class DetailFragment extends Fragment implements IWithBack {
   private MenuItem mItem;
   private AtomicBoolean isConnect=new AtomicBoolean(false);
   private WriteDialog mDialog;
+  public static final int TYPE_CHARACTERISTIC=0;
+  public static final int TYPE_DESCRIPTOR=1;
+  private BluetoothGattCharacteristic mCharacteristic=null;
+  private BluetoothGattDescriptor mDescriptor=null;
+  private int mType=0;
 
   public DetailFragment() {
     // Required empty public constructor
@@ -152,13 +159,32 @@ public class DetailFragment extends Fragment implements IWithBack {
         if (mDialog!=null){
           mDialog.show();
         }
-        mHomeViewmodel.write(mDevice,characteristic,"123".getBytes());
+        mCharacteristic=characteristic;
+        mType=TYPE_CHARACTERISTIC;
       }
     });
   }
 
   private void initDialog() {
     mDialog = new WriteDialog(getActivity());
+    mDialog.setOnWriteDialogListener(new WriteDialogListener() {
+      @Override
+      public void onCancelClick(Dialog dialog) {
+        dialog.dismiss();
+      }
+
+      @Override
+      public void onSendClick(Dialog dialog, byte[] data) {
+        switch (mType){
+          case TYPE_CHARACTERISTIC:
+            mHomeViewmodel.write(mDevice,mCharacteristic,data);
+            break;
+          case TYPE_DESCRIPTOR:
+            break;
+        }
+        dialog.dismiss();
+      }
+    });
   }
 
   private void initObserver() {

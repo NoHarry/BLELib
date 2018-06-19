@@ -310,7 +310,7 @@ public class HomeViewmodel extends AndroidViewModel {
         .with(new ReadCallback() {
           @Override
           public void onDataRecived(BleDevice bleDevice, Data data) {
-            L.i("onDataRecived:" + Arrays.toString(data.getValue()));
+            L.i("onDataRecived:" + data.toString());
           }
 
           @Override
@@ -337,7 +337,7 @@ public class HomeViewmodel extends AndroidViewModel {
         .with(new WriteCallback() {
           @Override
           public void onDataSent(BleDevice bleDevice, Data data) {
-            L.i("onDataSent:"+Arrays.toString(data.getValue()));
+            L.i("onDataSent:"+data.toString());
           }
 
           @Override

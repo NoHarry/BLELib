@@ -1,5 +1,7 @@
 package cc.noharry.bledemo.ui;
 
+import android.app.Activity;
+import android.app.Application;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
@@ -11,6 +13,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentManager.FragmentLifecycleCallbacks;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.widget.TextView;
 import androidx.navigation.Navigation;
 import cc.noharry.bledemo.R;
@@ -18,6 +21,7 @@ import cc.noharry.bledemo.databinding.ActivityHomeBinding;
 import cc.noharry.bledemo.ui.toolbar.IWithBack;
 import cc.noharry.bledemo.ui.toolbar.IWithoutBack;
 import cc.noharry.bledemo.ui.view.LogDialog;
+import cc.noharry.bledemo.util.L;
 import cc.noharry.bledemo.viewmodel.HomeViewmodel;
 import cc.noharry.bledemo.viewmodel.ViewModelFactory;
 
@@ -29,6 +33,7 @@ public class HomeActivity extends AppCompatActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    setCustomDensity(this,getApplication());
     mBinding=DataBindingUtil.setContentView(this,R.layout.activity_home);
     initFragmentLifeCycle();
     initData();
@@ -50,7 +55,6 @@ public class HomeActivity extends AppCompatActivity {
 //            mDialog.addLog(log);
             mDialog.notifyLog();
           }
-
         }
       }
     });
@@ -90,6 +94,47 @@ public class HomeActivity extends AppCompatActivity {
     mDialog.show();
   }
 
+
+  private static float sNoCompatDensity;
+  private static float sNoCompatScaleDensity;
+  public void setCustomDensity(Activity activity,Application application){
+    final DisplayMetrics displayMetrics = application.getResources().getDisplayMetrics();
+    if (sNoCompatDensity==0){
+      sNoCompatDensity=displayMetrics.density;
+      sNoCompatScaleDensity=displayMetrics.scaledDensity;
+
+      /*application.registerComponentCallbacks(new ComponentCallbacks() {
+        @Override
+        public void onConfigurationChanged(Configuration newConfig) {
+          if (newConfig!=null&&newConfig.fontScale>0){
+            sNoCompatScaleDensity=application.getResources().getDisplayMetrics().scaledDensity;
+          }
+        }
+
+        @Override
+        public void onLowMemory() {
+
+        }
+      });
+*/
+      final float targetDensity=displayMetrics.widthPixels/420.0f;
+//      final float targetDensity=displayMetrics.widthPixels/360.0f;
+      final float targetScaleDensity=targetDensity*(sNoCompatScaleDensity/sNoCompatDensity);
+      final int targetDensityDpi= (int) (160*targetDensity);
+
+      L.i("sNoCompatDensity:"+sNoCompatDensity+" sNoCompatScaleDensity:"+sNoCompatScaleDensity
+          +" targetDensity:"+targetDensity+" targetScaleDensity:"+targetScaleDensity+" targetDensityDpi:"+targetDensityDpi);
+
+      displayMetrics.density=targetDensity;
+      displayMetrics.scaledDensity=targetScaleDensity;
+      displayMetrics.densityDpi=targetDensityDpi;
+
+      final DisplayMetrics activityMetrics = activity.getResources().getDisplayMetrics();
+      activityMetrics.density=targetDensity;
+      activityMetrics.scaledDensity=targetScaleDensity;
+      activityMetrics.densityDpi=targetDensityDpi;
+    }
+  }
 
   private void initFragmentLifeCycle() {
     setSupportActionBar(mBinding.includeToolbar.appToolbar);
