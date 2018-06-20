@@ -22,6 +22,7 @@ import cc.noharry.blelib.ble.scan.BleScanConfig;
 import cc.noharry.blelib.callback.BaseBleConnectCallback;
 import cc.noharry.blelib.callback.BleConnectCallback;
 import cc.noharry.blelib.callback.BleScanCallback;
+import cc.noharry.blelib.callback.DataChangeCallback;
 import cc.noharry.blelib.callback.ReadCallback;
 import cc.noharry.blelib.callback.WriteCallback;
 import cc.noharry.blelib.data.BleDevice;
@@ -361,6 +362,36 @@ public class HomeViewmodel extends AndroidViewModel {
   private boolean checkSameDevice(BleDevice bleDevice1,BleDevice bleDevice2){
     return (bleDevice1.getKey()!=null)&&(bleDevice2.getKey()!=null)
         &&(bleDevice1.getKey().equalsIgnoreCase(bleDevice2.getKey()));
+  }
+
+  public void getConnectDevice(){
+    BleAdmin.getINSTANCE(getApplication()).getConnectBt();
+  }
+
+  public void enableNotify(Device device,BluetoothGattCharacteristic characteristic){
+    WriteTask enableTask = Task.newEnableNotificationsTask(device.getBleDevice(), characteristic).with(
+        new DataChangeCallback() {
+          @Override
+          public void onDataChange(BleDevice bleDevice, Data data) {
+
+          }
+
+          @Override
+          public void onOperationSuccess(BleDevice bleDevice) {
+
+          }
+
+          @Override
+          public void onFail(BleDevice bleDevice, int statuCode, String message) {
+
+          }
+
+          @Override
+          public void onComplete(BleDevice bleDevice) {
+
+          }
+        });
+    BleAdmin.getINSTANCE(getApplication()).addTask(enableTask);
   }
 
 

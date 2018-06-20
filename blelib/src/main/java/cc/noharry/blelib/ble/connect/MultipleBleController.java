@@ -37,6 +37,7 @@ import java.util.concurrent.ConcurrentMap;
   }
 
   public List<BleDevice> getConnectedDevice(){
+    BleConnectorProxy.getInstance(mContext).updateDevice();
     List<BleDevice> result=new ArrayList<>();
     for (String s:clientMap.keySet()){
       BleClient bleClient = clientMap.get(s);
@@ -46,4 +47,6 @@ import java.util.concurrent.ConcurrentMap;
     }
     return result;
   }
+
+
 }

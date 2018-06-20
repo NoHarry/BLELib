@@ -1,6 +1,7 @@
 package cc.noharry.bledemo.ui.adapter;
 
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.graphics.drawable.AnimatedVectorDrawable;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
@@ -25,6 +26,10 @@ public class DeviceDetailAdapter extends BaseMultiItemQuickAdapter<MultiItemEnti
   public static final int TYPE_CHARACTERISTIC=1;
   public static final int TYPE_DESCRIPTOR=2;
   public AtomicBoolean isConnected=new AtomicBoolean(false);
+  private AnimatedVectorDrawable mNotifyImage;
+  private ImageView mWrite;
+  private ImageView mRead;
+  private ImageView mNotify;
 
 
   /**
@@ -39,6 +44,7 @@ public class DeviceDetailAdapter extends BaseMultiItemQuickAdapter<MultiItemEnti
     addItemType(TYPE_SERVICE, R.layout.item_service);
     addItemType(TYPE_CHARACTERISTIC,R.layout.item_characteristic);
     addItemType(TYPE_DESCRIPTOR,R.layout.item_descriptor);
+
   }
 
   @Override
@@ -73,6 +79,10 @@ public class DeviceDetailAdapter extends BaseMultiItemQuickAdapter<MultiItemEnti
 
   private void handleCharacteristic(BaseViewHolder helper, DeviceCharacteristic item) {
     DeviceCharacteristic characteristic= item;
+    mNotifyImage = (AnimatedVectorDrawable) mContext.getDrawable(R.drawable.ic_notify_off_on);
+    mWrite = helper.itemView.findViewById(R.id.iv_characteristic_write);
+    mRead = helper.itemView.findViewById(R.id.iv_characteristic_read);
+    mNotify = helper.itemView.findViewById(R.id.iv_characteristic_notify);
     if (isConnected.get()){
 
       helper.setText(R.id.tv_characteristic_uuid,characteristic.getBluetoothGattCharacteristic().getUuid().toString());
@@ -82,6 +92,7 @@ public class DeviceDetailAdapter extends BaseMultiItemQuickAdapter<MultiItemEnti
       helper.setText(R.id.tv_characteristic_value
           ,MethodUtils.getHexString(characteristic
               .getBluetoothGattCharacteristic().getValue()));
+
 //      L.i("characteristic:"+Arrays.toString(characteristic.getBluetoothGattCharacteristic().getValue()));
       setToolVisiable(helper,characteristic
           .getBluetoothGattCharacteristic().getProperties());
@@ -112,7 +123,16 @@ public class DeviceDetailAdapter extends BaseMultiItemQuickAdapter<MultiItemEnti
                 .getBluetoothGattCharacteristic(),helper.itemView,helper.getAdapterPosition());
           }
         });
+    helper.itemView.findViewById(R.id.iv_characteristic_notify).setOnClickListener(
+        new OnClickListener() {
+          @Override
+          public void onClick(View v) {
 
+//            mNotifyImage.start();
+            mCharacteristicClickListener.onNotify(characteristic
+                .getBluetoothGattCharacteristic(),v,helper.getAdapterPosition());
+          }
+        });
 
     helper.itemView.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -175,27 +195,34 @@ public class DeviceDetailAdapter extends BaseMultiItemQuickAdapter<MultiItemEnti
 
   private void setToolVisiable(BaseViewHolder helper,int properties){
     List<String> list = getProperties(properties);
-    ImageView write=helper.itemView.findViewById(R.id.iv_characteristic_write);
-    ImageView read=helper.itemView.findViewById(R.id.iv_characteristic_read);
+
+//    notify.setImageDrawable(mNotifyImage);
     if (list.contains("READ")){
-      read.setVisibility(View.VISIBLE);
+      mRead.setVisibility(View.VISIBLE);
     }else {
-      read.setVisibility(View.GONE);
+      mRead.setVisibility(View.GONE);
     }
 
     if (list.contains("WRITE")){
-      write.setVisibility(View.VISIBLE);
+      mWrite.setVisibility(View.VISIBLE);
     }else {
-      write.setVisibility(View.GONE);
+      mWrite.setVisibility(View.GONE);
+    }
+
+    if (list.contains("NOTIFY")){
+      mNotify.setVisibility(View.VISIBLE);
+    }else {
+      mNotify.setVisibility(View.GONE);
     }
   }
 
   private void setToolGone(BaseViewHolder helper){
-    ImageView write=helper.itemView.findViewById(R.id.iv_characteristic_write);
-    ImageView read=helper.itemView.findViewById(R.id.iv_characteristic_read);
-    if (write!=null&&read!=null){
-      write.setVisibility(View.GONE);
-      read.setVisibility(View.GONE);
+
+//    notify.setImageDrawable(mNotifyImage);
+    if (mWrite!=null&&mRead!=null&&mNotify!=null){
+      mWrite.setVisibility(View.GONE);
+      mRead.setVisibility(View.GONE);
+      mNotify.setVisibility(View.GONE);
     }
 
   }
@@ -204,6 +231,7 @@ public class DeviceDetailAdapter extends BaseMultiItemQuickAdapter<MultiItemEnti
   public interface OnCharacteristicClickListener{
     void onRead(BluetoothGattCharacteristic characteristic,View view,int position);
     void onWrite(BluetoothGattCharacteristic characteristic,View view,int position);
+    void onNotify(BluetoothGattCharacteristic characteristic,View view,int position);
   }
 
   private OnCharacteristicClickListener mCharacteristicClickListener=null;

@@ -286,6 +286,9 @@ public class BleClient implements IBleOperation{
       case ENABLE_NOTIFICATIONS:
         isOperationSuccess=handleEnableNotification(mBluetoothGattCharacteristic);
         break;
+      case DISABLE_NOTIFICATIONS:
+        isOperationSuccess=handleDisableNotification(mBluetoothGattCharacteristic);
+        break;
       default:
     }
     isOperating.set(false);
@@ -325,7 +328,42 @@ public class BleClient implements IBleOperation{
       remoteEnable = gatt.writeDescriptor(descriptor);
       L.i("Enable notifications for " + mBluetoothGattCharacteristic.getUuid());
     }
+    L.i("result:"+" localEnable:"+localEnable+" remoteEnable:"+remoteEnable+" descriptor:"+descriptor);
     boolean result = localEnable & remoteEnable;
+    return result;
+  }
+
+
+
+  private boolean handleDisableNotification(
+      BluetoothGattCharacteristic mBluetoothGattCharacteristic) {
+    mCurrentDataChangeTask= (WriteTask) mCurrentTask;
+    if (gatt==null||mBluetoothGattCharacteristic==null){
+      return false;
+    }
+
+    //not check permissions because it's always return 0
+    //see:https://stackoverflow.com/questions/23674668/android-bluetooth-low-energy-characteristic-getpermissions-returns-0
+    int properties = mBluetoothGattCharacteristic.getProperties();
+    if ((properties&(BluetoothGattCharacteristic.PROPERTY_NOTIFY))==0){
+      return false;
+    }
+
+    //this method only Disable notification localy
+    //also need to setting CCCD to DISABLE_NOTIFICATION_VALUE to Disable notification on ble peripheral
+    //see:https://stackoverflow.com/questions/22817005/why-does-setcharacteristicnotification-not-actually-enable-notifications
+    //also see:https://developer.android.com/guide/topics/connectivity/bluetooth-le#notification
+    boolean localDisable = gatt.setCharacteristicNotification(mBluetoothGattCharacteristic, false);
+    final BluetoothGattDescriptor descriptor = mBluetoothGattCharacteristic
+        .getDescriptor(CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR_UUID);
+    boolean remoteDisable=false;
+    if (descriptor != null) {
+      descriptor.setValue(BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
+      mBluetoothGattCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+      remoteDisable = gatt.writeDescriptor(descriptor);
+      L.i("Disable notifications for " + mBluetoothGattCharacteristic.getUuid());
+    }
+    boolean result = localDisable & remoteDisable;
     return result;
   }
 
@@ -369,5 +407,13 @@ public class BleClient implements IBleOperation{
 
   protected int getCurrentConnectionState() {
     return mCurrentConnectionState;
+  }
+
+  protected void setIsConnected(boolean isConnected) {
+    this.isConnected.set(isConnected);
+  }
+
+  protected void setCurrentConnectionState(int currentConnectionState) {
+    mCurrentConnectionState = currentConnectionState;
   }
 }

@@ -9,6 +9,7 @@ import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
+import android.graphics.drawable.Animatable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -20,6 +21,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import cc.noharry.bledemo.R;
 import cc.noharry.bledemo.data.Device;
 import cc.noharry.bledemo.data.DeviceCharacteristic;
@@ -161,6 +163,12 @@ public class DetailFragment extends Fragment implements IWithBack {
         }
         mCharacteristic=characteristic;
         mType=TYPE_CHARACTERISTIC;
+      }
+
+      @Override
+      public void onNotify(BluetoothGattCharacteristic characteristic, View view, int position) {
+        ((Animatable) ((ImageView)view).getDrawable()).start();
+        mHomeViewmodel.enableNotify(mDevice,characteristic);
       }
     });
   }

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+  android:viewportWidth="24"
+  android:viewportHeight="24"
+  android:width="24dp"
+  android:height="24dp">
+  <group
+    android:name="notify_off_group"
+    >
+    <path
+      android:name="notify_off"
+      android:fillColor="#FF000000"
+      android:pathData="@string/notify_off_path"/>
+  </group>
+</vector>

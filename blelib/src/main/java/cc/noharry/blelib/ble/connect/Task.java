@@ -102,6 +102,11 @@ public class Task{
     return new WriteTask(Type.ENABLE_NOTIFICATIONS,bleDevice,serviceUUID,characteristicUUID);
   }
 
+  public static WriteTask newEnableNotificationsTask(BleDevice bleDevice
+      ,BluetoothGattCharacteristic characteristic){
+    return new WriteTask(Type.ENABLE_NOTIFICATIONS,bleDevice,characteristic);
+  }
+
   public BleDevice getBleDevice() {
     return mBleDevice;
   }

@@ -26,7 +26,10 @@ public class WriteTask extends Task {
       BluetoothGattCharacteristic bluetoothGattCharacteristic,byte[] data) {
     this(type, bleDevice, bluetoothGattCharacteristic,data,BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
   }
-
+  protected WriteTask(Type type, BleDevice bleDevice,
+      BluetoothGattCharacteristic bluetoothGattCharacteristic) {
+    this(type, bleDevice, bluetoothGattCharacteristic,BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+  }
   protected WriteTask(Type type, BleDevice bleDevice,
       BluetoothGattDescriptor bluetoothGattDescriptor,byte[] data) {
     this(type, bleDevice,  bluetoothGattDescriptor,data,BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
@@ -39,6 +42,13 @@ public class WriteTask extends Task {
 
   protected WriteTask(Type type, BleDevice bleDevice,
       BluetoothGattCharacteristic bluetoothGattCharacteristic,byte[] data,int writeType) {
+    super(type, bleDevice, bluetoothGattCharacteristic);
+    this.data=data;
+    this.mWriteType=writeType;
+    mBleConnectorProxy = BleConnectorProxy.getInstance(BleAdmin.getContext());
+  }
+  protected WriteTask(Type type, BleDevice bleDevice,
+      BluetoothGattCharacteristic bluetoothGattCharacteristic,int writeType) {
     super(type, bleDevice, bluetoothGattCharacteristic);
     this.data=data;
     this.mWriteType=writeType;

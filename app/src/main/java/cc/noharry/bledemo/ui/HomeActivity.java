@@ -13,6 +13,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentManager.FragmentLifecycleCallbacks;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.util.DisplayMetrics;
 import android.widget.TextView;
 import androidx.navigation.Navigation;
@@ -39,6 +40,12 @@ public class HomeActivity extends AppCompatActivity {
     initData();
     initObserver();
     initFb();
+  }
+
+  static {
+//设置VectorDrawable兼容支持，否则会闪退
+    AppCompatDelegate
+        .setCompatVectorFromResourcesEnabled(true);
   }
 
   private void initData() {
@@ -92,6 +99,7 @@ public class HomeActivity extends AppCompatActivity {
     mDialog = new LogDialog(this,this,mHomeViewmodel.getLogList());
 //    mHomeViewmodel.displayLog();
     mDialog.show();
+    mHomeViewmodel.getConnectDevice();
   }
 
 
