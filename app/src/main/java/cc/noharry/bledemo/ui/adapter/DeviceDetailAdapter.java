@@ -9,6 +9,7 @@ import cc.noharry.bledemo.R;
 import cc.noharry.bledemo.data.DeviceCharacteristic;
 import cc.noharry.bledemo.data.DeviceDescriptor;
 import cc.noharry.bledemo.data.DeviceService;
+import cc.noharry.bledemo.ui.view.ToggleImageView;
 import cc.noharry.bledemo.util.MethodUtils;
 import com.chad.library.adapter.base.BaseMultiItemQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
@@ -29,7 +30,7 @@ public class DeviceDetailAdapter extends BaseMultiItemQuickAdapter<MultiItemEnti
   private AnimatedVectorDrawable mNotifyImage;
   private ImageView mWrite;
   private ImageView mRead;
-  private ImageView mNotify;
+  private ToggleImageView mNotify;
 
 
   /**

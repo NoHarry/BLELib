@@ -9,7 +9,6 @@ import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
-import android.graphics.drawable.Animatable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -21,7 +20,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import cc.noharry.bledemo.R;
 import cc.noharry.bledemo.data.Device;
 import cc.noharry.bledemo.data.DeviceCharacteristic;
@@ -31,6 +29,7 @@ import cc.noharry.bledemo.databinding.FragmentDetailBinding;
 import cc.noharry.bledemo.ui.adapter.DeviceDetailAdapter;
 import cc.noharry.bledemo.ui.adapter.DeviceDetailAdapter.OnCharacteristicClickListener;
 import cc.noharry.bledemo.ui.toolbar.IWithBack;
+import cc.noharry.bledemo.ui.view.ToggleImageView;
 import cc.noharry.bledemo.ui.view.WriteDialog;
 import cc.noharry.bledemo.ui.view.WriteDialog.WriteDialogListener;
 import cc.noharry.bledemo.util.L;
@@ -167,8 +166,15 @@ public class DetailFragment extends Fragment implements IWithBack {
 
       @Override
       public void onNotify(BluetoothGattCharacteristic characteristic, View view, int position) {
-        ((Animatable) ((ImageView)view).getDrawable()).start();
-        mHomeViewmodel.enableNotify(mDevice,characteristic);
+        ToggleImageView toggleImageView = (ToggleImageView) view;
+        if (toggleImageView.getIsSwitchOn()){
+          toggleImageView.setSwitchMode(ToggleImageView.SWITCH_MODE_OFF).doSwitch();
+
+        }else {
+          toggleImageView.setSwitchMode(ToggleImageView.SWITCH_MODE_ON).doSwitch();
+          mHomeViewmodel.enableNotify(mDevice,characteristic);
+        }
+
       }
     });
   }

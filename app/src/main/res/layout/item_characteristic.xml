@@ -95,12 +95,14 @@
       android:src="@drawable/baseline_visibility_black_24"
       android:background="?attr/selectableItemBackgroundBorderless"
       />
-    <ImageView
-      android:layout_width="24dp"
-      android:layout_height="24dp"
+    <cc.noharry.bledemo.ui.view.ToggleImageView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
       android:id="@+id/iv_characteristic_notify"
       android:layout_marginRight="30dp"
-      app:srcCompat="@drawable/ic_notify_on_off"
+      app:is_switch_on="false"
+      app:switch_off_drawable="@drawable/ic_notify_on_off"
+      app:switch_on_drawable="@drawable/ic_notify_off_on"
       />
   </LinearLayout>
 </LinearLayout>

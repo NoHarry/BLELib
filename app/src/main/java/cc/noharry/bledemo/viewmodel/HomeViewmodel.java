@@ -4,7 +4,6 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattDescriptor;
 import android.databinding.ObservableBoolean;
 import android.os.Handler;
 import android.os.Looper;
@@ -28,7 +27,6 @@ import cc.noharry.blelib.callback.WriteCallback;
 import cc.noharry.blelib.data.BleDevice;
 import cc.noharry.blelib.data.Data;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -55,6 +53,9 @@ public class HomeViewmodel extends AndroidViewModel {
   public static final int SCANNING=0;
   public static final int NOT_SCAN=1;
   private BaseBleConnectCallback mBaseBleConnectCallback;
+  private WriteCallback mWriteCallback;
+  private DataChangeCallback mDataChangeCallback;
+  private ReadCallback mReadCallback;
 
 
   private void runOnUiThread(Runnable runnable){
@@ -107,7 +108,9 @@ public class HomeViewmodel extends AndroidViewModel {
         L.i("onScanCompleted:"+isScanning.get());
       }
     };
-  /*  mBleConnectCallback = new BleConnectCallback() {
+
+
+    mBleConnectCallback = new BleConnectCallback() {
       @Override
       public void onDeviceConnecting(BleDevice bleDevice) {
         Device device=new Device(bleDevice);
@@ -123,7 +126,7 @@ public class HomeViewmodel extends AndroidViewModel {
 
       @Override
       public void onDeviceConnected(BleDevice bleDevice) {
-        Device device=new Device(bleDevice);
+        /*Device device=new Device(bleDevice);
         device.setState(Device.CONNECTED);
         foundDevice.setValue(device);
         try {
@@ -131,7 +134,7 @@ public class HomeViewmodel extends AndroidViewModel {
             currentDevice.setValue(device);
           }
         }catch (NullPointerException e){
-        }
+        }*/
 
       }
 
@@ -166,9 +169,9 @@ public class HomeViewmodel extends AndroidViewModel {
         }catch (NullPointerException e){
         }
       }
-    };*/
+    };
 
-    mBaseBleConnectCallback = new BaseBleConnectCallback() {
+    /*mBaseBleConnectCallback = new BaseBleConnectCallback() {
       @Override
       public void onConnectionStateChangeBase(BleDevice bleDevice, BluetoothGatt gatt, int status,
           int newState) {
@@ -298,6 +301,76 @@ public class HomeViewmodel extends AndroidViewModel {
         }
         L.e("断开连接:"+foundDevice.getValue());
       }
+    };*/
+
+    mWriteCallback = new WriteCallback() {
+      @Override
+      public void onDataSent(BleDevice bleDevice, Data data) {
+        L.i("onDataSent:" + data.toString());
+        valueChange.setValue(0);
+      }
+
+      @Override
+      public void onOperationSuccess(BleDevice bleDevice) {
+        L.i("onOperationSuccess");
+      }
+
+      @Override
+      public void onFail(BleDevice bleDevice, int statuCode, String message) {
+        L.e("onFail:" + message);
+      }
+
+      @Override
+      public void onComplete(BleDevice bleDevice) {
+        L.i("onComplete");
+      }
+    };
+
+    mDataChangeCallback = new DataChangeCallback() {
+      @Override
+      public void onDataChange(BleDevice bleDevice, Data data) {
+        L.i("onDataChange:" + data.toString());
+        valueChange.setValue(0);
+      }
+
+      @Override
+      public void onOperationSuccess(BleDevice bleDevice) {
+
+      }
+
+      @Override
+      public void onFail(BleDevice bleDevice, int statuCode, String message) {
+
+      }
+
+      @Override
+      public void onComplete(BleDevice bleDevice) {
+
+      }
+    };
+
+    mReadCallback = new ReadCallback() {
+      @Override
+      public void onDataRecived(BleDevice bleDevice, Data data) {
+        L.i("onDataRecived:" + data.toString());
+        valueChange.setValue(0);
+      }
+
+      @Override
+      public void onOperationSuccess(BleDevice bleDevice) {
+        L.i("onOperationSuccess");
+
+      }
+
+      @Override
+      public void onFail(BleDevice bleDevice, int statuCode, String message) {
+        L.e("onFail:" + message);
+      }
+
+      @Override
+      public void onComplete(BleDevice bleDevice) {
+        L.i("onComplete");
+      }
     };
   }
 
@@ -308,54 +381,13 @@ public class HomeViewmodel extends AndroidViewModel {
 
   public void read(Device device,BluetoothGattCharacteristic characteristic){
     ReadTask task = Task.newReadTask(device.getBleDevice(), characteristic)
-        .with(new ReadCallback() {
-          @Override
-          public void onDataRecived(BleDevice bleDevice, Data data) {
-            L.i("onDataRecived:" + data.toString());
-          }
-
-          @Override
-          public void onOperationSuccess(BleDevice bleDevice) {
-            L.i("onOperationSuccess");
-
-          }
-
-          @Override
-          public void onFail(BleDevice bleDevice, int statuCode, String message) {
-            L.e("onFail:" + message);
-          }
-
-          @Override
-          public void onComplete(BleDevice bleDevice) {
-            L.i("onComplete");
-          }
-        });
+        .with(mReadCallback);
     BleAdmin.getINSTANCE(getApplication()).addTask(task);
   }
 
   public void write(Device device,BluetoothGattCharacteristic characteristic,byte[] data){
     WriteTask task = Task.newWriteTask(device.getBleDevice(), characteristic, data)
-        .with(new WriteCallback() {
-          @Override
-          public void onDataSent(BleDevice bleDevice, Data data) {
-            L.i("onDataSent:"+data.toString());
-          }
-
-          @Override
-          public void onOperationSuccess(BleDevice bleDevice) {
-            L.i("onOperationSuccess");
-          }
-
-          @Override
-          public void onFail(BleDevice bleDevice, int statuCode, String message) {
-            L.e("onFail:"+message);
-          }
-
-          @Override
-          public void onComplete(BleDevice bleDevice) {
-            L.i("onComplete");
-          }
-        });
+        .with(mWriteCallback);
     BleAdmin.getINSTANCE(getApplication()).addTask(task);
   }
 
@@ -369,28 +401,8 @@ public class HomeViewmodel extends AndroidViewModel {
   }
 
   public void enableNotify(Device device,BluetoothGattCharacteristic characteristic){
-    WriteTask enableTask = Task.newEnableNotificationsTask(device.getBleDevice(), characteristic).with(
-        new DataChangeCallback() {
-          @Override
-          public void onDataChange(BleDevice bleDevice, Data data) {
-
-          }
-
-          @Override
-          public void onOperationSuccess(BleDevice bleDevice) {
-
-          }
-
-          @Override
-          public void onFail(BleDevice bleDevice, int statuCode, String message) {
-
-          }
-
-          @Override
-          public void onComplete(BleDevice bleDevice) {
-
-          }
-        });
+    WriteTask enableTask = Task.newEnableNotificationsTask(device.getBleDevice(), characteristic)
+        .with(mDataChangeCallback);
     BleAdmin.getINSTANCE(getApplication()).addTask(enableTask);
   }
 
@@ -421,7 +433,7 @@ public class HomeViewmodel extends AndroidViewModel {
           .getINSTANCE(getApplication())
           .connect(device.getBleDevice()
               , false
-              , mBaseBleConnectCallback);
+              , mBleConnectCallback);
     }
 
   }
