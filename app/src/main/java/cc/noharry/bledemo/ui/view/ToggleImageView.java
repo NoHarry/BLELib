@@ -77,11 +77,12 @@ public class ToggleImageView extends android.support.v7.widget.AppCompatImageVie
   }
 
   private void switchView(boolean b){
+    L.i("isSwitchOn:"+isSwitchOn.get());
     isSwitchOn.set(b);
     if (isSwitchOn.get()){
-      mSwitchAni = (AnimatedVectorDrawable) mContext.getDrawable(mSwitchOffDrawable);
-    }else {
       mSwitchAni = (AnimatedVectorDrawable) mContext.getDrawable(mSwitchOnDrawable);
+    }else {
+      mSwitchAni = (AnimatedVectorDrawable) mContext.getDrawable(mSwitchOffDrawable);
     }
     setImageDrawable(mSwitchAni);
   }
@@ -100,14 +101,18 @@ public class ToggleImageView extends android.support.v7.widget.AppCompatImageVie
   public ToggleImageView setSwitchMode(int switchMode){
     switch(switchMode){
       case SWITCH_MODE_ON:
-        if (!isSwitchOn.get()){
+        switchView(true);
+        /*if (!isSwitchOn.get()){
           switchView(true);
-        }
+          doSwitch();
+        }*/
         break;
       case SWITCH_MODE_OFF:
-        if (isSwitchOn.get()){
+        switchView(false);
+        /*if (isSwitchOn.get()){
           switchView(false);
-        }
+          doSwitch();
+        }*/
 
         break;
     }

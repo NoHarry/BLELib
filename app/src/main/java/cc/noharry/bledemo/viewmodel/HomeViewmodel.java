@@ -405,7 +405,12 @@ public class HomeViewmodel extends AndroidViewModel {
         .with(mDataChangeCallback);
     BleAdmin.getINSTANCE(getApplication()).addTask(enableTask);
   }
+  public void disableNotify(Device device,BluetoothGattCharacteristic characteristic){
+    WriteTask disableTask = Task.newDisableNotificationsTask(device.getBleDevice(), characteristic)
+        .with(mDataChangeCallback);
+    BleAdmin.getINSTANCE(getApplication()).addTask(disableTask);
 
+  }
 
 
   public void scan(){

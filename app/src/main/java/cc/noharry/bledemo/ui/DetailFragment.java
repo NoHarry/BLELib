@@ -153,6 +153,7 @@ public class DetailFragment extends Fragment implements IWithBack {
         mHomeViewmodel.read(mDevice,characteristic);
 //        mAdapter.notifyItemChanged(position);
 //        mAdapter.notifyDataSetChanged();
+
       }
 
       @Override
@@ -169,7 +170,7 @@ public class DetailFragment extends Fragment implements IWithBack {
         ToggleImageView toggleImageView = (ToggleImageView) view;
         if (toggleImageView.getIsSwitchOn()){
           toggleImageView.setSwitchMode(ToggleImageView.SWITCH_MODE_OFF).doSwitch();
-
+          mHomeViewmodel.disableNotify(mDevice,characteristic);
         }else {
           toggleImageView.setSwitchMode(ToggleImageView.SWITCH_MODE_ON).doSwitch();
           mHomeViewmodel.enableNotify(mDevice,characteristic);
