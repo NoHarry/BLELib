@@ -5,6 +5,14 @@
   xmlns:app="http://schemas.android.com/apk/res-auto"
   tools:context=".ui.DetailFragment"
   >
+  <data>
+    <!--<variable
+      name="homeviewmodel"
+      type="cc.noharry.bledemo.viewmodel.HomeViewmodel"/>-->
+    <variable
+      name="homeViewModel"
+      type="cc.noharry.bledemo.viewmodel.HomeViewmodel"/>
+  </data>
 <LinearLayout
   android:layout_width="match_parent"
   android:layout_height="match_parent"

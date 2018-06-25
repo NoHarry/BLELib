@@ -29,6 +29,8 @@ import cc.noharry.bledemo.databinding.FragmentDetailBinding;
 import cc.noharry.bledemo.ui.adapter.DeviceDetailAdapter;
 import cc.noharry.bledemo.ui.adapter.DeviceDetailAdapter.OnCharacteristicClickListener;
 import cc.noharry.bledemo.ui.toolbar.IWithBack;
+import cc.noharry.bledemo.ui.view.OperationDialog;
+import cc.noharry.bledemo.ui.view.OperationDialog.OnOperationListener;
 import cc.noharry.bledemo.ui.view.ToggleImageView;
 import cc.noharry.bledemo.ui.view.WriteDialog;
 import cc.noharry.bledemo.ui.view.WriteDialog.WriteDialogListener;
@@ -64,6 +66,7 @@ public class DetailFragment extends Fragment implements IWithBack {
   private BluetoothGattCharacteristic mCharacteristic=null;
   private BluetoothGattDescriptor mDescriptor=null;
   private int mType=0;
+  private OperationDialog mOperationDialog;
 
   public DetailFragment() {
     // Required empty public constructor
@@ -177,6 +180,55 @@ public class DetailFragment extends Fragment implements IWithBack {
         }
 
       }
+
+      @Override
+      public void onOperation(BluetoothGattCharacteristic characteristic, View view, int position) {
+        mOperationDialog = new OperationDialog(getContext(),mDevice
+            ,characteristic,mHomeViewmodel.getLogList());
+        mOperationDialog.setOnOperationListener(new OnOperationListener() {
+          @Override
+          public void onCharacteristicWrite(Device device,
+              BluetoothGattCharacteristic bluetoothGattCharacteristic, byte[] data) {
+            mHomeViewmodel.write(device,bluetoothGattCharacteristic,data);
+          }
+
+          @Override
+          public void onDescriptorWrite(Device device,
+              BluetoothGattDescriptor bluetoothGattDescriptor, byte[] data) {
+
+          }
+
+          @Override
+          public void onCharacteristicRead(Device device,
+              BluetoothGattCharacteristic bluetoothGattCharacteristic) {
+            mHomeViewmodel.read(device, bluetoothGattCharacteristic);
+          }
+
+          @Override
+          public void onDescriptorRead(Device device,
+              BluetoothGattDescriptor bluetoothGattDescriptor) {
+
+          }
+
+          @Override
+          public void onEnableNotify(Device device,
+              BluetoothGattCharacteristic bluetoothGattCharacteristic) {
+            mHomeViewmodel.enableNotify(device, bluetoothGattCharacteristic);
+          }
+
+          @Override
+          public void onDisableNotify(Device device,
+              BluetoothGattCharacteristic bluetoothGattCharacteristic) {
+            mHomeViewmodel.disableNotify(device, bluetoothGattCharacteristic);
+          }
+
+          @Override
+          public void onCleanLog() {
+            mHomeViewmodel.clearLog();
+          }
+        });
+        mOperationDialog.show();
+      }
     });
   }
 
@@ -203,6 +255,12 @@ public class DetailFragment extends Fragment implements IWithBack {
   }
 
   private void initObserver() {
+
+    mHomeViewmodel.getDetailLogClean().observe(this,(integer -> {
+      if (mOperationDialog!=null){
+        mOperationDialog.notifyClean();
+      }
+    }));
     mHomeViewmodel.getCurrentDevice().observe(this, new Observer<Device>() {
       @Override
       public void onChanged(@Nullable Device device) {
@@ -259,6 +317,16 @@ public class DetailFragment extends Fragment implements IWithBack {
         }
       }
     });
+
+    mHomeViewmodel.getDetailLogSize().observe(this, new Observer<Integer>() {
+      @Override
+      public void onChanged(@Nullable Integer integer) {
+        if (mOperationDialog!=null){
+          mOperationDialog.notifyLog(integer.intValue());
+//          mOperationDialog.notifyLog();
+        }
+      }
+    });
   }
 
   private List<String> getProperties(int properties){
@@ -282,6 +350,7 @@ public class DetailFragment extends Fragment implements IWithBack {
 
   private void initData() {
     mHomeViewmodel = HomeActivity.obtainViewModel(getActivity());
+    mBinding.setHomeViewModel(mHomeViewmodel);
   }
 
 

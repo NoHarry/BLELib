@@ -99,7 +99,6 @@ public class HomeActivity extends AppCompatActivity {
     mDialog = new LogDialog(this,this,mHomeViewmodel.getLogList());
 //    mHomeViewmodel.displayLog();
     mDialog.show();
-    mHomeViewmodel.getConnectDevice();
   }
 
 

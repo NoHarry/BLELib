@@ -31,6 +31,7 @@ public class DeviceDetailAdapter extends BaseMultiItemQuickAdapter<MultiItemEnti
   private ImageView mWrite;
   private ImageView mRead;
   private ToggleImageView mNotify;
+  private ImageView mOperation;
 
 
   /**
@@ -84,6 +85,7 @@ public class DeviceDetailAdapter extends BaseMultiItemQuickAdapter<MultiItemEnti
     mWrite = helper.itemView.findViewById(R.id.iv_characteristic_write);
     mRead = helper.itemView.findViewById(R.id.iv_characteristic_read);
     mNotify = helper.itemView.findViewById(R.id.iv_characteristic_notify);
+    mOperation = helper.itemView.findViewById(R.id.iv_characteristic_operation);
     if (isConnected.get()){
 
       helper.setText(R.id.tv_characteristic_uuid,characteristic.getBluetoothGattCharacteristic().getUuid().toString());
@@ -134,7 +136,14 @@ public class DeviceDetailAdapter extends BaseMultiItemQuickAdapter<MultiItemEnti
                 .getBluetoothGattCharacteristic(),v,helper.getAdapterPosition());
           }
         });
-
+    helper.itemView.findViewById(R.id.iv_characteristic_operation).setOnClickListener(
+        new OnClickListener() {
+          @Override
+          public void onClick(View v) {
+            mCharacteristicClickListener.onOperation(characteristic
+                .getBluetoothGattCharacteristic(),v,helper.getAdapterPosition());
+          }
+        });
     helper.itemView.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
@@ -215,15 +224,22 @@ public class DeviceDetailAdapter extends BaseMultiItemQuickAdapter<MultiItemEnti
     }else {
       mNotify.setVisibility(View.GONE);
     }
+
+    if (!list.isEmpty()){
+      mOperation.setVisibility(View.VISIBLE);
+    }else {
+      mOperation.setVisibility(View.GONE);
+    }
   }
 
   private void setToolGone(BaseViewHolder helper){
 
 //    notify.setImageDrawable(mNotifyImage);
-    if (mWrite!=null&&mRead!=null&&mNotify!=null){
+    if (mWrite!=null&&mRead!=null&&mNotify!=null&&mOperation!=null){
       mWrite.setVisibility(View.GONE);
       mRead.setVisibility(View.GONE);
       mNotify.setVisibility(View.GONE);
+      mOperation.setVisibility(View.GONE);
     }
 
   }
@@ -233,6 +249,7 @@ public class DeviceDetailAdapter extends BaseMultiItemQuickAdapter<MultiItemEnti
     void onRead(BluetoothGattCharacteristic characteristic,View view,int position);
     void onWrite(BluetoothGattCharacteristic characteristic,View view,int position);
     void onNotify(BluetoothGattCharacteristic characteristic,View view,int position);
+    void onOperation(BluetoothGattCharacteristic characteristic,View view,int position);
   }
 
   private OnCharacteristicClickListener mCharacteristicClickListener=null;

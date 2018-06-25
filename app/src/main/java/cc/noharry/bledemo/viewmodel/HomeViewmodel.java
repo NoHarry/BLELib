@@ -39,6 +39,9 @@ public class HomeViewmodel extends AndroidViewModel {
   private final SingleLiveEvent<Device> currentDevice=new SingleLiveEvent<>();
   private final SingleLiveEvent<Integer> currentDeviceState=new SingleLiveEvent<>();
   private final SingleLiveEvent<Integer> logSize=new SingleLiveEvent<>();
+  private final SingleLiveEvent<Integer> detailLogSize=new SingleLiveEvent<>();
+  private final SingleLiveEvent<Integer> detailLogClean=new SingleLiveEvent<>();
+  private final SingleLiveEvent<Integer> homeLogClean=new SingleLiveEvent<>();
   private final SingleLiveEvent<List<Device>> deviceList=new SingleLiveEvent<>();
   public final ObservableBoolean isScanning=new ObservableBoolean(false);
   private final SingleLiveEvent<Integer> scanState=new SingleLiveEvent<>();
@@ -80,7 +83,10 @@ public class HomeViewmodel extends AndroidViewModel {
           runOnUiThread(()->mLog.setValue(log));
         }*/
         mLogList.add(log);
-        runOnUiThread(()->logSize.setValue(mLogList.size()));
+        runOnUiThread(()->{
+          logSize.setValue(mLogList.size());
+          detailLogSize.setValue(mLogList.size());
+        });
 
       }
     };
@@ -376,6 +382,8 @@ public class HomeViewmodel extends AndroidViewModel {
 
   public void clearLog(){
     mLogList.clear();
+    detailLogClean.setValue(mLogList.size());
+    homeLogClean.setValue(mLogList.size());
   }
 
 
@@ -484,6 +492,18 @@ public class HomeViewmodel extends AndroidViewModel {
 
   public SingleLiveEvent<Integer> getValueChange() {
     return valueChange;
+  }
+
+  public SingleLiveEvent<Integer> getDetailLogSize() {
+    return detailLogSize;
+  }
+
+  public SingleLiveEvent<Integer> getDetailLogClean() {
+    return detailLogClean;
+  }
+
+  public SingleLiveEvent<Integer> getHomeLogClean() {
+    return homeLogClean;
   }
 
   public List<Log> getLogList() {
