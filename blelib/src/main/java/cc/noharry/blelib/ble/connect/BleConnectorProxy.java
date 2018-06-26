@@ -93,23 +93,6 @@ public class BleConnectorProxy implements IBleOperation{
         }
       }
     });
-    /*new Thread(new Runnable() {
-      @Override
-      public void run() {
-        while (true){
-          try {
-            if (!isOperating.get()){
-              Task task = mBlockingDeque.take();
-              doTask(task);
-            }
-
-          } catch (InterruptedException e) {
-            e.printStackTrace();
-          }
-        }
-      }
-    }).start();
-*/
   }
 
   private void runOnUiThread(Runnable runnable){
@@ -187,7 +170,7 @@ public class BleConnectorProxy implements IBleOperation{
   }
 
   public void enqueue(Task task){
-    L.e("enqueue task:"+task);
+    L.i("enqueue task:"+task);
     try {
       mBlockingDeque.put(task);
     } catch (InterruptedException e) {
@@ -196,7 +179,7 @@ public class BleConnectorProxy implements IBleOperation{
   }
 
   public void taskNotify(int state){
-    L.e("taskNotify:"+state+" message:"+ GattError.parse(state));
+    L.i("Task Finished:"+state+" message:"+ GattError.parse(state));
     isOperating.set(false);
   }
 }

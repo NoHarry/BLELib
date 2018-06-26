@@ -22,6 +22,7 @@ import cc.noharry.bledemo.databinding.ActivityHomeBinding;
 import cc.noharry.bledemo.ui.toolbar.IWithBack;
 import cc.noharry.bledemo.ui.toolbar.IWithoutBack;
 import cc.noharry.bledemo.ui.view.LogDialog;
+import cc.noharry.bledemo.ui.view.LogDialog.OnLogListener;
 import cc.noharry.bledemo.util.L;
 import cc.noharry.bledemo.viewmodel.HomeViewmodel;
 import cc.noharry.bledemo.viewmodel.ViewModelFactory;
@@ -66,6 +67,11 @@ public class HomeActivity extends AppCompatActivity {
       }
     });
     */
+    mHomeViewmodel.getHomeLogClean().observe(this,(integer -> {
+      if (mDialog!=null){
+        mDialog.notifyClean();
+      }
+    }));
     mHomeViewmodel.getLogSize().observe(this, new Observer<Integer>() {
       @Override
       public void onChanged(@Nullable Integer integer) {
@@ -98,6 +104,12 @@ public class HomeActivity extends AppCompatActivity {
   private void showDialog() {
     mDialog = new LogDialog(this,this,mHomeViewmodel.getLogList());
 //    mHomeViewmodel.displayLog();
+    mDialog.setOnLogListener(new OnLogListener() {
+      @Override
+      public void onCleanLog() {
+        mHomeViewmodel.clearLog();
+      }
+    });
     mDialog.show();
   }
 

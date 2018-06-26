@@ -14,10 +14,9 @@
     type="cc.noharry.bledemo.viewmodel.HomeViewmodel"/>
 </data>
 
-<LinearLayout
+<RelativeLayout
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  android:orientation="vertical"
  >
 
   <android.support.v4.widget.SwipeRefreshLayout
@@ -35,5 +34,5 @@
   </android.support.v4.widget.SwipeRefreshLayout>
 
 
-</LinearLayout>
+</RelativeLayout>
 </layout>

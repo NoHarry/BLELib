@@ -25,6 +25,8 @@ import cc.noharry.bledemo.ui.adapter.DeviceAdapter;
 import cc.noharry.bledemo.ui.adapter.DeviceAdapter.OnConnectClickListener;
 import cc.noharry.bledemo.ui.toolbar.IWithoutBack;
 import cc.noharry.bledemo.ui.view.LogDialog;
+import cc.noharry.bledemo.ui.view.ScanFilterDialog;
+import cc.noharry.bledemo.ui.view.ScanFilterDialog.OnFilterConfirmListener;
 import cc.noharry.bledemo.util.L;
 import cc.noharry.bledemo.util.ThreadPoolProxyFactory;
 import cc.noharry.bledemo.viewmodel.HomeViewmodel;
@@ -54,6 +56,7 @@ public class HomeFragment extends Fragment implements IWithoutBack {
   private HomeActivity mParent;
   private LogDialog mDialog;
   private MenuItem mItem;
+  private ScanFilterDialog mScanFilterDialog;
 
 
   public HomeFragment() {
@@ -111,17 +114,15 @@ public class HomeFragment extends Fragment implements IWithoutBack {
         scan();
       }
     });
+
+    mScanFilterDialog.setOnFilterConfirmListener(new OnFilterConfirmListener() {
+      @Override
+      public void onConfirm(String mac, String uuid, String name) {
+        L.i("onConfirm:"+" mac:"+mac+" UUID:"+uuid+" name:"+name);
+        mHomeViewmodel.setFilter(name,mac,uuid);
+      }
+    });
     mParent = (HomeActivity)getActivity();
-  }
-
-  private void initView() {
-    mAdapter = new DeviceAdapter(getActivity(),mDeviceList);
-    LinearLayoutManager linearLayoutManager=new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false);
-    mBinding.homeRv.addItemDecoration(new DividerItemDecoration(getActivity(),LinearLayoutManager.VERTICAL));
-    mBinding.homeRv.setLayoutManager(linearLayoutManager);
-    mBinding.homeRv.setAdapter(mAdapter);
-//    ((DefaultItemAnimator) mBinding.homeRv.getItemAnimator()).setSupportsChangeAnimations(false);
-
     mAdapter.setOnConnectBtnClickListener(new OnConnectClickListener() {
       @Override
       public void onConnectClick(int position, Device device) {
@@ -143,6 +144,21 @@ public class HomeFragment extends Fragment implements IWithoutBack {
 
 
     });
+  }
+
+  private void initView() {
+    mAdapter = new DeviceAdapter(getActivity(),mDeviceList);
+    LinearLayoutManager linearLayoutManager=new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false);
+    mBinding.homeRv.addItemDecoration(new DividerItemDecoration(getActivity(),LinearLayoutManager.VERTICAL));
+    mBinding.homeRv.setLayoutManager(linearLayoutManager);
+    mBinding.homeRv.setAdapter(mAdapter);
+//    ((DefaultItemAnimator) mBinding.homeRv.getItemAnimator()).setSupportsChangeAnimations(false);
+    initDialog();
+  }
+
+  private void initDialog() {
+    mScanFilterDialog = new ScanFilterDialog(getContext());
+
   }
 
   private void initObserver() {
@@ -239,12 +255,19 @@ public class HomeFragment extends Fragment implements IWithoutBack {
         }else {
           scan();
         }
-
-
+        break;
+      case R.id.menu_scan_filter:
+        showFilterDialog();
         break;
       default:
     }
     return super.onOptionsItemSelected(item);
+  }
+
+  private void showFilterDialog() {
+    if (mScanFilterDialog!=null){
+      mScanFilterDialog.show();
+    }
   }
 
   private void scan() {

@@ -8,6 +8,7 @@ import android.databinding.ObservableBoolean;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import cc.noharry.bledemo.data.Device;
 import cc.noharry.bledemo.util.L;
 import cc.noharry.bledemo.util.Log;
@@ -18,6 +19,7 @@ import cc.noharry.blelib.ble.connect.ReadTask;
 import cc.noharry.blelib.ble.connect.Task;
 import cc.noharry.blelib.ble.connect.WriteTask;
 import cc.noharry.blelib.ble.scan.BleScanConfig;
+import cc.noharry.blelib.ble.scan.BleScanConfig.Builder;
 import cc.noharry.blelib.callback.BaseBleConnectCallback;
 import cc.noharry.blelib.callback.BleConnectCallback;
 import cc.noharry.blelib.callback.BleScanCallback;
@@ -26,8 +28,10 @@ import cc.noharry.blelib.callback.ReadCallback;
 import cc.noharry.blelib.callback.WriteCallback;
 import cc.noharry.blelib.data.BleDevice;
 import cc.noharry.blelib.data.Data;
+import cc.noharry.blelib.data.WriteData;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author NoHarry
@@ -59,6 +63,9 @@ public class HomeViewmodel extends AndroidViewModel {
   private WriteCallback mWriteCallback;
   private DataChangeCallback mDataChangeCallback;
   private ReadCallback mReadCallback;
+  private String filterMac;
+  private String filterName;
+  private String filterUUID;
 
 
   private void runOnUiThread(Runnable runnable){
@@ -311,10 +318,13 @@ public class HomeViewmodel extends AndroidViewModel {
 
     mWriteCallback = new WriteCallback() {
       @Override
-      public void onDataSent(BleDevice bleDevice, Data data) {
-        L.i("onDataSent:" + data.toString());
+      public void onDataSent(BleDevice bleDevice, Data data, int totalPackSize,
+          int remainPackSize) {
+        L.i("onDataSent:" + data.toString()+" totalPackSize:"+totalPackSize+" remainPackSize:"+remainPackSize);
         valueChange.setValue(0);
       }
+
+
 
       @Override
       public void onOperationSuccess(BleDevice bleDevice) {
@@ -394,7 +404,9 @@ public class HomeViewmodel extends AndroidViewModel {
   }
 
   public void write(Device device,BluetoothGattCharacteristic characteristic,byte[] data){
-    WriteTask task = Task.newWriteTask(device.getBleDevice(), characteristic, data)
+    WriteData writeData=new WriteData();
+    writeData.setValue(data,true);
+    WriteTask task = Task.newWriteTask(device.getBleDevice(), characteristic, writeData)
         .with(mWriteCallback);
     BleAdmin.getINSTANCE(getApplication()).addTask(task);
   }
@@ -423,17 +435,32 @@ public class HomeViewmodel extends AndroidViewModel {
 
   public void scan(){
     if (!isScanning.get()){
-      BleScanConfig config=new BleScanConfig.Builder().setScanTime(5000).build();
+//      BleScanConfig config=new BleScanConfig.Builder().setScanTime(5000).build();
       if (BleAdmin.getINSTANCE(getApplication()).isEnable()){
         BleAdmin
             .getINSTANCE(getApplication())
             .setLogEnable(true)
             .setLogStyle(BleAdmin.LOG_STYLE_DEFAULT)
-            .scan(config, mBleScanCallback);
+            .scan(getConfig(), mBleScanCallback);
       }
     }
 
 
+  }
+
+  private BleScanConfig getConfig(){
+    Builder builder = new Builder();
+    if (!TextUtils.isEmpty(filterMac)){
+      builder.setDeviceMac(new String[]{filterMac});
+    }
+    if (!TextUtils.isEmpty(filterUUID)){
+      builder.setUUID(new UUID[]{UUID.fromString(filterUUID)});
+    }
+    if (!TextUtils.isEmpty(filterName)){
+      builder.setDeviceName(new String[]{filterName},true);
+    }
+    builder.setScanTime(5000);
+    return builder.build();
   }
 
   public void stopScan(){
@@ -508,5 +535,11 @@ public class HomeViewmodel extends AndroidViewModel {
 
   public List<Log> getLogList() {
     return mLogList;
+  }
+
+  public void setFilter(String name,String mac,String uuid){
+    filterMac=mac;
+    filterName=name;
+    filterUUID=uuid;
   }
 }

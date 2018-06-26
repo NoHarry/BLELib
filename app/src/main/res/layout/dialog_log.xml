@@ -10,10 +10,34 @@
 
     <android.support.v7.widget.RecyclerView
       android:layout_width="match_parent"
-      android:layout_height="match_parent"
+      android:layout_height="400dp"
       android:id="@+id/dialog_rv"
       android:layout_gravity="center_horizontal"
       />
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="48dp"
+      android:orientation="horizontal"
+      >
+        <TextView
+          android:layout_width="0dp"
+          android:layout_weight="1"
+          android:layout_height="match_parent"
+          android:text="@string/dialog_delete"
+          android:gravity="center"
+          android:id="@+id/dialog_clear_log"
+          android:background="?attr/selectableItemBackgroundBorderless"
+          />
+        <TextView
+          android:layout_width="0dp"
+          android:layout_weight="1"
+          android:layout_height="match_parent"
+          android:text="@string/dialog_close"
+          android:gravity="center"
+          android:id="@+id/dialog_close"
+          android:background="?attr/selectableItemBackgroundBorderless"
+          />
+    </LinearLayout>
 
 </LinearLayout>
 </layout>

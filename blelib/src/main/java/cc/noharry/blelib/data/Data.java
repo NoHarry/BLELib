@@ -16,7 +16,6 @@ public class Data {
     this.value = value;
   }
 
-
   @Override
   public  String toString(){
     char[] chars = "0123456789ABCDEF".toCharArray();

@@ -164,6 +164,11 @@ public class BleClient implements IBleOperation{
       }else {
         writeTask.notifyError(getBleDevice(),status);
       }
+
+      if (!writeTask.getData().isFinished()){
+        handleWrite(characteristic);
+      }
+
     }
 
     @Override
@@ -379,7 +384,7 @@ public class BleClient implements IBleOperation{
       return false;
     }
     WriteTask writeTask= (WriteTask) mCurrentTask;
-    mBluetoothGattCharacteristic.setValue(writeTask.getData());
+    mBluetoothGattCharacteristic.setValue(writeTask.getData().getValue());
     mBluetoothGattCharacteristic.setWriteType(writeTask.getWriteType());
     return gatt.writeCharacteristic(mBluetoothGattCharacteristic);
   }

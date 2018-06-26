@@ -146,9 +146,8 @@ public class OperationDialog extends Dialog implements OnClickListener {
   }
 
   public void notifyClean(){
-    int size = mLogList.size();
     mLogList.clear();
-    mAdapter.notifyItemRangeRemoved(0,size);
+    mAdapter.notifyDataSetChanged();
   }
   private void handleNotify() {
     if (mOnOperationListener!=null){
@@ -170,6 +169,7 @@ public class OperationDialog extends Dialog implements OnClickListener {
         mOnOperationListener.onDescriptorRead(mDevice,mBluetoothGattDescriptor);
       }
     }
+
   }
 
   private void handleWrite() {

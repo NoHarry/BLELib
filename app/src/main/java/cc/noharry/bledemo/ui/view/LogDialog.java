@@ -8,6 +8,9 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.LayoutManager;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.TextView;
 import cc.noharry.bledemo.R;
 import cc.noharry.bledemo.databinding.DialogLogBinding;
 import cc.noharry.bledemo.ui.adapter.LogAdapter;
@@ -28,6 +31,8 @@ public class LogDialog extends Dialog {
   private DialogLogBinding mBinding;
   private LogAdapter mAdapter;
   private RecyclerView mRecyclerView;
+  private TextView mClear;
+  private TextView mClose;
 
 
   public LogDialog(@NonNull Context context, Activity activity,
@@ -60,8 +65,31 @@ public class LogDialog extends Dialog {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.dialog_log);
-    mRecyclerView = findViewById(R.id.dialog_rv);
+    initView();
+    initEvent();
     initRV();
+    Window win = getWindow();
+    if (win != null) {
+      WindowManager.LayoutParams lp = win.getAttributes();
+      lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+      win.setAttributes(lp);
+    }
+    setCanceledOnTouchOutside(false);
+  }
+
+  private void initEvent() {
+    mClear.setOnClickListener((v -> {
+      mOnLogListener.onCleanLog();
+    }));
+    mClose.setOnClickListener((v -> {
+      dismiss();
+    }));
+  }
+
+  private void initView() {
+    mRecyclerView = findViewById(R.id.dialog_rv);
+    mClear = findViewById(R.id.dialog_clear_log);
+    mClose = findViewById(R.id.dialog_close);
   }
 
 
@@ -98,5 +126,26 @@ public class LogDialog extends Dialog {
   public void notifyLog(int position){
     mAdapter.notifyItemInserted(position);
     mRecyclerView.scrollToPosition(position);
+  }
+
+  private void handleClean() {
+    if (mOnLogListener!=null){
+      mOnLogListener.onCleanLog();
+    }
+  }
+
+  public void notifyClean(){
+    mLogList.clear();
+    mAdapter.notifyDataSetChanged();
+  }
+
+  public interface OnLogListener{
+    void onCleanLog();
+  }
+
+  private OnLogListener mOnLogListener=null;
+
+  public void setOnLogListener(OnLogListener listener){
+    mOnLogListener=listener;
   }
 }

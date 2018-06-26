@@ -7,7 +7,6 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.View.OnClickListener;
 import cc.noharry.bledemo.R;
-import cc.noharry.blelib.util.L;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -45,9 +44,6 @@ public class ToggleImageView extends android.support.v7.widget.AppCompatImageVie
     isSwitchOn.set(mIsSwitchOn);
     array.recycle();
 
-    L.i("mSwitchOnDrawable:"+mSwitchOnDrawable);
-    L.i("mSwtichOffDrawable:"+mSwitchOffDrawable);
-    L.i("mIsSwitchOn:"+mIsSwitchOn);
     initView();
     initEvent();
   }
@@ -77,7 +73,6 @@ public class ToggleImageView extends android.support.v7.widget.AppCompatImageVie
   }
 
   private void switchView(boolean b){
-    L.i("isSwitchOn:"+isSwitchOn.get());
     isSwitchOn.set(b);
     if (isSwitchOn.get()){
       mSwitchAni = (AnimatedVectorDrawable) mContext.getDrawable(mSwitchOnDrawable);

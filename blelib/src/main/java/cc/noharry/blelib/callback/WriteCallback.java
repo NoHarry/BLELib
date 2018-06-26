@@ -9,5 +9,5 @@ import cc.noharry.blelib.data.Data;
  */
 
 public interface WriteCallback extends TaskCallback{
-  void onDataSent(BleDevice bleDevice,Data data);
+  void onDataSent(BleDevice bleDevice,Data data,int totalPackSize,int remainPackSize);
 }

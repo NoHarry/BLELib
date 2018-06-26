@@ -7,6 +7,7 @@ import cc.noharry.blelib.callback.DataChangeCallback;
 import cc.noharry.blelib.callback.WriteCallback;
 import cc.noharry.blelib.data.BleDevice;
 import cc.noharry.blelib.data.Data;
+import cc.noharry.blelib.data.WriteData;
 import cc.noharry.blelib.exception.GattError;
 
 /**
@@ -17,13 +18,13 @@ import cc.noharry.blelib.exception.GattError;
 public class WriteTask extends Task {
 
   private WriteCallback mWriteCallback;
-  private byte[] data;
+  private WriteData data;
   private BleConnectorProxy mBleConnectorProxy;
   private int mWriteType;
   private DataChangeCallback mDataChangeCallback;
 
   protected WriteTask(Type type, BleDevice bleDevice,
-      BluetoothGattCharacteristic bluetoothGattCharacteristic,byte[] data) {
+      BluetoothGattCharacteristic bluetoothGattCharacteristic,WriteData data) {
     this(type, bleDevice, bluetoothGattCharacteristic,data,BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
   }
   protected WriteTask(Type type, BleDevice bleDevice,
@@ -31,17 +32,17 @@ public class WriteTask extends Task {
     this(type, bleDevice, bluetoothGattCharacteristic,BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
   }
   protected WriteTask(Type type, BleDevice bleDevice,
-      BluetoothGattDescriptor bluetoothGattDescriptor,byte[] data) {
+      BluetoothGattDescriptor bluetoothGattDescriptor,WriteData data) {
     this(type, bleDevice,  bluetoothGattDescriptor,data,BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
   }
 
   protected WriteTask(Type type, BleDevice bleDevice, String serviceUUID,
-      String characteristicUUID,byte[] data) {
+      String characteristicUUID,WriteData data) {
     this(type, bleDevice, serviceUUID, characteristicUUID,data,BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
   }
 
   protected WriteTask(Type type, BleDevice bleDevice,
-      BluetoothGattCharacteristic bluetoothGattCharacteristic,byte[] data,int writeType) {
+      BluetoothGattCharacteristic bluetoothGattCharacteristic,WriteData data,int writeType) {
     super(type, bleDevice, bluetoothGattCharacteristic);
     this.data=data;
     this.mWriteType=writeType;
@@ -56,7 +57,7 @@ public class WriteTask extends Task {
   }
 
   protected WriteTask(Type type, BleDevice bleDevice,
-      BluetoothGattDescriptor bluetoothGattDescriptor,byte[] data,int writeType) {
+      BluetoothGattDescriptor bluetoothGattDescriptor,WriteData data,int writeType) {
     super(type, bleDevice,  bluetoothGattDescriptor);
     this.data=data;
     this.mWriteType=writeType;
@@ -64,7 +65,7 @@ public class WriteTask extends Task {
   }
 
   protected WriteTask(Type type, BleDevice bleDevice, String serviceUUID,
-      String characteristicUUID,byte[] data,int writeType) {
+      String characteristicUUID,WriteData data,int writeType) {
     super(type, bleDevice, serviceUUID, characteristicUUID);
     this.data=data;
     this.mWriteType=writeType;
@@ -124,10 +125,16 @@ public class WriteTask extends Task {
   }
 
   protected void notifyDataSent(BleDevice bleDevice,Data data){
-    mBleConnectorProxy.taskNotify(0);
+    if (this.data.isFinished()){
+      mBleConnectorProxy.taskNotify(0);
+    }
+
     if (mWriteCallback!=null){
-      mWriteCallback.onDataSent(bleDevice, data);
-      mWriteCallback.onComplete(bleDevice);
+      mWriteCallback.onDataSent(bleDevice, data,this.data.getTotalPackSize(),this.data.getReamainPackSize());
+      if (this.data.isFinished()){
+        mWriteCallback.onComplete(bleDevice);
+      }
+
     }
 
   }
@@ -138,7 +145,7 @@ public class WriteTask extends Task {
     }
   }
 
-  public byte[] getData() {
+  public WriteData getData() {
     return data;
   }
 
