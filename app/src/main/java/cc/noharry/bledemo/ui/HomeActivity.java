@@ -1,21 +1,28 @@
 package cc.noharry.bledemo.ui;
 
+import android.Manifest.permission;
 import android.app.Activity;
 import android.app.Application;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentManager.FragmentLifecycleCallbacks;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.util.DisplayMetrics;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.navigation.Navigation;
 import cc.noharry.bledemo.R;
 import cc.noharry.bledemo.databinding.ActivityHomeBinding;
@@ -23,7 +30,8 @@ import cc.noharry.bledemo.ui.toolbar.IWithBack;
 import cc.noharry.bledemo.ui.toolbar.IWithoutBack;
 import cc.noharry.bledemo.ui.view.LogDialog;
 import cc.noharry.bledemo.ui.view.LogDialog.OnLogListener;
-import cc.noharry.bledemo.util.L;
+import cc.noharry.bledemo.util.PermissionUtils;
+import cc.noharry.bledemo.util.PermissionUtils.OnPermissionListener;
 import cc.noharry.bledemo.viewmodel.HomeViewmodel;
 import cc.noharry.bledemo.viewmodel.ViewModelFactory;
 
@@ -41,6 +49,58 @@ public class HomeActivity extends AppCompatActivity {
     initData();
     initObserver();
     initFb();
+    requestPermission();
+  }
+
+  private void checkLocation() {
+
+      Toast.makeText(this, R.string.toast_open_location,
+          Toast.LENGTH_SHORT).show();
+      AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+      dialog.setMessage(getString(R.string.toast_open_location));
+      dialog.setPositiveButton(getString(R.string.confirm),
+          new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface arg0, int arg1) {
+
+              // 转到手机设置界面，用户设置GPS
+              Intent intent = new Intent(
+                  Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+              startActivityForResult(intent, 0); // 设置完成后返回到原来的界面
+            }
+          });
+      dialog.setNeutralButton(getString(R.string.Cancel), new DialogInterface.OnClickListener() {
+
+        @Override
+        public void onClick(DialogInterface arg0, int arg1) {
+          arg0.dismiss();
+
+        }
+      });
+      dialog.show();
+
+  }
+
+  private void requestPermission() {
+    PermissionUtils.requestPermissions(this, 100, new String[]{permission.ACCESS_COARSE_LOCATION},
+        new OnPermissionListener() {
+          @Override
+          public void onPermissionGranted() {
+
+          }
+
+          @Override
+          public void onPermissionDenied() {
+
+          }
+        });
+  }
+
+  @Override
+  public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+      @NonNull int[] grantResults) {
+    PermissionUtils.onRequestPermissionsResult(requestCode, permissions, grantResults);
   }
 
   static {
@@ -55,18 +115,15 @@ public class HomeActivity extends AppCompatActivity {
   }
 
   private void initObserver() {
-    /*mHomeViewmodel.getLog().observe(this, new Observer<Log>() {
-      @Override
-      public void onChanged(@Nullable Log log) {
-        if (mDialog!=null){
-          if (mDialog.isShowing()){
-//            mDialog.addLog(log);
-            mDialog.notifyLog();
-          }
-        }
+    mHomeViewmodel.getLocationStatu().observe(this,(integer -> {
+      switch (integer){
+        case 0:
+          break;
+        case 1:
+          checkLocation();
+          break;
       }
-    });
-    */
+    }));
     mHomeViewmodel.getHomeLogClean().observe(this,(integer -> {
       if (mDialog!=null){
         mDialog.notifyClean();
@@ -80,12 +137,7 @@ public class HomeActivity extends AppCompatActivity {
         }
       }
     });
-    /*mHomeViewmodel.getFoundDevice().observe(this, new Observer<Device>() {
-      @Override
-      public void onChanged(@Nullable Device device) {
-        L.i("ACTIVITY:"+device);
-      }
-    });*/
+
   }
 
   private void initFb() {
@@ -122,27 +174,12 @@ public class HomeActivity extends AppCompatActivity {
       sNoCompatDensity=displayMetrics.density;
       sNoCompatScaleDensity=displayMetrics.scaledDensity;
 
-      /*application.registerComponentCallbacks(new ComponentCallbacks() {
-        @Override
-        public void onConfigurationChanged(Configuration newConfig) {
-          if (newConfig!=null&&newConfig.fontScale>0){
-            sNoCompatScaleDensity=application.getResources().getDisplayMetrics().scaledDensity;
-          }
-        }
 
-        @Override
-        public void onLowMemory() {
-
-        }
-      });
-*/
       final float targetDensity=displayMetrics.widthPixels/420.0f;
 //      final float targetDensity=displayMetrics.widthPixels/360.0f;
       final float targetScaleDensity=targetDensity*(sNoCompatScaleDensity/sNoCompatDensity);
       final int targetDensityDpi= (int) (160*targetDensity);
 
-      L.i("sNoCompatDensity:"+sNoCompatDensity+" sNoCompatScaleDensity:"+sNoCompatScaleDensity
-          +" targetDensity:"+targetDensity+" targetScaleDensity:"+targetScaleDensity+" targetDensityDpi:"+targetDensityDpi);
 
       displayMetrics.density=targetDensity;
       displayMetrics.scaledDensity=targetScaleDensity;
@@ -154,6 +191,7 @@ public class HomeActivity extends AppCompatActivity {
       activityMetrics.densityDpi=targetDensityDpi;
     }
   }
+
 
   private void initFragmentLifeCycle() {
     setSupportActionBar(mBinding.includeToolbar.appToolbar);

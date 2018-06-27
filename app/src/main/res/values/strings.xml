@@ -25,6 +25,11 @@
   <string name="dialog_close">Close</string>
   <string name="dialog_confirm">Confirm</string>
 
+
+  <string name="toast_open_location">Please Open Location!</string>
+  <string name="confirm">OK</string>
+  <string name="Cancel">CANCEL</string>
+
   <string name="editext_hint_hex_error">Please enter a hexadecimal string</string>
   <string name="editext_hint_hex">e.g:ab0a equals 0xab,0x0a</string>
 </resources>

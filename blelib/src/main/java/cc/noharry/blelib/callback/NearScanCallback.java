@@ -114,22 +114,7 @@ public  class NearScanCallback {
 
   private void handleStoreDevice(BleScanConfig bleScanConfig,
       BleDevice bleDevice) {
-    /*boolean checkBleDevice =
-        scanMode==NEW_SCAN?
-            MethodUtils.checkBleDeviceNew(bleScanConfig, bleDevice):
-            MethodUtils.checkBleDevice(bleScanConfig,bleDevice);
-    L.i("handleStoreDevice");
-    if (checkBleDevice){
-      runOnUiThread(new Runnable() {
-        @Override
-        public void run() {
-          L.i("handleStoreDevice1");
-          mBleScanCallback.onFoundDevice(bleDevice);
-          mBleDevices.offer(bleDevice);
-        }
-      });
 
-    }*/
     ThreadPoolProxyFactory.getScanThreadPoolProxy().submit(new Runnable() {
       @Override
       public void run() {
@@ -163,7 +148,7 @@ public  class NearScanCallback {
           public void run() {
             BleScanner.getINSTANCE(mContext).stopScan();
             onScanCompleted(mDeviceList);
-            L.e("定时停止");
+            L.e("stop scan");
           }
         });
 

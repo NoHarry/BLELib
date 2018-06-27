@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 27
@@ -48,8 +50,12 @@ dependencies {
     annotationProcessor "android.arch.lifecycle:compiler:" + rootProject.lifecycleVersion
     implementation 'android.arch.lifecycle:extensions:' + rootProject.lifecycleVersion
 
-    implementation 'com.tencent.bugly:crashreport:latest.release'
-    implementation 'com.tencent.bugly:nativecrashreport:latest.release'
+    //firebase
+    implementation 'com.google.firebase:firebase-core:' + rootProject.firebaseCoreVersion
+    implementation 'com.crashlytics.sdk.android:crashlytics:' + rootProject.crashlyticsVersion
+    implementation 'com.google.firebase:firebase-messaging:' + rootProject.firebaseMessageVersion
+//    implementation 'com.tencent.bugly:crashreport:latest.release'
+//    implementation 'com.tencent.bugly:nativecrashreport:latest.release'
 
 }
 

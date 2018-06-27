@@ -264,7 +264,7 @@ public class DetailFragment extends Fragment implements IWithBack {
     mHomeViewmodel.getCurrentDevice().observe(this, new Observer<Device>() {
       @Override
       public void onChanged(@Nullable Device device) {
-        L.i("DetailFragment:"+device);
+//        L.i("DetailFragment:"+device);
         mDevice = device;
         BluetoothGatt bluetoothGatt = device.getGatt().get();
         if (mDevice.getState().get()==Device.CONNECTED){
@@ -295,7 +295,7 @@ public class DetailFragment extends Fragment implements IWithBack {
               for (BluetoothGattDescriptor descriptor:characteristic.getDescriptors()){
                 DeviceDescriptor deviceDescriptor=new DeviceDescriptor(descriptor);
                 deviceCharacteristic.addSubItem(deviceDescriptor);
-                L.i("descriptor:"+descriptor.getUuid()+" per:"+descriptor.getPermissions());
+                L.i("descriptor:"+descriptor.getUuid()+" permission:"+descriptor.getPermissions());
               }
             }
             mList.add(deviceService);

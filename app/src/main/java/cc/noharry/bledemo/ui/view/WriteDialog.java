@@ -18,7 +18,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import cc.noharry.bledemo.R;
-import cc.noharry.bledemo.util.L;
 import cc.noharry.bledemo.util.MethodUtils;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
@@ -85,7 +84,7 @@ public class WriteDialog extends Dialog {
     mSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
       @Override
       public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        L.i("position:"+position+" id:"+id);
+//        L.i("position:"+position+" id:"+id);
         switch (position){
           case TYPE_TEXT:
             mType=TYPE_TEXT;
@@ -179,7 +178,7 @@ public class WriteDialog extends Dialog {
 
   private boolean isHexNum(String s){
     boolean matches = HEXSTR.matcher(s).matches();
-    L.i("matches:"+matches+" s:"+s);
+//    L.i("matches:"+matches+" s:"+s);
     return matches;
   }
 

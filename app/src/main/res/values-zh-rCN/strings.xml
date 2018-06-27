@@ -11,7 +11,7 @@
 
 
 
-  <string name="app_name">蓝牙助手</string>
+  <string name="app_name">蓝牙调试助手</string>
   <string name="menu_filter">筛选</string>
   <string name="menu_scan">扫描</string>
   <string name="menu_scanning">扫描中</string>
@@ -28,6 +28,11 @@
   <string name="dialog_delete">清除日志</string>
   <string name="dialog_close">关闭</string>
   <string name="dialog_confirm">确定</string>
+
+
+  <string name="toast_open_location">请打开位置信息!</string>
+  <string name="confirm">确定</string>
+  <string name="Cancel">取消</string>
 
   <string name="editext_hint_hex_error">请输入16进制字符串</string>
   <string name="editext_hint_hex">例如:ab0a 等同于 0xab,0x0a</string>

@@ -170,7 +170,7 @@ public class BleConnectorProxy implements IBleOperation{
   }
 
   public void enqueue(Task task){
-    L.i("enqueue task:"+task);
+    L.i("enqueue task:"+" TYPE:"+task.getType()+" Device:"+task.getBleDevice().getMac());
     try {
       mBlockingDeque.put(task);
     } catch (InterruptedException e) {

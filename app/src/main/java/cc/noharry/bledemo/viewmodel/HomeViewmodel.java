@@ -4,7 +4,9 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.content.Context;
 import android.databinding.ObservableBoolean;
+import android.location.LocationManager;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -15,6 +17,7 @@ import cc.noharry.bledemo.util.Log;
 import cc.noharry.bledemo.util.LogUtil;
 import cc.noharry.bledemo.util.LogUtil.LogCallback;
 import cc.noharry.blelib.ble.BleAdmin;
+import cc.noharry.blelib.ble.BleAdmin.OnBTOpenStateListener;
 import cc.noharry.blelib.ble.connect.ReadTask;
 import cc.noharry.blelib.ble.connect.Task;
 import cc.noharry.blelib.ble.connect.WriteTask;
@@ -46,6 +49,7 @@ public class HomeViewmodel extends AndroidViewModel {
   private final SingleLiveEvent<Integer> detailLogSize=new SingleLiveEvent<>();
   private final SingleLiveEvent<Integer> detailLogClean=new SingleLiveEvent<>();
   private final SingleLiveEvent<Integer> homeLogClean=new SingleLiveEvent<>();
+  private final SingleLiveEvent<Integer> locationStatu=new SingleLiveEvent<>();
   private final SingleLiveEvent<List<Device>> deviceList=new SingleLiveEvent<>();
   public final ObservableBoolean isScanning=new ObservableBoolean(false);
   private final SingleLiveEvent<Integer> scanState=new SingleLiveEvent<>();
@@ -97,7 +101,6 @@ public class HomeViewmodel extends AndroidViewModel {
 
       }
     };
-    L.i("HomeViewmodel:"+this+" mLogCallback:"+mLogCallback);
     mBleScanCallback = new BleScanCallback() {
       @Override
       public void onScanStarted(boolean isStartSuccess) {
@@ -434,7 +437,7 @@ public class HomeViewmodel extends AndroidViewModel {
 
 
   public void scan(){
-    if (!isScanning.get()){
+    if (!isScanning.get()&&checkLocation()){
 //      BleScanConfig config=new BleScanConfig.Builder().setScanTime(5000).build();
       if (BleAdmin.getINSTANCE(getApplication()).isEnable()){
         BleAdmin
@@ -442,6 +445,17 @@ public class HomeViewmodel extends AndroidViewModel {
             .setLogEnable(true)
             .setLogStyle(BleAdmin.LOG_STYLE_DEFAULT)
             .scan(getConfig(), mBleScanCallback);
+      }else {
+        BleAdmin.getINSTANCE(getApplication()).openBT(new OnBTOpenStateListener() {
+          @Override
+          public void onBTOpen() {
+            BleAdmin
+                .getINSTANCE(getApplication())
+                .setLogEnable(true)
+                .setLogStyle(BleAdmin.LOG_STYLE_DEFAULT)
+                .scan(getConfig(), mBleScanCallback);
+          }
+        });
       }
     }
 
@@ -478,6 +492,18 @@ public class HomeViewmodel extends AndroidViewModel {
 
   }
 
+
+  public boolean checkLocation(){
+    LocationManager locationManager = (LocationManager) getApplication().getSystemService(Context.LOCATION_SERVICE);
+    if (!locationManager
+        .isProviderEnabled(LocationManager.GPS_PROVIDER)){
+      locationStatu.setValue(1);
+      return false;
+    }else {
+      locationStatu.setValue(0);
+      return true;
+    }
+  }
   public void disConnect(Device device){
     BleAdmin
         .getINSTANCE(getApplication())
@@ -531,6 +557,10 @@ public class HomeViewmodel extends AndroidViewModel {
 
   public SingleLiveEvent<Integer> getHomeLogClean() {
     return homeLogClean;
+  }
+
+  public SingleLiveEvent<Integer> getLocationStatu() {
+    return locationStatu;
   }
 
   public List<Log> getLogList() {

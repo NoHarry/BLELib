@@ -89,7 +89,7 @@ public class BleClient implements IBleOperation{
     if (gatt!=null){
       gatt.disconnect();
       mBleConnectCallback.onDeviceDisconnectingBase(getBleDevice());
-      L.i("disconnect():"+MultipleBleController.getInstance(BleAdmin.getContext()).getClientMap());
+      L.i("disconnect():"+mBleDevice);
     }
   }
 
@@ -260,7 +260,7 @@ public class BleClient implements IBleOperation{
     }else {
       mCurrentTask.notifyError(getBleDevice(),GattError.LOCAL_GATT_OPERATION_DEVICE_DISCONNECTED);
 //      mBleConnectorProxy.taskNotify(1);
-      L.e("设备未连接");
+      L.e("Device Disconnected");
     }
 
   }
@@ -283,7 +283,7 @@ public class BleClient implements IBleOperation{
     switch (mCurrentTask.mType){
       case READ:
         isOperationSuccess= handleRead(mBluetoothGattCharacteristic);
-        L.e("Read:"+isOperationSuccess);
+//        L.e("Read:"+isOperationSuccess);
         break;
       case WRITE:
         isOperationSuccess=handleWrite(mBluetoothGattCharacteristic);
@@ -407,7 +407,7 @@ public class BleClient implements IBleOperation{
   }
 
   private void handleGattStatu(int statuCode){
-    L.e("handleStatu:"+ GattError.parse(statuCode));
+    L.e("handleGATTStatu:"+ GattError.parse(statuCode));
   }
 
   protected int getCurrentConnectionState() {
