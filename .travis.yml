@@ -18,4 +18,5 @@ before_install:
  - chmod +x gradlew
  - touch local.properties
 
-script: ./gradlew assembleRelease
+script:
+  - ./gradlew clean build -Pbuild=dev
