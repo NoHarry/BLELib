@@ -79,7 +79,7 @@ public class ThreadPoolProxy {
     }
 
     static class LocalTheadFactory implements ThreadFactory {
-        private static final AtomicInteger poolNumber = new AtomicInteger(1);
+        private static final AtomicInteger POOLNUMBER = new AtomicInteger(1);
         private final ThreadGroup group;
         private final AtomicInteger threadNumber = new AtomicInteger(1);
         private final String namePrefix;
@@ -96,8 +96,8 @@ public class ThreadPoolProxy {
 
         public LocalTheadFactory(String namePrefix,boolean daemo) {
             this.namePrefix = TextUtils.isEmpty(namePrefix)
-                ?"blelib-pool-"+poolNumber.getAndIncrement()+"-thread-"
-                :"blelib-pool-"+poolNumber.getAndIncrement()+"-"+namePrefix+"-thread-";
+                ?"blelib-pool-"+POOLNUMBER.getAndIncrement()+"-thread-"
+                :"blelib-pool-"+POOLNUMBER.getAndIncrement()+"-"+namePrefix+"-thread-";
             SecurityManager s = System.getSecurityManager();
             group=(s!=null)?s.getThreadGroup():Thread.currentThread().getThreadGroup();
             daemoThread=daemo;

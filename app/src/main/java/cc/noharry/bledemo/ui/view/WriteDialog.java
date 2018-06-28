@@ -30,7 +30,7 @@ public class WriteDialog extends Dialog {
 
   private int mType = 0;
   private Context mContext;
-  private static final String [] langurage ={"Text","Byte Array"};
+  private static final String [] WRITE_TYPE ={"Text","Byte Array"};
   private ArrayAdapter<String> adapter = null;
   private TextView mSend;
   private TextView mCancel;
@@ -60,7 +60,7 @@ public class WriteDialog extends Dialog {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.dialog_write);
     mSpinner = findViewById(R.id.dialog_write_spinner);
-    adapter = new ArrayAdapter<String>(mContext,android.R.layout.simple_spinner_item,langurage);
+    adapter = new ArrayAdapter<String>(mContext,android.R.layout.simple_spinner_item,WRITE_TYPE);
     //设置下拉列表风格
     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     mSpinner.setAdapter(adapter);
