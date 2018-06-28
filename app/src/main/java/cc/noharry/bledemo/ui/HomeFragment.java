@@ -3,7 +3,6 @@ package cc.noharry.bledemo.ui;
 import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
-import android.graphics.drawable.AnimatedVectorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -25,6 +24,9 @@ import cc.noharry.bledemo.databinding.FragmentHomeBinding;
 import cc.noharry.bledemo.ui.adapter.DeviceAdapter;
 import cc.noharry.bledemo.ui.adapter.DeviceAdapter.OnConnectClickListener;
 import cc.noharry.bledemo.ui.toolbar.IWithoutBack;
+import cc.noharry.bledemo.ui.view.LogDialog;
+import cc.noharry.bledemo.ui.view.ScanFilterDialog;
+import cc.noharry.bledemo.ui.view.ScanFilterDialog.OnFilterConfirmListener;
 import cc.noharry.bledemo.util.L;
 import cc.noharry.bledemo.util.ThreadPoolProxyFactory;
 import cc.noharry.bledemo.viewmodel.HomeViewmodel;
@@ -42,7 +44,6 @@ public class HomeFragment extends Fragment implements IWithoutBack {
   private static final String ARG_PARAM1 = "param1";
   private static final String ARG_PARAM2 = "param2";
 
-  // TODO: Rename and change types of parameters
   private String mParam1;
   private String mParam2;
   private FragmentHomeBinding mBinding;
@@ -51,9 +52,11 @@ public class HomeFragment extends Fragment implements IWithoutBack {
   private DeviceAdapter mAdapter;
   private Handler mHandler=new Handler(Looper.getMainLooper());
   private List<Device> mDeviceList=new ArrayList<>();
-  private AnimatedVectorDrawable mVectorDrawable;
   private AtomicBoolean isBleOpen=new AtomicBoolean(false);
-  private AnimatedVectorDrawable mVectorDrawable1;
+  private HomeActivity mParent;
+  private LogDialog mDialog;
+  private MenuItem mItem;
+  private ScanFilterDialog mScanFilterDialog;
 
 
   public HomeFragment() {
@@ -86,7 +89,7 @@ public class HomeFragment extends Fragment implements IWithoutBack {
       mParam1 = getArguments().getString(ARG_PARAM1);
       mParam2 = getArguments().getString(ARG_PARAM2);
     }
-
+      L.v("onCreate");
   }
 
 
@@ -100,6 +103,7 @@ public class HomeFragment extends Fragment implements IWithoutBack {
     initData();
     initObserver();
     initEvent();
+    L.v("onCreateView");
     return mBinding.getRoot();
   }
 
@@ -111,19 +115,14 @@ public class HomeFragment extends Fragment implements IWithoutBack {
       }
     });
 
-  }
-
-  private void initView() {
-    mAdapter = new DeviceAdapter(getActivity(),mDeviceList);
-    LinearLayoutManager linearLayoutManager=new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false);
-    mBinding.homeRv.addItemDecoration(new DividerItemDecoration(getActivity(),LinearLayoutManager.VERTICAL));
-    mBinding.homeRv.setLayoutManager(linearLayoutManager);
-    mBinding.homeRv.setAdapter(mAdapter);
-//    ((DefaultItemAnimator) mBinding.homeRv.getItemAnimator()).setSupportsChangeAnimations(false);
-    mVectorDrawable = (AnimatedVectorDrawable) getActivity().getDrawable(R.drawable.ic_bluetooth_animated);
-    mVectorDrawable1 = (AnimatedVectorDrawable) getActivity()
-        .getDrawable(R.drawable.ic_bluetooth_animated);
-
+    mScanFilterDialog.setOnFilterConfirmListener(new OnFilterConfirmListener() {
+      @Override
+      public void onConfirm(String mac, String uuid, String name) {
+        L.i("onConfirm:"+" mac:"+mac+" UUID:"+uuid+" name:"+name);
+        mHomeViewmodel.setFilter(name,mac,uuid);
+      }
+    });
+    mParent = (HomeActivity)getActivity();
     mAdapter.setOnConnectBtnClickListener(new OnConnectClickListener() {
       @Override
       public void onConnectClick(int position, Device device) {
@@ -147,6 +146,21 @@ public class HomeFragment extends Fragment implements IWithoutBack {
     });
   }
 
+  private void initView() {
+    mAdapter = new DeviceAdapter(getActivity(),mDeviceList);
+    LinearLayoutManager linearLayoutManager=new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false);
+    mBinding.homeRv.addItemDecoration(new DividerItemDecoration(getActivity(),LinearLayoutManager.VERTICAL));
+    mBinding.homeRv.setLayoutManager(linearLayoutManager);
+    mBinding.homeRv.setAdapter(mAdapter);
+//    ((DefaultItemAnimator) mBinding.homeRv.getItemAnimator()).setSupportsChangeAnimations(false);
+    initDialog();
+  }
+
+  private void initDialog() {
+    mScanFilterDialog = new ScanFilterDialog(getContext());
+
+  }
+
   private void initObserver() {
     mHomeViewmodel.getFoundDevice().observe(this, new Observer<Device>() {
       @Override
@@ -154,11 +168,25 @@ public class HomeFragment extends Fragment implements IWithoutBack {
         ThreadPoolProxyFactory.getUpdateThreadPoolProxy().submit(new Runnable() {
           @Override
           public void run() {
+//            L.e("更新:"+device);
             updateData(device);
           }
         });
 
 //
+      }
+    });
+    mHomeViewmodel.getScanState().observe(this, new Observer<Integer>() {
+      @Override
+      public void onChanged(@Nullable Integer integer) {
+        switch (integer){
+          case HomeViewmodel.SCANNING:
+            mItem.setTitle(getString(R.string.menu_stop_scan));
+            break;
+          case HomeViewmodel.NOT_SCAN:
+            mItem.setTitle(getString(R.string.menu_scan));
+            break;
+        }
       }
     });
 
@@ -214,6 +242,7 @@ public class HomeFragment extends Fragment implements IWithoutBack {
   public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
     super.onCreateOptionsMenu(menu, inflater);
     inflater.inflate(R.menu.home_menu,menu);
+    mItem = menu.findItem(R.id.menu_scan);
   }
 
   @Override
@@ -226,12 +255,19 @@ public class HomeFragment extends Fragment implements IWithoutBack {
         }else {
           scan();
         }
-
-
+        break;
+      case R.id.menu_scan_filter:
+        showFilterDialog();
         break;
       default:
     }
     return super.onOptionsItemSelected(item);
+  }
+
+  private void showFilterDialog() {
+    if (mScanFilterDialog!=null){
+      mScanFilterDialog.show();
+    }
   }
 
   private void scan() {
@@ -254,6 +290,7 @@ public class HomeFragment extends Fragment implements IWithoutBack {
   public void onDetach() {
     super.onDetach();
   }
+
 
 
 }

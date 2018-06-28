@@ -2,18 +2,35 @@
 <layout
   xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:tools="http://schemas.android.com/tools"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
   tools:context=".ui.DetailFragment"
   >
+  <data>
+    <!--<variable
+      name="homeviewmodel"
+      type="cc.noharry.bledemo.viewmodel.HomeViewmodel"/>-->
+    <variable
+      name="homeViewModel"
+      type="cc.noharry.bledemo.viewmodel.HomeViewmodel"/>
+  </data>
 <LinearLayout
   android:layout_width="match_parent"
   android:layout_height="match_parent"
+  android:orientation="vertical"
   >
-
-  <!-- TODO: Update blank fragment layout -->
-  <TextView
+  <cc.noharry.bledemo.ui.view.ToggleImageView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:is_switch_on="false"
+    app:switch_off_drawable="@drawable/ic_notify_on_off"
+    app:switch_on_drawable="@drawable/ic_notify_off_on"
+    android:visibility="gone"
+    />
+  <android.support.v7.widget.RecyclerView
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:text="detail"/>
+    android:id="@+id/rv_detail"
+    />
 
 </LinearLayout>
 </layout>

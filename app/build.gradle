@@ -1,5 +1,7 @@
 apply plugin: 'com.android.application'
 
+apply plugin: 'io.fabric'
+
 android {
     compileSdkVersion 27
     defaultConfig {
@@ -9,6 +11,13 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        lintOptions {
+            abortOnError false
+        }
+        ndk {
+            // 设置支持的SO库架构
+            abiFilters 'armeabi' //, 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
+        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -22,6 +31,28 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        dev {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+def build_param = "${build}";
+
+if (build_param != "dev") {
+    //exclude production build
+    android.variantFilter { variant ->
+        if (variant.buildType.name.equals('dev')) {
+            variant.setIgnore(true);
+        }
+    }
+} else {
+    //exclude all except production build
+    android.variantFilter { variant ->
+        if (!variant.buildType.name.equals('dev')) {
+            variant.setIgnore(true);
+        }
     }
 }
 
@@ -29,12 +60,12 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:' + rootProject.supportLibVersion
     implementation 'com.android.support.constraint:constraint-layout:' + rootProject.constraintLayoutVersion
-    implementation 'com.android.support:support-v4:27.1.1'
+    implementation 'com.android.support:support-v4:'+ rootProject.supportLibVersion
     testImplementation 'junit:junit:' + rootProject.juntiVersion
     androidTestImplementation 'com.android.support.test:runner:' + rootProject.runner
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:' + rootProject.espressoCore
     implementation project(':blelib')
-
+//    implementation 'cc.noharry.blelib:blelib:0.0.4'
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:' + rootProject.baseRecyclerViewAdapterVersion
     implementation 'android.arch.navigation:navigation-fragment:' + rootProject.navigationVersion
     implementation 'android.arch.navigation:navigation-ui:' + rootProject.navigationVersion
@@ -42,4 +73,15 @@ dependencies {
     annotationProcessor "android.arch.lifecycle:compiler:" + rootProject.lifecycleVersion
     implementation 'android.arch.lifecycle:extensions:' + rootProject.lifecycleVersion
 
+    //firebase
+    implementation 'com.google.firebase:firebase-core:' + rootProject.firebaseCoreVersion
+    implementation 'com.crashlytics.sdk.android:crashlytics:' + rootProject.crashlyticsVersion
+    implementation 'com.google.firebase:firebase-messaging:' + rootProject.firebaseMessageVersion
+//    implementation 'com.tencent.bugly:crashreport:latest.release'
+//    implementation 'com.tencent.bugly:nativecrashreport:latest.release'
+
 }
+apply plugin: 'com.google.gms.google-services'
+
+
+

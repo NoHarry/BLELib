@@ -18,7 +18,6 @@ import cc.noharry.blelib.callback.BleConnectCallback;
 import cc.noharry.blelib.callback.BleScanCallback;
 import cc.noharry.blelib.callback.DataChangeCallback;
 import cc.noharry.blelib.callback.ReadCallback;
-import cc.noharry.blelib.callback.WriteCallback;
 import cc.noharry.blelib.data.BleDevice;
 import cc.noharry.blelib.data.Data;
 import cc.noharry.blelib.util.L;
@@ -262,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
       }
     });
 
-    mBinding.btnWrite.setOnClickListener(new OnClickListener() {
+    /*mBinding.btnWrite.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View v) {
         WriteTask writeTask = Task.newWriteTask(mBleDevice, "0000ffe5-0000-1000-8000-00805f9b34fb",
@@ -317,7 +316,7 @@ public class MainActivity extends AppCompatActivity {
           mBleAdmin.addTask(writeTask1);
         }
       }
-    });
+    });*/
 
     mBinding.btnEnableNotify.setOnClickListener(new OnClickListener() {
       @Override

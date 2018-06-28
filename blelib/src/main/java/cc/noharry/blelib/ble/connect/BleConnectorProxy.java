@@ -1,14 +1,21 @@
 package cc.noharry.blelib.ble.connect;
 
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothManager;
+import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.os.Build.VERSION_CODES;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.RequiresApi;
 import cc.noharry.blelib.callback.BaseBleConnectCallback;
+import cc.noharry.blelib.callback.BleConnectCallback;
 import cc.noharry.blelib.data.BleDevice;
 import cc.noharry.blelib.exception.GattError;
 import cc.noharry.blelib.util.L;
+import cc.noharry.blelib.util.ThreadPoolProxyFactory;
+import java.util.List;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -25,17 +32,52 @@ public class BleConnectorProxy implements IBleOperation{
   private BlockingDeque<Task> mBlockingDeque;
   private AtomicBoolean isOperating;
   private Handler mHandler=new Handler(Looper.getMainLooper());
+  private BluetoothManager mBluetoothManager;
+  private BleConnectCallback mDefaultCallback;
 
   private BleConnectorProxy(Context context){
     mContext=context;
     mMultipleBleController = MultipleBleController.getInstance(mContext);
+    mBluetoothManager = (BluetoothManager) mContext
+        .getSystemService(Context.BLUETOOTH_SERVICE);
     isOperating=new AtomicBoolean(false);
     initQueue();
+    initCallback();
+
+  }
+
+  private void initCallback() {
+    mDefaultCallback = new BleConnectCallback() {
+      @Override
+      public void onDeviceConnecting(BleDevice bleDevice) {
+
+      }
+
+      @Override
+      public void onDeviceConnected(BleDevice bleDevice) {
+
+      }
+
+      @Override
+      public void onServicesDiscovered(BleDevice bleDevice, BluetoothGatt gatt, int status) {
+
+      }
+
+      @Override
+      public void onDeviceDisconnecting(BleDevice bleDevice) {
+
+      }
+
+      @Override
+      public void onDeviceDisconnected(BleDevice bleDevice, int status) {
+
+      }
+    };
   }
 
   private void initQueue() {
     mBlockingDeque = new LinkedBlockingDeque();
-    new Thread(new Runnable() {
+    ThreadPoolProxyFactory.getTaskThreadPoolProxy().submit(new Runnable() {
       @Override
       public void run() {
         while (true){
@@ -50,8 +92,7 @@ public class BleConnectorProxy implements IBleOperation{
           }
         }
       }
-    }).start();
-
+    });
   }
 
   private void runOnUiThread(Runnable runnable){
@@ -118,8 +159,18 @@ public class BleConnectorProxy implements IBleOperation{
     return bleClient;
   }
 
+  public void updateDevice(){
+    List<BluetoothDevice> connectedDevices = mBluetoothManager
+        .getConnectedDevices(BluetoothProfile.GATT_SERVER);
+    for (BluetoothDevice device:connectedDevices){
+      BleDevice bleDevice=new BleDevice(device,new byte[]{},0,System.currentTimeMillis());
+      BleClient bleClient = getBleClient(bleDevice);
+      bleClient.connect(false,mDefaultCallback);
+    }
+  }
+
   public void enqueue(Task task){
-    L.e("enqueue task:"+task);
+    L.i("enqueue task:"+" TYPE:"+task.getType()+" Device:"+task.getBleDevice().getMac());
     try {
       mBlockingDeque.put(task);
     } catch (InterruptedException e) {
@@ -128,7 +179,7 @@ public class BleConnectorProxy implements IBleOperation{
   }
 
   public void taskNotify(int state){
-    L.e("taskNotify:"+state+" message:"+ GattError.parse(state));
+    L.i("Task Finished:"+state+" message:"+ GattError.parse(state));
     isOperating.set(false);
   }
 }

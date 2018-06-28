@@ -1,6 +1,7 @@
 package cc.noharry.blelib.ble;
 
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -19,6 +20,9 @@ import cc.noharry.blelib.callback.BaseBleConnectCallback;
 import cc.noharry.blelib.callback.BleScanCallback;
 import cc.noharry.blelib.data.BleDevice;
 import cc.noharry.blelib.util.L;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author NoHarry
@@ -36,12 +40,13 @@ public class BleAdmin {
   private final BleConnectorProxy mBleConnectorProxy;
   public static final int LOG_STYLE_DEFAULT=0;
   public static final int LOG_STYLE_LOGGER=1;
+  private final BluetoothManager mBluetoothManager;
 
 
   private BleAdmin(Context context) {
     mContext = context.getApplicationContext();
-    BluetoothManager bluetoothManager= (BluetoothManager) mContext.getSystemService(Context.BLUETOOTH_SERVICE);
-    mBluetoothAdapter = bluetoothManager.getAdapter();
+    mBluetoothManager = (BluetoothManager) mContext.getSystemService(Context.BLUETOOTH_SERVICE);
+    mBluetoothAdapter = mBluetoothManager.getAdapter();
     mHandler = new Handler(mContext.getMainLooper());
     btStateReceiver = new BTStateReceiver();
     mBleScanner = BleScanner.getINSTANCE(getContext());
@@ -187,6 +192,79 @@ public class BleAdmin {
 
   public int getConnectionState(BleDevice bleDevice){
     return mBleConnectorProxy.getConnectionState(bleDevice);
+  }
+
+
+  public void getConnectedDevice(){
+    List<BleDevice> connectedDevice = mMultipleBleController.getConnectedDevice();
+    L.i("connectedDevices:"+connectedDevice);
+
+  }
+
+  //检查已连接的蓝牙设备
+  public void getConnectBt() {
+    /*int a2dp = mBluetoothAdapter.getProfileConnectionState(BluetoothProfile.A2DP);
+    int headset = mBluetoothAdapter.getProfileConnectionState(BluetoothProfile.HEADSET);
+    int health = mBluetoothAdapter.getProfileConnectionState(BluetoothProfile.HEALTH);
+    int flag = -1;
+    if (a2dp == BluetoothProfile.STATE_CONNECTED) {
+      flag = a2dp;
+    } else if (headset == BluetoothProfile.STATE_CONNECTED) {
+      flag = headset;
+    } else if (health == BluetoothProfile.STATE_CONNECTED) {
+      flag = health;
+    }
+    if (flag != -1) {
+      mBluetoothAdapter.getProfileProxy(mContext, new BluetoothProfile.ServiceListener() {
+        @Override
+        public void onServiceDisconnected(int profile) {
+        }
+
+        @Override
+        public void onServiceConnected(int profile, BluetoothProfile proxy) {
+          List<BluetoothDevice> mDevices = proxy.getConnectedDevices();
+          if (mDevices != null && mDevices.size() > 0) {
+            for (BluetoothDevice device : mDevices) {
+              L.i(device.getName() + "," + device.getAddress());
+            }
+          } else {
+            L.i("mDevices is null");
+          }
+        }
+      }, flag);
+    }*/
+
+    Class<BluetoothAdapter> bluetoothAdapterClass = BluetoothAdapter.class;//得到BluetoothAdapter的Class对象
+    try {//得到蓝牙状态的方法
+      Method method = bluetoothAdapterClass.getDeclaredMethod("getConnectionState", (Class[]) null);
+      //打开权限
+      method.setAccessible(true);
+      int state = (int) method.invoke(mBluetoothAdapter, (Object[]) null);
+      L.i("state:"+state);
+      if(state == BluetoothAdapter.STATE_CONNECTED){
+
+        L.i("BluetoothAdapter.STATE_CONNECTED");
+
+        Set<BluetoothDevice> devices = mBluetoothAdapter.getBondedDevices();
+        L.i("devices:"+devices.size());
+
+        for(BluetoothDevice device : devices){
+
+          Method isConnectedMethod = BluetoothDevice.class.getDeclaredMethod("isConnected", (Class[]) null);
+          method.setAccessible(true);
+          boolean isConnected = (boolean) isConnectedMethod.invoke(device, (Object[]) null);
+
+          if(isConnected){
+            L.i("connected:"+device.getAddress());
+          }
+
+        }
+
+      }
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   private void registerBtStateReceiver(Context context) {

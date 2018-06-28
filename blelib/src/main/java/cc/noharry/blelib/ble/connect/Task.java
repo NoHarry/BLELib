@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothGattService;
 import cc.noharry.blelib.ble.BleAdmin;
 import cc.noharry.blelib.callback.TaskCallback;
 import cc.noharry.blelib.data.BleDevice;
+import cc.noharry.blelib.data.WriteData;
 import cc.noharry.blelib.exception.GattError;
 
 /**
@@ -83,18 +84,38 @@ public class Task{
   }
 
   public static WriteTask newWriteTask(BleDevice bleDevice,String serviceUUID
-      , String characteristicUUID,byte[] data){
+      , String characteristicUUID,WriteData data){
     return new WriteTask(Type.WRITE,bleDevice,serviceUUID,characteristicUUID,data);
   }
 
+  public static WriteTask newWriteTask(BleDevice bleDevice
+      ,BluetoothGattCharacteristic characteristic,WriteData data){
+    return new WriteTask(Type.WRITE,bleDevice,characteristic,data);
+  }
+
   public static WriteTask newWriteTask(BleDevice bleDevice,String serviceUUID
-      , String characteristicUUID,byte[] data,int writeType){
+      , String characteristicUUID,WriteData data,int writeType){
     return new WriteTask(Type.WRITE,bleDevice,serviceUUID,characteristicUUID,data,writeType);
   }
 
   public static WriteTask newEnableNotificationsTask(BleDevice bleDevice,String serviceUUID
       , String characteristicUUID){
     return new WriteTask(Type.ENABLE_NOTIFICATIONS,bleDevice,serviceUUID,characteristicUUID);
+  }
+
+  public static WriteTask newEnableNotificationsTask(BleDevice bleDevice
+      ,BluetoothGattCharacteristic characteristic){
+    return new WriteTask(Type.ENABLE_NOTIFICATIONS,bleDevice,characteristic);
+  }
+
+  public static WriteTask newDisableNotificationsTask(BleDevice bleDevice,String serviceUUID
+      , String characteristicUUID){
+    return new WriteTask(Type.DISABLE_NOTIFICATIONS,bleDevice,serviceUUID,characteristicUUID);
+  }
+
+  public static WriteTask newDisableNotificationsTask(BleDevice bleDevice
+      ,BluetoothGattCharacteristic characteristic){
+    return new WriteTask(Type.DISABLE_NOTIFICATIONS,bleDevice,characteristic);
   }
 
   public BleDevice getBleDevice() {

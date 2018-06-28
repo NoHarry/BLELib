@@ -7,4 +7,14 @@
   <declare-styleable name="ScrollChildSwipeRefreshLayout">
     <attr name="refreshing" format="boolean" />
   </declare-styleable>
+  <declare-styleable name="ToggleImageView">
+    <attr name="switch_on_drawable" format="reference"/>
+    <attr name="switch_off_drawable" format="reference"/>
+    <attr name="is_switch_on" format="boolean"/>
+  </declare-styleable>
+  <declare-styleable name="DropDownFilter">
+    <attr name="top_layout" format="reference"/>
+    <attr name="second_layout" format="reference"/>
+  </declare-styleable>
+
 </resources>

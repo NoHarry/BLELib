@@ -58,10 +58,10 @@ public class BleScanner {
         e.printStackTrace();
       }
 
-      L.i("开启新扫描");
+      L.i("start new scan");
     }else {
         handleScan(config);
-      L.i("开启旧扫描");
+      L.i("start lagacy scan");
     }
   }
 

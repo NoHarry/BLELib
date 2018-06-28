@@ -89,7 +89,7 @@ public class BleClient implements IBleOperation{
     if (gatt!=null){
       gatt.disconnect();
       mBleConnectCallback.onDeviceDisconnectingBase(getBleDevice());
-      L.i("disconnect():"+MultipleBleController.getInstance(BleAdmin.getContext()).getClientMap());
+      L.i("disconnect():"+mBleDevice);
     }
   }
 
@@ -164,6 +164,11 @@ public class BleClient implements IBleOperation{
       }else {
         writeTask.notifyError(getBleDevice(),status);
       }
+
+      if (!writeTask.getData().isFinished()){
+        handleWrite(characteristic);
+      }
+
     }
 
     @Override
@@ -255,7 +260,7 @@ public class BleClient implements IBleOperation{
     }else {
       mCurrentTask.notifyError(getBleDevice(),GattError.LOCAL_GATT_OPERATION_DEVICE_DISCONNECTED);
 //      mBleConnectorProxy.taskNotify(1);
-      L.e("设备未连接");
+      L.e("Device Disconnected");
     }
 
   }
@@ -278,13 +283,16 @@ public class BleClient implements IBleOperation{
     switch (mCurrentTask.mType){
       case READ:
         isOperationSuccess= handleRead(mBluetoothGattCharacteristic);
-        L.e("Read:"+isOperationSuccess);
+//        L.e("Read:"+isOperationSuccess);
         break;
       case WRITE:
         isOperationSuccess=handleWrite(mBluetoothGattCharacteristic);
         break;
       case ENABLE_NOTIFICATIONS:
         isOperationSuccess=handleEnableNotification(mBluetoothGattCharacteristic);
+        break;
+      case DISABLE_NOTIFICATIONS:
+        isOperationSuccess=handleDisableNotification(mBluetoothGattCharacteristic);
         break;
       default:
     }
@@ -325,7 +333,42 @@ public class BleClient implements IBleOperation{
       remoteEnable = gatt.writeDescriptor(descriptor);
       L.i("Enable notifications for " + mBluetoothGattCharacteristic.getUuid());
     }
+    L.i("result:"+" localEnable:"+localEnable+" remoteEnable:"+remoteEnable+" descriptor:"+descriptor);
     boolean result = localEnable & remoteEnable;
+    return result;
+  }
+
+
+
+  private boolean handleDisableNotification(
+      BluetoothGattCharacteristic mBluetoothGattCharacteristic) {
+    mCurrentDataChangeTask= (WriteTask) mCurrentTask;
+    if (gatt==null||mBluetoothGattCharacteristic==null){
+      return false;
+    }
+
+    //not check permissions because it's always return 0
+    //see:https://stackoverflow.com/questions/23674668/android-bluetooth-low-energy-characteristic-getpermissions-returns-0
+    int properties = mBluetoothGattCharacteristic.getProperties();
+    if ((properties&(BluetoothGattCharacteristic.PROPERTY_NOTIFY))==0){
+      return false;
+    }
+
+    //this method only Disable notification localy
+    //also need to setting CCCD to DISABLE_NOTIFICATION_VALUE to Disable notification on ble peripheral
+    //see:https://stackoverflow.com/questions/22817005/why-does-setcharacteristicnotification-not-actually-enable-notifications
+    //also see:https://developer.android.com/guide/topics/connectivity/bluetooth-le#notification
+    boolean localDisable = gatt.setCharacteristicNotification(mBluetoothGattCharacteristic, false);
+    final BluetoothGattDescriptor descriptor = mBluetoothGattCharacteristic
+        .getDescriptor(CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR_UUID);
+    boolean remoteDisable=false;
+    if (descriptor != null) {
+      descriptor.setValue(BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
+      mBluetoothGattCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+      remoteDisable = gatt.writeDescriptor(descriptor);
+      L.i("Disable notifications for " + mBluetoothGattCharacteristic.getUuid());
+    }
+    boolean result = localDisable & remoteDisable;
     return result;
   }
 
@@ -341,7 +384,7 @@ public class BleClient implements IBleOperation{
       return false;
     }
     WriteTask writeTask= (WriteTask) mCurrentTask;
-    mBluetoothGattCharacteristic.setValue(writeTask.getData());
+    mBluetoothGattCharacteristic.setValue(writeTask.getData().getValue());
     mBluetoothGattCharacteristic.setWriteType(writeTask.getWriteType());
     return gatt.writeCharacteristic(mBluetoothGattCharacteristic);
   }
@@ -364,10 +407,18 @@ public class BleClient implements IBleOperation{
   }
 
   private void handleGattStatu(int statuCode){
-    L.e("handleStatu:"+ GattError.parse(statuCode));
+    L.e("handleGATTStatu:"+ GattError.parse(statuCode));
   }
 
   protected int getCurrentConnectionState() {
     return mCurrentConnectionState;
+  }
+
+  protected void setIsConnected(boolean isConnected) {
+    this.isConnected.set(isConnected);
+  }
+
+  protected void setCurrentConnectionState(int currentConnectionState) {
+    mCurrentConnectionState = currentConnectionState;
   }
 }
