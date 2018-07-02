@@ -39,7 +39,6 @@ public class Task{
     ENABLE_INDICATIONS,
     DISABLE_NOTIFICATIONS,
     DISABLE_INDICATIONS,
-    WAIT_FOR_VALUE_CHANGE,
     CHANGE_MTU
   }
 
@@ -130,6 +129,25 @@ public class Task{
   public static WriteTask newDisableNotificationsTask(BleDevice bleDevice
       ,BluetoothGattCharacteristic characteristic){
     return new WriteTask(Type.DISABLE_NOTIFICATIONS,bleDevice,characteristic);
+  }
+
+  public static ReadTask newReadDescriptor(BleDevice bleDevice,BluetoothGattDescriptor descriptor){
+    return new ReadTask(Type.READ_DESCRIPTOR,bleDevice,descriptor);
+  }
+
+  public static WriteTask newWriteDescriptor(BleDevice bleDevice,BluetoothGattDescriptor descriptor
+      ,WriteData data){
+    return new WriteTask(Type.WRITE_DESCRIPTOR,bleDevice,descriptor,data);
+  }
+
+  public static WriteTask newEnableIndication(BleDevice bleDevice
+      ,BluetoothGattCharacteristic characteristic){
+    return new WriteTask(Type.ENABLE_INDICATIONS,bleDevice,characteristic);
+  }
+
+  public static WriteTask newDisableIndication(BleDevice bleDevice
+      ,BluetoothGattCharacteristic characteristic){
+    return new WriteTask(Type.DISABLE_INDICATIONS,bleDevice,characteristic);
   }
 
   @RequiresApi(api = VERSION_CODES.LOLLIPOP)
