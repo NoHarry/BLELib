@@ -82,12 +82,14 @@ public class BleClient implements IBleOperation{
       gatt = mBleDevice.getBluetoothDevice().connectGatt(BleAdmin.getContext(),
           isAutoConnect, mBaseBleGattCallback);
     }
+    L.e("gatt="+gatt);
     return gatt;
   }
 
   protected synchronized void disconnect(){
     if (gatt!=null){
       gatt.disconnect();
+      gatt.close();
       mBleConnectCallback.onDeviceDisconnectingBase(getBleDevice());
       L.i("disconnect():"+mBleDevice);
     }
@@ -217,6 +219,14 @@ public class BleClient implements IBleOperation{
     public void onMtuChangedMain(BluetoothGatt gatt, int mtu, int status) {
       mBleConnectCallback.onMtuChangedBase(getBleDevice(),gatt,mtu,status);
 //      L.i("onMtuChangedMain"+" statu:"+status+" mtu:"+mtu);
+      if (mCurrentTask!=null&&mCurrentTask.getType()==Type.CHANGE_MTU){
+        MtuTask task= (MtuTask) mCurrentTask;
+        if (status==BluetoothGatt.GATT_SUCCESS){
+          task.notifyMutChanged(getBleDevice(),mtu);
+        }else {
+          task.notifyError(getBleDevice(),status);
+        }
+      }
     }
 
     @RequiresApi(api = VERSION_CODES.O)
@@ -267,6 +277,7 @@ public class BleClient implements IBleOperation{
 
 
 
+  @SuppressLint("NewApi")
   private void handleTask(Task task) {
     BluetoothGattService mBluetoothGattService;
     BluetoothGattCharacteristic mBluetoothGattCharacteristic;
@@ -294,6 +305,9 @@ public class BleClient implements IBleOperation{
       case DISABLE_NOTIFICATIONS:
         isOperationSuccess=handleDisableNotification(mBluetoothGattCharacteristic);
         break;
+      case CHANGE_MTU:
+        isOperationSuccess=handleChangeMtu();
+        break;
       default:
     }
     isOperating.set(false);
@@ -303,6 +317,16 @@ public class BleClient implements IBleOperation{
     }else {
       task.notifyError(getBleDevice(),GattError.LOCAL_GATT_OPERATION_FAIL);
     }
+  }
+
+  @RequiresApi(api = VERSION_CODES.LOLLIPOP)
+  private boolean handleChangeMtu() {
+    MtuTask mtuTask= (MtuTask) mCurrentTask;
+    if (gatt==null){
+      return false;
+    }
+    L.v("Request Change MTU to "+mtuTask.getMtu());
+    return gatt.requestMtu(mtuTask.getMtu());
   }
 
   private boolean handleEnableNotification(
@@ -331,7 +355,7 @@ public class BleClient implements IBleOperation{
       descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
       mBluetoothGattCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
       remoteEnable = gatt.writeDescriptor(descriptor);
-      L.i("Enable notifications for " + mBluetoothGattCharacteristic.getUuid());
+      L.v("Enable notifications for " + mBluetoothGattCharacteristic.getUuid());
     }
     L.i("result:"+" localEnable:"+localEnable+" remoteEnable:"+remoteEnable+" descriptor:"+descriptor);
     boolean result = localEnable & remoteEnable;
@@ -366,7 +390,7 @@ public class BleClient implements IBleOperation{
       descriptor.setValue(BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
       mBluetoothGattCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
       remoteDisable = gatt.writeDescriptor(descriptor);
-      L.i("Disable notifications for " + mBluetoothGattCharacteristic.getUuid());
+      L.v("Disable notifications for " + mBluetoothGattCharacteristic.getUuid());
     }
     boolean result = localDisable & remoteDisable;
     return result;
@@ -404,6 +428,9 @@ public class BleClient implements IBleOperation{
 
   private void handleConnStatu(int statuCode){
     L.e("handleConnStatu:"+ GattError.parseConnectionError(statuCode));
+
+    gatt.close();
+
   }
 
   private void handleGattStatu(int statuCode){

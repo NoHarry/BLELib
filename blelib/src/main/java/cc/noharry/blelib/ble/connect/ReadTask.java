@@ -43,7 +43,6 @@ public class ReadTask extends Task {
   protected void notifyDataRecived(BleDevice bleDevice,Data data){
     mBleConnectorProxy.taskNotify(0);
     if (mReadCallback!=null){
-
       mReadCallback.onDataRecived(bleDevice, data);
       mReadCallback.onComplete(bleDevice);
     }

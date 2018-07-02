@@ -3,6 +3,8 @@ package cc.noharry.blelib.ble.connect;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
+import android.os.Build.VERSION_CODES;
+import android.support.annotation.RequiresApi;
 import cc.noharry.blelib.ble.BleAdmin;
 import cc.noharry.blelib.callback.TaskCallback;
 import cc.noharry.blelib.data.BleDevice;
@@ -24,6 +26,7 @@ public class Task{
   protected String mDescriptorUUID;
   protected boolean isUseUUID=false;
   protected BleDevice mBleDevice;
+  protected int mMtu;
   private TaskCallback callback;
   private BleConnectorProxy mBleConnectorProxy;
 
@@ -36,7 +39,8 @@ public class Task{
     ENABLE_INDICATIONS,
     DISABLE_NOTIFICATIONS,
     DISABLE_INDICATIONS,
-    WAIT_FOR_VALUE_CHANGE
+    WAIT_FOR_VALUE_CHANGE,
+    CHANGE_MTU
   }
 
   protected Task(Type type, BleDevice bleDevice,
@@ -45,6 +49,16 @@ public class Task{
     mBleDevice=bleDevice;
     mBluetoothGattCharacteristic = bluetoothGattCharacteristic;
     isUseUUID=false;
+    mBleConnectorProxy = BleConnectorProxy.getInstance(BleAdmin.getContext());
+  }
+
+
+  protected Task(Type type, BleDevice bleDevice,
+      int mtu) {
+    mType = type;
+    mBleDevice=bleDevice;
+    isUseUUID=false;
+    mMtu=mtu;
     mBleConnectorProxy = BleConnectorProxy.getInstance(BleAdmin.getContext());
   }
 
@@ -116,6 +130,11 @@ public class Task{
   public static WriteTask newDisableNotificationsTask(BleDevice bleDevice
       ,BluetoothGattCharacteristic characteristic){
     return new WriteTask(Type.DISABLE_NOTIFICATIONS,bleDevice,characteristic);
+  }
+
+  @RequiresApi(api = VERSION_CODES.LOLLIPOP)
+  public static MtuTask newMtuTask(BleDevice bleDevice,int mtu){
+    return new MtuTask(Type.CHANGE_MTU,bleDevice,mtu);
   }
 
   public BleDevice getBleDevice() {

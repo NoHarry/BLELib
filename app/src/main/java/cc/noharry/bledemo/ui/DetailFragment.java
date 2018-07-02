@@ -19,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import cc.noharry.bledemo.R;
 import cc.noharry.bledemo.data.Device;
@@ -108,8 +109,18 @@ public class DetailFragment extends Fragment implements IWithBack {
     initView();
     initData();
     initObserver();
+    initEvent();
 
     return mBinding.getRoot();
+  }
+
+  private void initEvent() {
+    mBinding.btnTest.setOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        mHomeViewmodel.changeMtu(mDevice,40);
+      }
+    });
   }
 
   @Override

@@ -31,7 +31,7 @@
       </intent-filter>
     </activity>
 
-    <service
+    <!--<service
       android:name=".service.MyFirebaseMessagingService">
       <intent-filter>
         <action android:name="com.google.firebase.MESSAGING_EVENT"/>
@@ -44,7 +44,7 @@
       <intent-filter>
         <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
       </intent-filter>
-    </service>
+    </service>-->
   </application>
 
 </manifest>

@@ -1,6 +1,7 @@
 package cc.noharry.bledemo.app;
 
 import android.app.Application;
+import cc.noharry.bledemo.util.L;
 
 /**
  * @author NoHarry
@@ -12,6 +13,13 @@ public class MyApp extends Application {
   public void onCreate() {
     super.onCreate();
 //    initBugly();
+  }
+
+  @Override
+  public void onTerminate() {
+    L.e("onTerminate1");
+    super.onTerminate();
+    L.e("onTerminate");
   }
 
   /*private void initBugly() {
