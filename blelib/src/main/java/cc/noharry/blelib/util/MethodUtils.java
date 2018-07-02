@@ -154,4 +154,23 @@ public class MethodUtils {
     return true;
   }
 
+
+  public  static String getString(byte[] value){
+    char[] chars = "0123456789ABCDEF".toCharArray();
+    StringBuilder sb = new StringBuilder("");
+    int bit;
+
+    for (int i = 0; i < value.length; i++) {
+      bit = (value[i] & 0x0F0) >> 4;
+      sb.append(chars[bit]);
+      bit = value[i] & 0x0F;
+      sb.append(chars[bit]);
+      if (i!=value.length-1){
+        sb.append('-');
+      }
+
+    }
+    return "(0x) "+sb.toString().trim();
+  }
+
 }

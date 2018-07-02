@@ -18,6 +18,7 @@ import cc.noharry.bledemo.util.LogUtil;
 import cc.noharry.bledemo.util.LogUtil.LogCallback;
 import cc.noharry.blelib.ble.BleAdmin;
 import cc.noharry.blelib.ble.BleAdmin.OnBTOpenStateListener;
+import cc.noharry.blelib.ble.connect.MtuTask;
 import cc.noharry.blelib.ble.connect.ReadTask;
 import cc.noharry.blelib.ble.connect.Task;
 import cc.noharry.blelib.ble.connect.WriteTask;
@@ -27,6 +28,7 @@ import cc.noharry.blelib.callback.BaseBleConnectCallback;
 import cc.noharry.blelib.callback.BleConnectCallback;
 import cc.noharry.blelib.callback.BleScanCallback;
 import cc.noharry.blelib.callback.DataChangeCallback;
+import cc.noharry.blelib.callback.MtuCallback;
 import cc.noharry.blelib.callback.ReadCallback;
 import cc.noharry.blelib.callback.WriteCallback;
 import cc.noharry.blelib.data.BleDevice;
@@ -114,6 +116,7 @@ public class HomeViewmodel extends AndroidViewModel {
       public void onFoundDevice(BleDevice bleDevice) {
         Device device=new Device(bleDevice);
         foundDevice.setValue(device);
+//        L.i("onFoundDevice:"+bleDevice);
       }
 
       @Override
@@ -420,7 +423,7 @@ public class HomeViewmodel extends AndroidViewModel {
   }
 
   public void getConnectDevice(){
-    BleAdmin.getINSTANCE(getApplication()).getConnectBt();
+    BleAdmin.getINSTANCE(getApplication()).getConnectB();
   }
 
   public void enableNotify(Device device,BluetoothGattCharacteristic characteristic){
@@ -490,6 +493,31 @@ public class HomeViewmodel extends AndroidViewModel {
               , mBleConnectCallback);
     }
 
+  }
+
+  public void changeMtu(Device device,int mtu){
+    MtuTask mtuTask = Task.newMtuTask(device.getBleDevice(), mtu).with(new MtuCallback() {
+      @Override
+      public void onMtuChanged(BleDevice bleDevice, int mtu) {
+        L.i("onMtuChanged "+"bleDevice:"+bleDevice+" mtu:"+mtu);
+      }
+
+      @Override
+      public void onOperationSuccess(BleDevice bleDevice) {
+        L.i("onOperationSuccess "+"bleDevice:"+bleDevice);
+      }
+
+      @Override
+      public void onFail(BleDevice bleDevice, int statuCode, String message) {
+        L.i("onFail "+"bleDevice:"+bleDevice+" message:"+message);
+      }
+
+      @Override
+      public void onComplete(BleDevice bleDevice) {
+        L.i("onComplete "+"bleDevice:"+bleDevice);
+      }
+    });
+    BleAdmin.getINSTANCE(getApplication()).addTask(mtuTask);
   }
 
 

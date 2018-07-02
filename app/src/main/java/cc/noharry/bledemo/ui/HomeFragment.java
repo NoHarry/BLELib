@@ -257,11 +257,16 @@ public class HomeFragment extends Fragment implements IWithoutBack {
         }
         break;
       case R.id.menu_scan_filter:
-        showFilterDialog();
+//        showFilterDialog();
+        connectTest();
         break;
       default:
     }
     return super.onOptionsItemSelected(item);
+  }
+
+  private void connectTest() {
+    mHomeViewmodel.getConnectDevice();
   }
 
   private void showFilterDialog() {

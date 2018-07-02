@@ -3,6 +3,7 @@ package cc.noharry.blelib.ble;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
+import android.bluetooth.BluetoothProfile;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -201,6 +202,12 @@ public class BleAdmin {
 
   }
 
+  public void getConnectB(){
+    List<BluetoothDevice> connectedDevices = mBluetoothManager
+        .getConnectedDevices(BluetoothProfile.GATT_SERVER);
+    mBleConnectorProxy.updateDevice();
+    L.i("getConnectB:"+connectedDevices);
+  }
   //检查已连接的蓝牙设备
   public void getConnectBt() {
     /*int a2dp = mBluetoothAdapter.getProfileConnectionState(BluetoothProfile.A2DP);
