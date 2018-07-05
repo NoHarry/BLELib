@@ -18,6 +18,7 @@ import cc.noharry.bledemo.util.LogUtil;
 import cc.noharry.bledemo.util.LogUtil.LogCallback;
 import cc.noharry.blelib.ble.BleAdmin;
 import cc.noharry.blelib.ble.BleAdmin.OnBTOpenStateListener;
+import cc.noharry.blelib.ble.connect.ConnectionPriorityTask;
 import cc.noharry.blelib.ble.connect.MtuTask;
 import cc.noharry.blelib.ble.connect.ReadTask;
 import cc.noharry.blelib.ble.connect.Task;
@@ -27,6 +28,7 @@ import cc.noharry.blelib.ble.scan.BleScanConfig.Builder;
 import cc.noharry.blelib.callback.BaseBleConnectCallback;
 import cc.noharry.blelib.callback.BleConnectCallback;
 import cc.noharry.blelib.callback.BleScanCallback;
+import cc.noharry.blelib.callback.ConnectionPriorityCallback;
 import cc.noharry.blelib.callback.DataChangeCallback;
 import cc.noharry.blelib.callback.MtuCallback;
 import cc.noharry.blelib.callback.ReadCallback;
@@ -438,6 +440,33 @@ public class HomeViewmodel extends AndroidViewModel {
 
   }
 
+  public void changeConnectionPriority(Device device,int connectionPriority){
+    ConnectionPriorityTask task = Task.newConnectionPriorityTask(device.getBleDevice(), connectionPriority).with(
+        new ConnectionPriorityCallback() {
+          @Override
+          public void onConnectionUpdated(BleDevice bleDevice, int interval, int latency,
+              int timeout, int status) {
+            L.i("onConnectionUpdated:"+" interval:"+interval+" latency:"+latency
+                +" timeout:"+timeout+" status:"+status);
+          }
+
+          @Override
+          public void onOperationSuccess(BleDevice bleDevice) {
+            L.i("onOperationSuccess:"+"ConnectionPriority");
+          }
+
+          @Override
+          public void onFail(BleDevice bleDevice, int statuCode, String message) {
+            L.i("onOperationSuccess:"+"onFail"+message);
+          }
+
+          @Override
+          public void onComplete(BleDevice bleDevice) {
+            L.i("onOperationSuccess:"+"onComplete");
+          }
+        } );
+    BleAdmin.getINSTANCE(getApplication()).addTask(task);
+  }
 
   public void scan(){
     if (!isScanning.get()&&checkLocation()){

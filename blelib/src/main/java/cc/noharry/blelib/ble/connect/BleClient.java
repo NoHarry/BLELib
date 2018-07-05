@@ -154,7 +154,6 @@ public class BleClient implements IBleOperation{
         L.i("onServicesDiscoveredMain"+" statu:"+status+" services:"+service.getUuid().toString());
       }*/
 
-
     }
 
     @Override
@@ -281,6 +280,16 @@ public class BleClient implements IBleOperation{
       mBleConnectCallback.onPhyUpdateBase(getBleDevice(),gatt,txPhy,rxPhy,status);
 //      L.i("onPhyUpdateMain"+" statu:"+status+" txPhy:"+txPhy+" rxPhy:"+rxPhy);
     }
+
+    @RequiresApi(api = VERSION_CODES.O)
+    @Override
+    public void onConnectionUpdatedMain(BluetoothGatt gatt, int interval, int latency, int timeout,
+        int status) {
+      if (mCurrentTask!=null&&mCurrentTask.getType()==Type.CHANGE_CONNECTION_PRIORITY){
+        ConnectionPriorityTask task= (ConnectionPriorityTask) mCurrentTask;
+        task.notifyConnectionUpdated(getBleDevice(),interval,latency,timeout,status);
+      }
+    }
   };
 
   @Override
@@ -358,7 +367,10 @@ public class BleClient implements IBleOperation{
         isOperationSuccess=handleEnableIndications(mBluetoothGattCharacteristic);
         break;
       case DISABLE_INDICATIONS:
-        isOperationSuccess=handleDisableNotification(mBluetoothGattCharacteristic);
+        isOperationSuccess=handleDisableIndications(mBluetoothGattCharacteristic);
+        break;
+      case CHANGE_CONNECTION_PRIORITY:
+        isOperationSuccess=handleConnectionPriority();
         break;
       default:
     }
@@ -369,6 +381,16 @@ public class BleClient implements IBleOperation{
     }else {
       task.notifyError(getBleDevice(),GattError.LOCAL_GATT_OPERATION_FAIL);
     }
+  }
+
+  @RequiresApi(api = VERSION_CODES.LOLLIPOP)
+  private boolean handleConnectionPriority() {
+    if (gatt==null){
+      return false;
+    }
+    ConnectionPriorityTask task= (ConnectionPriorityTask) mCurrentTask;
+    L.v("request ConnectionPriority:"+task.getConnectionPriority());
+    return gatt.requestConnectionPriority(task.getConnectionPriority());
   }
 
   private boolean handleEnableIndications(

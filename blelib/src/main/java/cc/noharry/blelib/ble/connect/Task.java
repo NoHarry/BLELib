@@ -39,7 +39,8 @@ public class Task{
     ENABLE_INDICATIONS,
     DISABLE_NOTIFICATIONS,
     DISABLE_INDICATIONS,
-    CHANGE_MTU
+    CHANGE_MTU,
+    CHANGE_CONNECTION_PRIORITY
   }
 
   protected Task(Type type, BleDevice bleDevice,
@@ -58,6 +59,13 @@ public class Task{
     mBleDevice=bleDevice;
     isUseUUID=false;
     mMtu=mtu;
+    mBleConnectorProxy = BleConnectorProxy.getInstance(BleAdmin.getContext());
+  }
+
+  protected Task(Type type, BleDevice bleDevice) {
+    mType = type;
+    mBleDevice=bleDevice;
+    isUseUUID=false;
     mBleConnectorProxy = BleConnectorProxy.getInstance(BleAdmin.getContext());
   }
 
@@ -155,6 +163,11 @@ public class Task{
     return new MtuTask(Type.CHANGE_MTU,bleDevice,mtu);
   }
 
+  @RequiresApi(api = VERSION_CODES.LOLLIPOP)
+  public static ConnectionPriorityTask newConnectionPriorityTask(BleDevice bleDevice,int connectionPriority){
+    return new ConnectionPriorityTask(Type.CHANGE_CONNECTION_PRIORITY,bleDevice,connectionPriority);
+  }
+
   public BleDevice getBleDevice() {
     return mBleDevice;
   }
@@ -168,9 +181,9 @@ public class Task{
   }
 
   protected void notitySuccess(BleDevice bleDevice){
+    mBleConnectorProxy.taskNotify(0);
     callback.onOperationSuccess(bleDevice);
-    if(mType==Type.ENABLE_NOTIFICATIONS){
-      mBleConnectorProxy.taskNotify(0);
+    if(mType==Type.ENABLE_NOTIFICATIONS||mType==Type.CHANGE_CONNECTION_PRIORITY){
       callback.onComplete(bleDevice);
     }
   }

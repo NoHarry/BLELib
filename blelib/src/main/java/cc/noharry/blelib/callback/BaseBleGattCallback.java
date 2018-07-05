@@ -49,7 +49,9 @@ public abstract class BaseBleGattCallback extends BluetoothGattCallback{
   public abstract void onPhyReadMain(BluetoothGatt gatt, int txPhy, int rxPhy, int status);
   @RequiresApi(api = Build.VERSION_CODES.O)
   public abstract void onPhyUpdateMain(BluetoothGatt gatt, int txPhy, int rxPhy, int status);
-
+  @RequiresApi(api = Build.VERSION_CODES.O)
+  public abstract void onConnectionUpdatedMain(BluetoothGatt gatt, int interval, int latency, int timeout,
+      int status);
   @Override
   public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
     runOnUiThread(() -> onConnectionStateChangeMain(gatt, status, newState));
@@ -115,5 +117,11 @@ public abstract class BaseBleGattCallback extends BluetoothGattCallback{
   @Override
   public void onPhyUpdate(BluetoothGatt gatt, int txPhy, int rxPhy, int status) {
     runOnUiThread(() -> onPhyUpdateMain(gatt, txPhy, rxPhy, status));
+  }
+
+  @RequiresApi(api = VERSION_CODES.O)
+  public void onConnectionUpdated(BluetoothGatt gatt, int interval, int latency, int timeout,
+      int status) {
+    runOnUiThread(()->onConnectionUpdatedMain(gatt, interval, latency, timeout, status));
   }
 }
