@@ -149,6 +149,7 @@ public class DetailFragment extends Fragment implements IWithBack {
           mHomeViewmodel.connect(mDevice);
         }
         break;
+        default:
     }
     return super.onOptionsItemSelected(item);
   }
@@ -260,6 +261,7 @@ public class DetailFragment extends Fragment implements IWithBack {
             break;
           case TYPE_DESCRIPTOR:
             break;
+            default:
         }
         dialog.dismiss();
       }

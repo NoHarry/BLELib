@@ -152,6 +152,11 @@ public class BleAdmin {
     mBleConnectorProxy.doConnect(bleDevice, isAutoConnect, connectCallback);
   }
 
+  public void connect(@NonNull BleDevice bleDevice,@NonNull boolean isAutoConnect
+      , @NonNull BaseBleConnectCallback connectCallback,@NonNull long timeOut){
+    mBleConnectorProxy.doConnect(bleDevice, isAutoConnect, connectCallback,timeOut);
+  }
+
 
   @RequiresApi(api = VERSION_CODES.O)
   public void connect(@NonNull BleDevice bleDevice,@NonNull boolean isAutoConnect
@@ -159,6 +164,11 @@ public class BleAdmin {
     mBleConnectorProxy.doConnect(bleDevice, isAutoConnect, preferredPhy, connectCallback);
   }
 
+  @RequiresApi(api = VERSION_CODES.O)
+  public void connect(@NonNull BleDevice bleDevice,@NonNull boolean isAutoConnect
+      ,@NonNull int preferredPhy, @NonNull BaseBleConnectCallback connectCallback,long timeOut){
+    mBleConnectorProxy.doConnect(bleDevice, isAutoConnect, preferredPhy, connectCallback,timeOut);
+  }
 
   public void disconnect(@NonNull BleDevice bleDevice){
     mBleConnectorProxy.doDisconnect(bleDevice);

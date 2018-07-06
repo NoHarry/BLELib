@@ -1,5 +1,6 @@
 package cc.noharry.blelib.ble.connect;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothManager;
@@ -30,7 +31,9 @@ public class BleConnectorProxy implements IBleOperation{
   private Context mContext;
   private final MultipleBleController mMultipleBleController;
   private BlockingDeque<Task> mBlockingDeque;
+  private BlockingDeque<ConnectionRequest> mConnectionDeque;
   private AtomicBoolean isOperating;
+  private AtomicBoolean isConnecting;
   private Handler mHandler=new Handler(Looper.getMainLooper());
   private BluetoothManager mBluetoothManager;
   private BleConnectCallback mDefaultCallback;
@@ -41,6 +44,7 @@ public class BleConnectorProxy implements IBleOperation{
     mBluetoothManager = (BluetoothManager) mContext
         .getSystemService(Context.BLUETOOTH_SERVICE);
     isOperating=new AtomicBoolean(false);
+    isConnecting=new AtomicBoolean(false);
     initQueue();
     initCallback();
 
@@ -77,7 +81,8 @@ public class BleConnectorProxy implements IBleOperation{
 
   private void initQueue() {
     mBlockingDeque = new LinkedBlockingDeque();
-    ThreadPoolProxyFactory.getTaskThreadPoolProxy().submit(new Runnable() {
+    mConnectionDeque=new LinkedBlockingDeque<>();
+    /*ThreadPoolProxyFactory.getTaskThreadPoolProxy().submit(new Runnable() {
       @Override
       public void run() {
         while (true){
@@ -92,7 +97,65 @@ public class BleConnectorProxy implements IBleOperation{
           }
         }
       }
+    });*/
+    ThreadPoolProxyFactory.getTaskThreadPoolProxy().submit(()->{
+      while (true){
+        try {
+          if (!isOperating.get()){
+            Task task = mBlockingDeque.take();
+            doTask(task);
+          }
+
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
     });
+
+
+    ThreadPoolProxyFactory.getConnectionThreadPoolProxy().submit(()->{
+      while (true){
+        try {
+          if (!isConnecting.get()){
+            ConnectionRequest request = mConnectionDeque.take();
+            doConnection(request);
+          }
+
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
+    });
+  }
+
+  @SuppressLint("NewApi")
+  private void doConnection(ConnectionRequest request) {
+    switch (request.getType()){
+      case ConnectionRequest.CONNECTION_NORMAL:
+        isConnecting.set(true);
+        runOnUiThread(() -> getBleClient(request.getBleDevice())
+            .doConnect(request.getBleDevice(),request.isAutoConnect(),request.getBaseBleConnectCallback()));
+        break;
+      case ConnectionRequest.CONNECTION_NORMAL_WITH_TIMEOUT:
+        isConnecting.set(true);
+        runOnUiThread(() -> getBleClient(request.getBleDevice())
+            .doConnect(request.getBleDevice(),request.isAutoConnect()
+                ,request.getBaseBleConnectCallback(),request.getTimeOut()));
+        break;
+      case ConnectionRequest.CONNECTION_O:
+        isConnecting.set(true);
+        runOnUiThread(() -> getBleClient(request.getBleDevice())
+            .doConnect(request.getBleDevice(),request.isAutoConnect()
+                ,request.getPreferredPhy(),request.getBaseBleConnectCallback()));
+        break;
+      case ConnectionRequest.CONNECTION_O_WITH_TIMEOUT:
+        isConnecting.set(true);
+        runOnUiThread(() -> getBleClient(request.getBleDevice())
+            .doConnect(request.getBleDevice(),request.isAutoConnect()
+                ,request.getPreferredPhy(),request.getBaseBleConnectCallback(),request.getTimeOut()));
+        break;
+        default:
+    }
   }
 
   private void runOnUiThread(Runnable runnable){
@@ -116,22 +179,51 @@ public class BleConnectorProxy implements IBleOperation{
 
   @Override
   public void doConnect(BleDevice bleDevice, boolean isAutoConnect, BaseBleConnectCallback callback) {
-    runOnUiThread(() -> getBleClient(bleDevice).connect(isAutoConnect,callback));
+    ConnectionRequest request=new ConnectionRequest(bleDevice,isAutoConnect,callback);
+    try {
+      mConnectionDeque.put(request);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+  }
 
+  @Override
+  public void doConnect(BleDevice bleDevice, boolean isAutoConnect, BaseBleConnectCallback callback,
+      long timeOut) {
+    ConnectionRequest request=new ConnectionRequest(bleDevice,isAutoConnect,callback,timeOut);
+    try {
+      mConnectionDeque.put(request);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
   }
 
   @RequiresApi(api = VERSION_CODES.O)
   @Override
   public void doConnect(BleDevice bleDevice, boolean isAutoConnect, int preferredPhy,
       BaseBleConnectCallback callback) {
-    runOnUiThread(() -> getBleClient(bleDevice).connect(isAutoConnect,preferredPhy,callback));
+    ConnectionRequest request=new ConnectionRequest(bleDevice,isAutoConnect,callback,preferredPhy);
+    try {
+      mConnectionDeque.put(request);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+  }
 
+  @Override
+  public void doConnect(BleDevice bleDevice, boolean isAutoConnect, int preferredPhy,
+      BaseBleConnectCallback callback, long timeOut) {
+    ConnectionRequest request=new ConnectionRequest(bleDevice,isAutoConnect,callback,preferredPhy,timeOut);
+    try {
+      mConnectionDeque.put(request);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
   }
 
   @Override
   public void doDisconnect(BleDevice bleDevice) {
     runOnUiThread(() -> getBleClient(bleDevice).disconnect());
-
   }
 
   @Override
@@ -181,5 +273,10 @@ public class BleConnectorProxy implements IBleOperation{
   public void taskNotify(int state){
     L.i("Task Finished:"+state+" message:"+ GattError.parse(state));
     isOperating.set(false);
+  }
+
+  public void connectionNotify(int state){
+    L.i("connectionNotify:"+state+" message:"+ GattError.parseConnectionError(state));
+    isConnecting.set(false);
   }
 }
