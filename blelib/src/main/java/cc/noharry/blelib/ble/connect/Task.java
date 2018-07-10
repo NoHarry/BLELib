@@ -17,7 +17,7 @@ import cc.noharry.blelib.exception.GattError;
  */
 
 public class Task{
-  protected   Type mType;
+  protected Type mType;
   protected BluetoothGattService mBluetoothGattService;
   protected BluetoothGattCharacteristic mBluetoothGattCharacteristic;
   protected BluetoothGattDescriptor mBluetoothGattDescriptor;
@@ -104,6 +104,11 @@ public class Task{
     return new ReadTask(Type.READ,bleDevice,bluetoothGattCharacteristic);
   }
 
+  public static ReadTask newReadTask(BleDevice bleDevice,
+      BluetoothGattDescriptor bluetoothGattDescriptor){
+    return new ReadTask(Type.READ_DESCRIPTOR,bleDevice,bluetoothGattDescriptor);
+  }
+
   public static WriteTask newWriteTask(BleDevice bleDevice,String serviceUUID
       , String characteristicUUID,WriteData data){
     return new WriteTask(Type.WRITE,bleDevice,serviceUUID,characteristicUUID,data);
@@ -112,6 +117,11 @@ public class Task{
   public static WriteTask newWriteTask(BleDevice bleDevice
       ,BluetoothGattCharacteristic characteristic,WriteData data){
     return new WriteTask(Type.WRITE,bleDevice,characteristic,data);
+  }
+
+  public static WriteTask newWriteTask(BleDevice bleDevice
+      ,BluetoothGattDescriptor bluetoothGattDescriptor,WriteData data){
+    return new WriteTask(Type.WRITE_DESCRIPTOR,bleDevice,bluetoothGattDescriptor,data);
   }
 
   public static WriteTask newWriteTask(BleDevice bleDevice,String serviceUUID

@@ -620,9 +620,7 @@ public class BleClient implements IBleOperation{
 
   private void handleConnStatu(int statuCode){
     L.e("handleConnStatu:"+ GattError.parseConnectionError(statuCode));
-
     gatt.close();
-
   }
 
   private void handleGattStatu(int statuCode){

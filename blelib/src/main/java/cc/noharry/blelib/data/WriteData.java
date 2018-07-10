@@ -31,6 +31,16 @@ public class WriteData extends Data {
     handleValue(value);
   }
 
+  public void setValue(List<byte[]> value) {
+    mQueue.clear();
+    if (!value.isEmpty()){
+      for (byte[] bytes:value){
+        mQueue.offer(bytes);
+      }
+    }
+    totalPackSize=mQueue.size();
+  }
+
   private void handleValue(byte[] value) {
     mQueue.clear();
     if (value!=null){
@@ -72,13 +82,5 @@ public class WriteData extends Data {
     return reamainPackSize;
   }
 
-  public void setValue(List<byte[]> value) {
-    mQueue.clear();
-    if (!value.isEmpty()){
-      for (byte[] bytes:value){
-        mQueue.offer(bytes);
-      }
-    }
-    totalPackSize=mQueue.size();
-  }
+
 }
