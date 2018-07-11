@@ -257,8 +257,8 @@ public class HomeFragment extends Fragment implements IWithoutBack {
         }
         break;
       case R.id.menu_scan_filter:
-//        showFilterDialog();
-        connectTest();
+        showFilterDialog();
+//        connectTest();
         break;
       default:
     }

@@ -42,7 +42,7 @@ public class MtuTask extends Task {
     }
   }
 
-  protected void notifyMutChanged(BleDevice bleDevice,int mtu){
+  protected void notifyMtuChanged(BleDevice bleDevice,int mtu){
     if (mMtuCallback!=null){
       mMtuCallback.onMtuChanged(bleDevice, mtu);
       mMtuCallback.onComplete(bleDevice);

@@ -18,6 +18,7 @@ import cc.noharry.bledemo.util.LogUtil;
 import cc.noharry.bledemo.util.LogUtil.LogCallback;
 import cc.noharry.blelib.ble.BleAdmin;
 import cc.noharry.blelib.ble.BleAdmin.OnBTOpenStateListener;
+import cc.noharry.blelib.ble.connect.ConnectionPriorityTask;
 import cc.noharry.blelib.ble.connect.MtuTask;
 import cc.noharry.blelib.ble.connect.ReadTask;
 import cc.noharry.blelib.ble.connect.Task;
@@ -27,6 +28,7 @@ import cc.noharry.blelib.ble.scan.BleScanConfig.Builder;
 import cc.noharry.blelib.callback.BaseBleConnectCallback;
 import cc.noharry.blelib.callback.BleConnectCallback;
 import cc.noharry.blelib.callback.BleScanCallback;
+import cc.noharry.blelib.callback.ConnectionPriorityCallback;
 import cc.noharry.blelib.callback.DataChangeCallback;
 import cc.noharry.blelib.callback.MtuCallback;
 import cc.noharry.blelib.callback.ReadCallback;
@@ -72,6 +74,8 @@ public class HomeViewmodel extends AndroidViewModel {
   private String filterMac;
   private String filterName;
   private String filterUUID;
+  private MtuCallback mMtuCallback;
+  private ConnectionPriorityCallback mPriorityCallback;
 
 
   private void runOnUiThread(Runnable runnable){
@@ -394,6 +398,52 @@ public class HomeViewmodel extends AndroidViewModel {
         L.i("onComplete");
       }
     };
+
+    mMtuCallback = new MtuCallback() {
+      @Override
+      public void onMtuChanged(BleDevice bleDevice, int mtu) {
+        L.i("onMtuChanged " + "bleDevice:" + bleDevice + " mtu:" + mtu);
+      }
+
+      @Override
+      public void onOperationSuccess(BleDevice bleDevice) {
+        L.i("onOperationSuccess " + "bleDevice:" + bleDevice);
+      }
+
+      @Override
+      public void onFail(BleDevice bleDevice, int statuCode, String message) {
+        L.i("onFail " + "bleDevice:" + bleDevice + " message:" + message);
+      }
+
+      @Override
+      public void onComplete(BleDevice bleDevice) {
+        L.i("onComplete " + "bleDevice:" + bleDevice);
+      }
+    };
+
+    mPriorityCallback = new ConnectionPriorityCallback() {
+      @Override
+      public void onConnectionUpdated(BleDevice bleDevice, int interval, int latency,
+          int timeout, int status) {
+        L.i("onConnectionUpdated:" + " interval:" + interval + " latency:" + latency
+            + " timeout:" + timeout + " status:" + status);
+      }
+
+      @Override
+      public void onOperationSuccess(BleDevice bleDevice) {
+        L.i("onOperationSuccess:" + "ConnectionPriority");
+      }
+
+      @Override
+      public void onFail(BleDevice bleDevice, int statuCode, String message) {
+        L.i("onOperationSuccess:" + "onFail" + message);
+      }
+
+      @Override
+      public void onComplete(BleDevice bleDevice) {
+        L.i("onOperationSuccess:" + "onComplete");
+      }
+    };
   }
 
   public void clearLog(){
@@ -438,6 +488,11 @@ public class HomeViewmodel extends AndroidViewModel {
 
   }
 
+  public void changeConnectionPriority(Device device,int connectionPriority){
+    ConnectionPriorityTask task = Task.newConnectionPriorityTask(device.getBleDevice(), connectionPriority).with(
+      mPriorityCallback   );
+    BleAdmin.getINSTANCE(getApplication()).addTask(task);
+  }
 
   public void scan(){
     if (!isScanning.get()&&checkLocation()){
@@ -496,27 +551,7 @@ public class HomeViewmodel extends AndroidViewModel {
   }
 
   public void changeMtu(Device device,int mtu){
-    MtuTask mtuTask = Task.newMtuTask(device.getBleDevice(), mtu).with(new MtuCallback() {
-      @Override
-      public void onMtuChanged(BleDevice bleDevice, int mtu) {
-        L.i("onMtuChanged "+"bleDevice:"+bleDevice+" mtu:"+mtu);
-      }
-
-      @Override
-      public void onOperationSuccess(BleDevice bleDevice) {
-        L.i("onOperationSuccess "+"bleDevice:"+bleDevice);
-      }
-
-      @Override
-      public void onFail(BleDevice bleDevice, int statuCode, String message) {
-        L.i("onFail "+"bleDevice:"+bleDevice+" message:"+message);
-      }
-
-      @Override
-      public void onComplete(BleDevice bleDevice) {
-        L.i("onComplete "+"bleDevice:"+bleDevice);
-      }
-    });
+    MtuTask mtuTask = Task.newMtuTask(device.getBleDevice(), mtu).with(mMtuCallback);
     BleAdmin.getINSTANCE(getApplication()).addTask(mtuTask);
   }
 

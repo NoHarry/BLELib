@@ -1,5 +1,6 @@
 package cc.noharry.blelib.ble.connect;
 
+import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
@@ -17,7 +18,7 @@ import cc.noharry.blelib.exception.GattError;
  */
 
 public class Task{
-  protected   Type mType;
+  protected Type mType;
   protected BluetoothGattService mBluetoothGattService;
   protected BluetoothGattCharacteristic mBluetoothGattCharacteristic;
   protected BluetoothGattDescriptor mBluetoothGattDescriptor;
@@ -39,7 +40,8 @@ public class Task{
     ENABLE_INDICATIONS,
     DISABLE_NOTIFICATIONS,
     DISABLE_INDICATIONS,
-    CHANGE_MTU
+    CHANGE_MTU,
+    CHANGE_CONNECTION_PRIORITY
   }
 
   protected Task(Type type, BleDevice bleDevice,
@@ -58,6 +60,13 @@ public class Task{
     mBleDevice=bleDevice;
     isUseUUID=false;
     mMtu=mtu;
+    mBleConnectorProxy = BleConnectorProxy.getInstance(BleAdmin.getContext());
+  }
+
+  protected Task(Type type, BleDevice bleDevice) {
+    mType = type;
+    mBleDevice=bleDevice;
+    isUseUUID=false;
     mBleConnectorProxy = BleConnectorProxy.getInstance(BleAdmin.getContext());
   }
 
@@ -96,6 +105,11 @@ public class Task{
     return new ReadTask(Type.READ,bleDevice,bluetoothGattCharacteristic);
   }
 
+  public static ReadTask newReadTask(BleDevice bleDevice,
+      BluetoothGattDescriptor bluetoothGattDescriptor){
+    return new ReadTask(Type.READ_DESCRIPTOR,bleDevice,bluetoothGattDescriptor);
+  }
+
   public static WriteTask newWriteTask(BleDevice bleDevice,String serviceUUID
       , String characteristicUUID,WriteData data){
     return new WriteTask(Type.WRITE,bleDevice,serviceUUID,characteristicUUID,data);
@@ -104,6 +118,11 @@ public class Task{
   public static WriteTask newWriteTask(BleDevice bleDevice
       ,BluetoothGattCharacteristic characteristic,WriteData data){
     return new WriteTask(Type.WRITE,bleDevice,characteristic,data);
+  }
+
+  public static WriteTask newWriteTask(BleDevice bleDevice
+      ,BluetoothGattDescriptor bluetoothGattDescriptor,WriteData data){
+    return new WriteTask(Type.WRITE_DESCRIPTOR,bleDevice,bluetoothGattDescriptor,data);
   }
 
   public static WriteTask newWriteTask(BleDevice bleDevice,String serviceUUID
@@ -155,6 +174,20 @@ public class Task{
     return new MtuTask(Type.CHANGE_MTU,bleDevice,mtu);
   }
 
+  /**
+   *  Change connection priority
+   * @param bleDevice target BLE device
+   * @param connectionPriority one of
+   *  {@link BluetoothGatt#CONNECTION_PRIORITY_HIGH}
+   * ,{@link BluetoothGatt#CONNECTION_PRIORITY_BALANCED}
+   * ,{@link BluetoothGatt#CONNECTION_PRIORITY_LOW_POWER}
+   * @return a new task that can be enqueued by {@link BleAdmin#addTask(Task)}
+   */
+  @RequiresApi(api = VERSION_CODES.LOLLIPOP)
+  public static ConnectionPriorityTask newConnectionPriorityTask(BleDevice bleDevice,int connectionPriority){
+    return new ConnectionPriorityTask(Type.CHANGE_CONNECTION_PRIORITY,bleDevice,connectionPriority);
+  }
+
   public BleDevice getBleDevice() {
     return mBleDevice;
   }
@@ -168,9 +201,9 @@ public class Task{
   }
 
   protected void notitySuccess(BleDevice bleDevice){
+    mBleConnectorProxy.taskNotify(0);
     callback.onOperationSuccess(bleDevice);
-    if(mType==Type.ENABLE_NOTIFICATIONS){
-      mBleConnectorProxy.taskNotify(0);
+    if(mType==Type.ENABLE_NOTIFICATIONS||mType==Type.CHANGE_CONNECTION_PRIORITY){
       callback.onComplete(bleDevice);
     }
   }

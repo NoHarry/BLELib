@@ -4,6 +4,7 @@ public class ThreadPoolProxyFactory {
     static ThreadPoolProxy mNormalThreadPoolProxy;
     static ThreadPoolProxy mScanThreadPoolProxy;
     static ThreadPoolProxy mTaskThreadPoolProxy;
+    static ThreadPoolProxy mConnectionThreadPoolProxy;
 
 
 
@@ -41,5 +42,17 @@ public class ThreadPoolProxyFactory {
             }
         }
         return mTaskThreadPoolProxy;
+    }
+
+
+    public static ThreadPoolProxy getConnectionThreadPoolProxy() {
+        if (mConnectionThreadPoolProxy == null) {
+            synchronized (ThreadPoolProxyFactory.class) {
+                if (mConnectionThreadPoolProxy == null) {
+                    mConnectionThreadPoolProxy = new ThreadPoolProxy(1, 1,"Connection");
+                }
+            }
+        }
+        return mConnectionThreadPoolProxy;
     }
 }

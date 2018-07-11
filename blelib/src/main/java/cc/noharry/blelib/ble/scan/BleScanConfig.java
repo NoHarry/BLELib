@@ -11,7 +11,6 @@ public class BleScanConfig {
   private UUID[] mUUIDS;
   private String[] mDeviceNames;
   private String[] mDeviceMac;
-  private boolean isAutoConnect =false;
   private boolean isFuzzy= false;
   private long mScanTime=0;
 
@@ -40,13 +39,7 @@ public class BleScanConfig {
     mDeviceMac = deviceMac;
   }
 
-  public boolean isAutoConnect() {
-    return isAutoConnect;
-  }
 
-  private void setAutoConnect(boolean autoConnect) {
-    isAutoConnect = autoConnect;
-  }
 
   public boolean isFuzzy() {
     return isFuzzy;
@@ -88,10 +81,7 @@ public class BleScanConfig {
       return this;
     }
 
-    public Builder setIsAutoConnect(boolean isAutoConnect){
-      this.isAutoConnect=isAutoConnect;
-      return this;
-    }
+
 
     public Builder setScanTime(long scanTime){
       this.mScanTime=scanTime;
@@ -103,7 +93,6 @@ public class BleScanConfig {
       config.setUUIDS(this.mUUIDS);
       config.setDeviceNames(this.mDeviceNames);
       config.setFuzzy(this.isFuzzy);
-      config.setAutoConnect(this.isAutoConnect);
       config.setScanTime(this.mScanTime);
       config.setDeviceMac(this.mDeviceMac);
 

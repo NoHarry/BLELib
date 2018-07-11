@@ -118,7 +118,8 @@ public class DetailFragment extends Fragment implements IWithBack {
     mBinding.btnTest.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View v) {
-        mHomeViewmodel.changeMtu(mDevice,40);
+        mHomeViewmodel.changeMtu(mDevice,518);
+//        mHomeViewmodel.changeConnectionPriority(mDevice,1);
       }
     });
   }
@@ -148,6 +149,7 @@ public class DetailFragment extends Fragment implements IWithBack {
           mHomeViewmodel.connect(mDevice);
         }
         break;
+        default:
     }
     return super.onOptionsItemSelected(item);
   }
@@ -259,6 +261,7 @@ public class DetailFragment extends Fragment implements IWithBack {
             break;
           case TYPE_DESCRIPTOR:
             break;
+            default:
         }
         dialog.dismiss();
       }

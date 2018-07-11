@@ -51,7 +51,6 @@ public class WriteTask extends Task {
   protected WriteTask(Type type, BleDevice bleDevice,
       BluetoothGattCharacteristic bluetoothGattCharacteristic,int writeType) {
     super(type, bleDevice, bluetoothGattCharacteristic);
-    this.data=data;
     this.mWriteType=writeType;
     mBleConnectorProxy = BleConnectorProxy.getInstance(BleAdmin.getContext());
   }

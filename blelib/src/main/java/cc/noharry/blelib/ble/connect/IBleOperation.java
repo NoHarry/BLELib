@@ -10,7 +10,9 @@ import cc.noharry.blelib.data.BleDevice;
 
 public interface IBleOperation {
   void doConnect(BleDevice bleDevice,boolean isAutoConnect,BaseBleConnectCallback callback);
+  void doConnect(BleDevice bleDevice,boolean isAutoConnect,BaseBleConnectCallback callback,long timeOut);
   void doConnect(BleDevice bleDevice,boolean isAutoConnect,int preferredPhy,BaseBleConnectCallback callback);
+  void doConnect(BleDevice bleDevice,boolean isAutoConnect,int preferredPhy,BaseBleConnectCallback callback,long timeOut);
   void doDisconnect(BleDevice bleDevice);
   void doTask(Task task);
 }
