@@ -118,8 +118,8 @@ public class DetailFragment extends Fragment implements IWithBack {
     mBinding.btnTest.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View v) {
-//        mHomeViewmodel.changeMtu(mDevice,40);
-        mHomeViewmodel.changeConnectionPriority(mDevice,1);
+        mHomeViewmodel.changeMtu(mDevice,518);
+//        mHomeViewmodel.changeConnectionPriority(mDevice,1);
       }
     });
   }

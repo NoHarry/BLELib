@@ -1,5 +1,6 @@
 package cc.noharry.blelib.ble.connect;
 
+import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
@@ -173,6 +174,15 @@ public class Task{
     return new MtuTask(Type.CHANGE_MTU,bleDevice,mtu);
   }
 
+  /**
+   *  Change connection priority
+   * @param bleDevice target BLE device
+   * @param connectionPriority one of
+   *  {@link BluetoothGatt#CONNECTION_PRIORITY_HIGH}
+   * ,{@link BluetoothGatt#CONNECTION_PRIORITY_BALANCED}
+   * ,{@link BluetoothGatt#CONNECTION_PRIORITY_LOW_POWER}
+   * @return a new task that can be enqueued by {@link BleAdmin#addTask(Task)}
+   */
   @RequiresApi(api = VERSION_CODES.LOLLIPOP)
   public static ConnectionPriorityTask newConnectionPriorityTask(BleDevice bleDevice,int connectionPriority){
     return new ConnectionPriorityTask(Type.CHANGE_CONNECTION_PRIORITY,bleDevice,connectionPriority);
