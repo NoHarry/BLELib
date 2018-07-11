@@ -66,10 +66,10 @@ compileOptions {
 ```
 
 
-## HOW TO USE
+## How to use
+---
 
-
-### 1.SCAN
+### 1.Scan
 * Set scan rules
 
 |method|description|
