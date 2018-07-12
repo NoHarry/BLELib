@@ -169,6 +169,12 @@ public class Task{
     return new WriteTask(Type.DISABLE_INDICATIONS,bleDevice,characteristic);
   }
 
+  /**
+   * Request a new MTU
+   * @param bleDevice tatget Device
+   * @param mtu the New MTU,range between 23 and 517
+   * @return a new task that can be enqueued by {@link BleAdmin#addTask(Task)}
+   */
   @RequiresApi(api = VERSION_CODES.LOLLIPOP)
   public static MtuTask newMtuTask(BleDevice bleDevice,int mtu){
     return new MtuTask(Type.CHANGE_MTU,bleDevice,mtu);

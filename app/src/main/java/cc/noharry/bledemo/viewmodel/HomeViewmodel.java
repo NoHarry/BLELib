@@ -462,6 +462,8 @@ public class HomeViewmodel extends AndroidViewModel {
   public void write(Device device,BluetoothGattCharacteristic characteristic,byte[] data){
     WriteData writeData=new WriteData();
     writeData.setValue(data,true);
+    writeData.setMTUSize(517);
+//    writeData.setValue(data);
     WriteTask task = Task.newWriteTask(device.getBleDevice(), characteristic, writeData)
         .with(mWriteCallback);
     BleAdmin.getINSTANCE(getApplication()).addTask(task);
@@ -473,7 +475,12 @@ public class HomeViewmodel extends AndroidViewModel {
   }
 
   public void getConnectDevice(){
-    BleAdmin.getINSTANCE(getApplication()).getConnectB();
+    List<BleDevice> connectedDevice = BleAdmin.getINSTANCE(getApplication()).getConnectedDevice();
+    L.i("connectedDevice:"+connectedDevice);
+  }
+
+  public void disconnectAllDevices(){
+    BleAdmin.getINSTANCE(getApplication()).disconnectAllDevices();
   }
 
   public void enableNotify(Device device,BluetoothGattCharacteristic characteristic){
@@ -545,7 +552,7 @@ public class HomeViewmodel extends AndroidViewModel {
           .getINSTANCE(getApplication())
           .connect(device.getBleDevice()
               , false
-              , mBleConnectCallback);
+              , mBleConnectCallback,1000*10);
     }
 
   }

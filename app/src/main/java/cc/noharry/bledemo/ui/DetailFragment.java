@@ -120,6 +120,8 @@ public class DetailFragment extends Fragment implements IWithBack {
       public void onClick(View v) {
         mHomeViewmodel.changeMtu(mDevice,518);
 //        mHomeViewmodel.changeConnectionPriority(mDevice,1);
+//        mHomeViewmodel.getConnectDevice();
+//        mHomeViewmodel.disconnectAllDevices();
       }
     });
   }
