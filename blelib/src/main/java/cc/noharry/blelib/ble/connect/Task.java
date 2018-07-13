@@ -31,6 +31,8 @@ public class Task{
   private TaskCallback callback;
   private BleConnectorProxy mBleConnectorProxy;
 
+
+
   enum Type{
     WRITE,
     READ,
@@ -132,22 +134,30 @@ public class Task{
 
   public static WriteTask newEnableNotificationsTask(BleDevice bleDevice,String serviceUUID
       , String characteristicUUID){
-    return new WriteTask(Type.ENABLE_NOTIFICATIONS,bleDevice,serviceUUID,characteristicUUID);
+    WriteData data=new WriteData();
+    data.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+    return new WriteTask(Type.ENABLE_NOTIFICATIONS,bleDevice,serviceUUID,characteristicUUID,data);
   }
 
   public static WriteTask newEnableNotificationsTask(BleDevice bleDevice
       ,BluetoothGattCharacteristic characteristic){
-    return new WriteTask(Type.ENABLE_NOTIFICATIONS,bleDevice,characteristic);
+    WriteData data=new WriteData();
+    data.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+    return new WriteTask(Type.ENABLE_NOTIFICATIONS,bleDevice,characteristic,data);
   }
 
   public static WriteTask newDisableNotificationsTask(BleDevice bleDevice,String serviceUUID
       , String characteristicUUID){
-    return new WriteTask(Type.DISABLE_NOTIFICATIONS,bleDevice,serviceUUID,characteristicUUID);
+    WriteData data=new WriteData();
+    data.setValue(BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
+    return new WriteTask(Type.DISABLE_NOTIFICATIONS,bleDevice,serviceUUID,characteristicUUID,data);
   }
 
   public static WriteTask newDisableNotificationsTask(BleDevice bleDevice
       ,BluetoothGattCharacteristic characteristic){
-    return new WriteTask(Type.DISABLE_NOTIFICATIONS,bleDevice,characteristic);
+    WriteData data=new WriteData();
+    data.setValue(BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
+    return new WriteTask(Type.DISABLE_NOTIFICATIONS,bleDevice,characteristic,data);
   }
 
   public static ReadTask newReadDescriptor(BleDevice bleDevice,BluetoothGattDescriptor descriptor){
