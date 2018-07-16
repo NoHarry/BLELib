@@ -22,12 +22,21 @@ public class WriteData extends Data {
     setValue(value,false);
   }
 
-  public void setMTUSize(int packSize) {
-    this.packSize = packSize;
+
+  public void setMTUSize(int mtuSize) {
+    if (mtuSize<=23){
+      this.packSize=20;
+    }else if (mtuSize>=517){
+      this.packSize=512;
+    }else {
+      this.packSize = mtuSize;
+    }
+    handleValue(value);
   }
 
   public void setValue(byte[] value,boolean isAutoSplit) {
     this.isAutoSplit.set(isAutoSplit);
+    this.value=value;
     handleValue(value);
   }
 

@@ -439,6 +439,7 @@ public class BleClient implements IBleOperation{
 
   private boolean handleEnableIndications(
       BluetoothGattCharacteristic mBluetoothGattCharacteristic) {
+    mCurrentDataChangeTask= (WriteTask) mCurrentTask;
     if (gatt==null || mBluetoothGattCharacteristic==null){
       return false;
     }
@@ -452,7 +453,8 @@ public class BleClient implements IBleOperation{
         .getDescriptor(CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR_UUID);
     boolean remote=false;
     if (descriptor!=null){
-      descriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
+//      descriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
+      descriptor.setValue(mCurrentDataChangeTask.getData().getValue());
       int originWriteTye = mBluetoothGattCharacteristic.getWriteType();
       mBluetoothGattCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
       remote = gatt.writeDescriptor(descriptor);
@@ -465,6 +467,7 @@ public class BleClient implements IBleOperation{
 
   private boolean handleDisableIndications(
       BluetoothGattCharacteristic mBluetoothGattCharacteristic) {
+    mCurrentDataChangeTask= (WriteTask) mCurrentTask;
     if (gatt==null || mBluetoothGattCharacteristic==null){
       return false;
     }
@@ -478,7 +481,8 @@ public class BleClient implements IBleOperation{
         .getDescriptor(CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR_UUID);
     boolean remote=false;
     if (descriptor!=null){
-      descriptor.setValue(BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
+//      descriptor.setValue(BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
+      descriptor.setValue(mCurrentDataChangeTask.getData().getValue());
       int originWriteTye = mBluetoothGattCharacteristic.getWriteType();
       mBluetoothGattCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
       remote = gatt.writeDescriptor(descriptor);
@@ -542,7 +546,8 @@ public class BleClient implements IBleOperation{
         .getDescriptor(CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR_UUID);
     boolean remoteEnable=false;
     if (descriptor != null) {
-      descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+//      descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+      descriptor.setValue(mCurrentDataChangeTask.getData().getValue());
       int originWriteType = mBluetoothGattCharacteristic.getWriteType();
       mBluetoothGattCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
       remoteEnable = gatt.writeDescriptor(descriptor);
@@ -579,7 +584,8 @@ public class BleClient implements IBleOperation{
         .getDescriptor(CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR_UUID);
     boolean remoteDisable=false;
     if (descriptor != null) {
-      descriptor.setValue(BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
+//      descriptor.setValue(BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
+      descriptor.setValue(mCurrentDataChangeTask.getData().getValue());
       mBluetoothGattCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
       remoteDisable = gatt.writeDescriptor(descriptor);
       L.v("Disable notifications for " + mBluetoothGattCharacteristic.getUuid());

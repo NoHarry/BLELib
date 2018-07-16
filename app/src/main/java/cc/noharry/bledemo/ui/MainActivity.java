@@ -375,13 +375,13 @@ public class MainActivity extends AppCompatActivity {
         }
       }
     });
-    mBinding.btnGetConnectedDevice.setOnClickListener(new OnClickListener() {
+    /*mBinding.btnGetConnectedDevice.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View v) {
         List<BleDevice> connectedDevice = mBleAdmin.getMultipleBleController().getConnectedDevice();
         L.v("connectedDevice:"+connectedDevice);
       }
-    });
+    });*/
 
   }
 }
