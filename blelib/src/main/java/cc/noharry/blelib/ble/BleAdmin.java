@@ -55,12 +55,12 @@ public class BleAdmin {
 
   private BleAdmin(Context context) {
     mContext = context.getApplicationContext();
-    mBluetoothManager = (BluetoothManager) mContext.getSystemService(Context.BLUETOOTH_SERVICE);
+    mBluetoothManager = (BluetoothManager) getContext().getSystemService(Context.BLUETOOTH_SERVICE);
     mBluetoothAdapter = mBluetoothManager.getAdapter();
-    mHandler = new Handler(mContext.getMainLooper());
+    mHandler = new Handler(getContext().getMainLooper());
     btStateReceiver = new BTStateReceiver();
     mBleScanner = BleScanner.getINSTANCE(getContext());
-    mMultipleBleController = MultipleBleController.getInstance(mContext);
+    mMultipleBleController = MultipleBleController.getInstance(getContext());
     mBleConnectorProxy = BleConnectorProxy.getInstance(getContext());
 
   }
@@ -68,7 +68,9 @@ public class BleAdmin {
   public static BleAdmin getINSTANCE(Context context){
     if (INSTANCE == null){
       synchronized (BleAdmin.class){
-        INSTANCE = new BleAdmin(context);
+        if (INSTANCE==null){
+          INSTANCE = new BleAdmin(context);
+        }
       }
     }
     return INSTANCE;
@@ -318,13 +320,6 @@ public class BleAdmin {
     return connectedDevice;
   }
 
-  /*public void getConnectB(){
-    List<BluetoothDevice> connectedDevices = mBluetoothManager
-        .getConnectedDevices(BluetoothProfile.GATT_SERVER);
-    mBleConnectorProxy.updateDevice();
-    L.i("getConnectB:"+connectedDevices);
-  }*/
-
 
   private void registerBtStateReceiver(Context context) {
     IntentFilter filter = new IntentFilter();
@@ -336,7 +331,9 @@ public class BleAdmin {
     try {
       context.unregisterReceiver(btStateReceiver);
     } catch (Exception e) {
+      e.printStackTrace();
     } catch (Throwable e) {
+      e.printStackTrace();
     }
 
   }

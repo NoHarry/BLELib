@@ -96,42 +96,117 @@ public class Task{
   }
 
 
-
+  /**
+   * Read the value of the specified characteristic
+   * @param bleDevice Target device
+   * @param serviceUUID UUID of the service where the characteristic is located
+   * @param characteristicUUID UUID of the characteristic that needs to be read
+   * @return A new task that can be enqueued by {@link BleAdmin#addTask(Task)}
+   */
   public static ReadTask newReadTask(BleDevice bleDevice,String serviceUUID
       , String characteristicUUID){
     return new ReadTask(Type.READ,bleDevice,serviceUUID,characteristicUUID);
   }
 
+  /**
+   * Read the value of the specified characteristic
+   * @param bleDevice Target device
+   * @param bluetoothGattCharacteristic The characteristic that needs to be read
+   * @return A new task that can be enqueued by {@link BleAdmin#addTask(Task)}
+   */
   public static ReadTask newReadTask(BleDevice bleDevice,
       BluetoothGattCharacteristic bluetoothGattCharacteristic){
     return new ReadTask(Type.READ,bleDevice,bluetoothGattCharacteristic);
   }
 
+  /**
+   * Read the value of the specified descriptor
+   * @param bleDevice Target device
+   * @param bluetoothGattDescriptor The descriptor that needs to be read
+   * @return A new task that can be enqueued by {@link BleAdmin#addTask(Task)}
+   */
   public static ReadTask newReadTask(BleDevice bleDevice,
       BluetoothGattDescriptor bluetoothGattDescriptor){
     return new ReadTask(Type.READ_DESCRIPTOR,bleDevice,bluetoothGattDescriptor);
   }
 
+  /**
+   * Write the value to the specified characteristic
+   * @param bleDevice Target device
+   * @param serviceUUID UUID of the service where the characteristic is located
+   * @param characteristicUUID UUID of the characteristic that needs to be written
+   * @param data Data object to be written, specify data with {@link WriteData#setValue}
+   * @return A new task that can be enqueued by {@link BleAdmin#addTask(Task)}
+   */
   public static WriteTask newWriteTask(BleDevice bleDevice,String serviceUUID
       , String characteristicUUID,WriteData data){
     return new WriteTask(Type.WRITE,bleDevice,serviceUUID,characteristicUUID,data);
   }
 
+  /**
+   * Write the value to the specified characteristic
+   * @param bleDevice Target device
+   * @param characteristic The characteristic that needs to be written
+   * @param data Data object to be written, specify data with {@link WriteData#setValue}
+   * @return A new task that can be enqueued by {@link BleAdmin#addTask(Task)}
+   */
   public static WriteTask newWriteTask(BleDevice bleDevice
       ,BluetoothGattCharacteristic characteristic,WriteData data){
     return new WriteTask(Type.WRITE,bleDevice,characteristic,data);
   }
 
+  /**
+   * Write the value to the specified descriptor
+   * @param bleDevice Target device
+   * @param bluetoothGattDescriptor The descriptor that needs to be written
+   * @param data Data object to be written, specify data with {@link WriteData#setValue}
+   * @return A new task that can be enqueued by {@link BleAdmin#addTask(Task)}
+   */
   public static WriteTask newWriteTask(BleDevice bleDevice
       ,BluetoothGattDescriptor bluetoothGattDescriptor,WriteData data){
     return new WriteTask(Type.WRITE_DESCRIPTOR,bleDevice,bluetoothGattDescriptor,data);
   }
 
+  /**
+   * Write the value to the specified descriptor
+   * @param bleDevice Target device
+   * @param serviceUUID UUID of the service where the characteristic is located
+   * @param characteristicUUID UUID of the characteristic that needs to be written
+   * @param data Data object to be written, specify data with {@link WriteData#setValue}
+   * @param writeType The write type to for this characteristic. Can be one
+   *                  of :{@link BluetoothGattCharacteristic#WRITE_TYPE_DEFAULT},
+   *                  {@link BluetoothGattCharacteristic#WRITE_TYPE_NO_RESPONSE},
+   *                  {@link BluetoothGattCharacteristic#WRITE_TYPE_SIGNED}
+   * @return A new task that can be enqueued by {@link BleAdmin#addTask(Task)}
+   */
   public static WriteTask newWriteTask(BleDevice bleDevice,String serviceUUID
       , String characteristicUUID,WriteData data,int writeType){
     return new WriteTask(Type.WRITE,bleDevice,serviceUUID,characteristicUUID,data,writeType);
   }
 
+  /**
+   * Write the value to the specified descriptor
+   * @param bleDevice Target device
+   * @param characteristic The characteristic that needs to be written
+   * @param data Data object to be written, specify data with {@link WriteData#setValue}
+   * @param writeType The write type to for this characteristic. Can be one
+   *                  of :{@link BluetoothGattCharacteristic#WRITE_TYPE_DEFAULT},
+   *                  {@link BluetoothGattCharacteristic#WRITE_TYPE_NO_RESPONSE},
+   *                  {@link BluetoothGattCharacteristic#WRITE_TYPE_SIGNED}
+   * @return A new task that can be enqueued by {@link BleAdmin#addTask(Task)}
+   */
+  public static WriteTask newWriteTask(BleDevice bleDevice
+      ,BluetoothGattCharacteristic characteristic,WriteData data,int writeType){
+    return new WriteTask(Type.WRITE,bleDevice,characteristic,data,writeType);
+  }
+
+  /**
+   * Enable notifications for a given characteristic.
+   * @param bleDevice Target device
+   * @param serviceUUID UUID of the service where the characteristic is located
+   * @param characteristicUUID UUID of the characteristic that needs to enable notifications
+   * @return A new task that can be enqueued by {@link BleAdmin#addTask(Task)}
+   */
   public static WriteTask newEnableNotificationsTask(BleDevice bleDevice,String serviceUUID
       , String characteristicUUID){
     WriteData data=new WriteData();
@@ -139,6 +214,12 @@ public class Task{
     return new WriteTask(Type.ENABLE_NOTIFICATIONS,bleDevice,serviceUUID,characteristicUUID,data);
   }
 
+  /**
+   * Enable notifications for a given characteristic.
+   * @param bleDevice Target device
+   * @param characteristic The characteristic that needs to enable notifications
+   * @return A new task that can be enqueued by {@link BleAdmin#addTask(Task)}
+   */
   public static WriteTask newEnableNotificationsTask(BleDevice bleDevice
       ,BluetoothGattCharacteristic characteristic){
     WriteData data=new WriteData();
@@ -146,6 +227,13 @@ public class Task{
     return new WriteTask(Type.ENABLE_NOTIFICATIONS,bleDevice,characteristic,data);
   }
 
+  /**
+   * Disable notifications for a given characteristic.
+   * @param bleDevice Target device
+   * @param serviceUUID UUID of the service where the characteristic is located
+   * @param characteristicUUID UUID of the characteristic that needs to disable notifications
+   * @return A new task that can be enqueued by {@link BleAdmin#addTask(Task)}
+   */
   public static WriteTask newDisableNotificationsTask(BleDevice bleDevice,String serviceUUID
       , String characteristicUUID){
     WriteData data=new WriteData();
@@ -153,6 +241,12 @@ public class Task{
     return new WriteTask(Type.DISABLE_NOTIFICATIONS,bleDevice,serviceUUID,characteristicUUID,data);
   }
 
+  /**
+   * Disable notifications for a given characteristic.
+   * @param bleDevice Target device
+   * @param characteristic The characteristic that needs to disable notifications
+   * @return A new task that can be enqueued by {@link BleAdmin#addTask(Task)}
+   */
   public static WriteTask newDisableNotificationsTask(BleDevice bleDevice
       ,BluetoothGattCharacteristic characteristic){
     WriteData data=new WriteData();
@@ -160,20 +254,45 @@ public class Task{
     return new WriteTask(Type.DISABLE_NOTIFICATIONS,bleDevice,characteristic,data);
   }
 
+  /**
+   * Read the value of the specified descriptor
+   * @param bleDevice Target device
+   * @param descriptor The descriptor that needs to be read
+   * @return A new task that can be enqueued by {@link BleAdmin#addTask(Task)}
+   */
   public static ReadTask newReadDescriptor(BleDevice bleDevice,BluetoothGattDescriptor descriptor){
     return new ReadTask(Type.READ_DESCRIPTOR,bleDevice,descriptor);
   }
 
+  /**
+   * Write the value to the specified descriptor
+   * @param bleDevice Target device
+   * @param descriptor The descriptor that needs to be written
+   * @param data Data object to be written, specify data with {@link WriteData#setValue}
+   * @return A new task that can be enqueued by {@link BleAdmin#addTask(Task)}
+   */
   public static WriteTask newWriteDescriptor(BleDevice bleDevice,BluetoothGattDescriptor descriptor
       ,WriteData data){
     return new WriteTask(Type.WRITE_DESCRIPTOR,bleDevice,descriptor,data);
   }
 
+  /**
+   * Enable indication for a given characteristic
+   * @param bleDevice Target device
+   * @param characteristic The characteristic that needs to enable indication
+   * @return A new task that can be enqueued by {@link BleAdmin#addTask(Task)}
+   */
   public static WriteTask newEnableIndication(BleDevice bleDevice
       ,BluetoothGattCharacteristic characteristic){
     return new WriteTask(Type.ENABLE_INDICATIONS,bleDevice,characteristic);
   }
 
+  /**
+   * Disable indication for a given characteristic.
+   * @param bleDevice Target device
+   * @param characteristic The characteristic that needs to disable indication
+   * @return A new task that can be enqueued by {@link BleAdmin#addTask(Task)}
+   */
   public static WriteTask newDisableIndication(BleDevice bleDevice
       ,BluetoothGattCharacteristic characteristic){
     return new WriteTask(Type.DISABLE_INDICATIONS,bleDevice,characteristic);
@@ -183,7 +302,7 @@ public class Task{
    * Request a new MTU
    * @param bleDevice tatget Device
    * @param mtu the New MTU,range between 23 and 517
-   * @return a new task that can be enqueued by {@link BleAdmin#addTask(Task)}
+   * @return A new task that can be enqueued by {@link BleAdmin#addTask(Task)}
    */
   @RequiresApi(api = VERSION_CODES.LOLLIPOP)
   public static MtuTask newMtuTask(BleDevice bleDevice,int mtu){
@@ -197,7 +316,7 @@ public class Task{
    *  {@link BluetoothGatt#CONNECTION_PRIORITY_HIGH}
    * ,{@link BluetoothGatt#CONNECTION_PRIORITY_BALANCED}
    * ,{@link BluetoothGatt#CONNECTION_PRIORITY_LOW_POWER}
-   * @return a new task that can be enqueued by {@link BleAdmin#addTask(Task)}
+   * @return A new task that can be enqueued by {@link BleAdmin#addTask(Task)}
    */
   @RequiresApi(api = VERSION_CODES.LOLLIPOP)
   public static ConnectionPriorityTask newConnectionPriorityTask(BleDevice bleDevice,int connectionPriority){

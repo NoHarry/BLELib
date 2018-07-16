@@ -30,7 +30,13 @@ public class BleConnectorProxy implements IBleOperation{
   private static BleConnectorProxy instance=null;
   private Context mContext;
   private final MultipleBleController mMultipleBleController;
+  /**
+   * Task queue
+   */
   private BlockingDeque<Task> mBlockingDeque;
+  /**
+   * Connection queue
+   */
   private BlockingDeque<ConnectionRequest> mConnectionDeque;
   private AtomicBoolean isOperating;
   private AtomicBoolean isConnecting;
@@ -82,22 +88,6 @@ public class BleConnectorProxy implements IBleOperation{
   private void initQueue() {
     mBlockingDeque = new LinkedBlockingDeque();
     mConnectionDeque=new LinkedBlockingDeque<>();
-    /*ThreadPoolProxyFactory.getTaskThreadPoolProxy().submit(new Runnable() {
-      @Override
-      public void run() {
-        while (true){
-          try {
-            if (!isOperating.get()){
-              Task task = mBlockingDeque.take();
-              doTask(task);
-            }
-
-          } catch (InterruptedException e) {
-            e.printStackTrace();
-          }
-        }
-      }
-    });*/
     ThreadPoolProxyFactory.getTaskThreadPoolProxy().submit(()->{
       while (true){
         try {
