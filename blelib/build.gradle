@@ -1,7 +1,8 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
-
+apply plugin: 'com.github.kt3k.coveralls'
+apply from: '../jacoco.gradle'
 
 
 
@@ -29,12 +30,23 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+            testCoverageEnabled = true
+        }
     }
 
     compileOptions {
         targetCompatibility JavaVersion.VERSION_1_8
         sourceCompatibility JavaVersion.VERSION_1_8
     }
+}
+
+coveralls {
+    jacocoReportPath = "${buildDir}/reports/jacoco/testBlueDebugUnitTestCoverage/testBlueDebugUnitTestCoverage.xml"
+}
+tasks.coveralls {
+    dependsOn 'testBlueDebugUnitTestCoverage'
+    onlyIf { System.env.'CI' }
 }
 
 def build_param = "${build}";
