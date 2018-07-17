@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.github.kt3k.coveralls'
-apply plugin: 'jacoco'
+apply from: '../jacoco.gradle'
+
 apply plugin: 'io.fabric'
 
 android {
@@ -43,14 +44,8 @@ android {
     }
 
 }
-coveralls {
-    jacocoReportPath = "${buildDir}/reports/jacoco/testBlueDebugUnitTestCoverage/testBlueDebugUnitTestCoverage.xml"
-}
 
-tasks.coveralls {
-    dependsOn 'testBlueDebugUnitTestCoverage'
-    onlyIf { System.env.'CI' }
-}
+
 
 
 def build_param = "${build}";
