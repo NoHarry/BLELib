@@ -2,7 +2,8 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.github.kt3k.coveralls'
-apply from: '../jacoco.gradle'
+//apply from: '../jacoco.gradle'
+apply plugin: 'jacoco'
 
 
 
@@ -41,12 +42,36 @@ android {
     }
 }
 
-coveralls {
+/*coveralls {
     jacocoReportPath = "${buildDir}/reports/jacoco/testBlueDebugUnitTestCoverage/testBlueDebugUnitTestCoverage.xml"
 }
 tasks.coveralls {
     dependsOn 'testBlueDebugUnitTestCoverage'
     onlyIf { System.env.'CI' }
+}*/
+
+
+def coverageSourceDirs = [
+        'src/main/java',
+        'src/gen'
+]
+task jacocoTestReport(type: JacocoReport) {
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports after running tests."
+    reports {
+        xml.enabled = true
+        html.enabled = true
+        xml.destination "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+    }
+
+    // Class R is used, but usage will not be covered, so ignore this class from report
+    classDirectories = fileTree(
+            dir: './build/intermediates/classes/debug',
+            excludes: ['**/R.class',
+                       '**/R$*.class'
+            ])
+    sourceDirectories = files(coverageSourceDirs)
+    executionData = files('build/jacoco/testDebug.exec')
 }
 
 def build_param = "${build}";
