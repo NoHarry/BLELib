@@ -20,4 +20,4 @@ before_install:
 
 script:
   - ./gradlew clean build -Pbuild=dev
-  - ./gradlew test jacocoTestReport coveralls
+  - ./gradlew test jacocoTestReport coveralls-Pbuild=dev
