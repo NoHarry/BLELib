@@ -44,7 +44,13 @@ android {
     }
 
 }
-
+coveralls {
+    jacocoReportPath = "${buildDir}/reports/jacoco/testBlueDebugUnitTestCoverage/testBlueDebugUnitTestCoverage.xml"
+}
+tasks.coveralls {
+    dependsOn 'testBlueDebugUnitTestCoverage'
+    onlyIf { System.env.'CI' }
+}
 
 
 
