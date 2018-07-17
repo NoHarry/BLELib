@@ -1,6 +1,10 @@
 language: android
 jdk:
   - oraclejdk8
+
+env:
+- repo_token=${COVERALLS_TOKEN}
+
 android:
   components:
     - tools
