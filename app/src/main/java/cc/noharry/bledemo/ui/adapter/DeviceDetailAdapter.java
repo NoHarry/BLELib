@@ -3,7 +3,6 @@ package cc.noharry.bledemo.ui.adapter;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import cc.noharry.bledemo.R;
 import cc.noharry.bledemo.data.DeviceCharacteristic;
@@ -69,11 +68,10 @@ public class DeviceDetailAdapter extends BaseMultiItemQuickAdapter<MultiItemEnti
     if (isConnected.get()){
       helper.setText(R.id.tv_descriptor_uuid,descriptor.getBluetoothGattDescriptor().getUuid().toString());
 //      L.i("descriptor:"+ Arrays.toString(descriptor.getBluetoothGattDescriptor().getValue()));
-
       helper.itemView.setAlpha(1);
     }else {
 //      helper.setText(R.id.tv_descriptor_uuid,descriptor.getBluetoothGattDescriptor().getUuid().toString());
-      setToolGone(helper);
+      setToolGone(helper,item);
       helper.itemView.setAlpha(0.5f);
     }
 
@@ -97,7 +95,7 @@ public class DeviceDetailAdapter extends BaseMultiItemQuickAdapter<MultiItemEnti
               .getBluetoothGattCharacteristic().getValue()));
 
 //      L.i("characteristic:"+Arrays.toString(characteristic.getBluetoothGattCharacteristic().getValue()));
-      setToolVisiable(helper,characteristic
+      setToolVisiable(helper,item,characteristic
           .getBluetoothGattCharacteristic().getProperties());
       helper.itemView.setAlpha(1);
     }else {
@@ -106,57 +104,35 @@ public class DeviceDetailAdapter extends BaseMultiItemQuickAdapter<MultiItemEnti
       helper.setText(R.id.tv_characteristic_properties
           ,getProperties(characteristic
               .getBluetoothGattCharacteristic().getProperties()).toString());*/
-      setToolGone(helper);
+      setToolGone(helper,item);
       helper.itemView.setAlpha(0.5f);
 
     }
     helper.itemView.findViewById(R.id.iv_characteristic_read).setOnClickListener(
-        new OnClickListener() {
-          @Override
-          public void onClick(View v) {
-            mCharacteristicClickListener.onRead(characteristic
-                .getBluetoothGattCharacteristic(),helper.itemView,helper.getAdapterPosition());
-          }
-        });
+        v -> mCharacteristicClickListener.onRead(characteristic
+            .getBluetoothGattCharacteristic(),helper.itemView,helper.getAdapterPosition()));
     helper.itemView.findViewById(R.id.iv_characteristic_write).setOnClickListener(
-        new OnClickListener() {
-          @Override
-          public void onClick(View v) {
-            mCharacteristicClickListener.onWrite(characteristic
-                .getBluetoothGattCharacteristic(),helper.itemView,helper.getAdapterPosition());
-          }
-        });
+        v -> mCharacteristicClickListener.onWrite(characteristic
+            .getBluetoothGattCharacteristic(),helper.itemView,helper.getAdapterPosition()));
     helper.itemView.findViewById(R.id.iv_characteristic_notify).setOnClickListener(
-        new OnClickListener() {
-          @Override
-          public void onClick(View v) {
+        v -> {
 
-//            mNotifyImage.start();
-            mCharacteristicClickListener.onNotify(characteristic
-                .getBluetoothGattCharacteristic(),v,helper.getAdapterPosition());
-          }
+          mCharacteristicClickListener.onNotify(characteristic
+              .getBluetoothGattCharacteristic(),v,helper.getAdapterPosition());
         });
     helper.itemView.findViewById(R.id.iv_characteristic_operation).setOnClickListener(
-        new OnClickListener() {
-          @Override
-          public void onClick(View v) {
-            mCharacteristicClickListener.onOperation(characteristic
-                .getBluetoothGattCharacteristic(),v,helper.getAdapterPosition());
-          }
-        });
-    helper.itemView.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        int pos = helper.getAdapterPosition();
-        if (!characteristic.isExpanded()){
-          expand(pos, false);
-        }
-        /*if (characteristic.isExpanded()) {
-          collapse(pos, false);
-        } else {
-          expand(pos, false);
-        }*/
+        v -> mCharacteristicClickListener.onOperation(characteristic
+            .getBluetoothGattCharacteristic(),v,helper.getAdapterPosition()));
+    helper.itemView.setOnClickListener(v -> {
+      int pos = helper.getAdapterPosition();
+      if (!characteristic.isExpanded()){
+        expand(pos, false);
       }
+      /*if (characteristic.isExpanded()) {
+        collapse(pos, false);
+      } else {
+        expand(pos, false);
+      }*/
     });
   }
 
@@ -171,15 +147,12 @@ public class DeviceDetailAdapter extends BaseMultiItemQuickAdapter<MultiItemEnti
 //      helper.setText(R.id.tv_service_uuid,service.getBluetoothGattService().getUuid().toString());
       helper.itemView.setAlpha(0.5f);
     }
-    helper.itemView.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        int pos = helper.getAdapterPosition();
-        if (service.isExpanded()) {
-          collapse(pos, false);
-        } else {
-          expand(pos, false);
-        }
+    helper.itemView.setOnClickListener(v -> {
+      int pos = helper.getAdapterPosition();
+      if (service.isExpanded()) {
+        collapse(pos, false);
+      } else {
+        expand(pos, false);
       }
     });
   }
@@ -203,7 +176,7 @@ public class DeviceDetailAdapter extends BaseMultiItemQuickAdapter<MultiItemEnti
 
   }
 
-  private void setToolVisiable(BaseViewHolder helper,int properties){
+  private void setToolVisiable(BaseViewHolder helper,MultiItemEntity item,int properties){
     List<String> list = getProperties(properties);
 
 //    notify.setImageDrawable(mNotifyImage);
@@ -232,7 +205,7 @@ public class DeviceDetailAdapter extends BaseMultiItemQuickAdapter<MultiItemEnti
     }
   }
 
-  private void setToolGone(BaseViewHolder helper){
+  private void setToolGone(BaseViewHolder helper,MultiItemEntity item){
 
 //    notify.setImageDrawable(mNotifyImage);
     if (mWrite!=null&&mRead!=null&&mNotify!=null&&mOperation!=null){

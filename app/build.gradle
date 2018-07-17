@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
-
+apply plugin: 'com.github.kt3k.coveralls'
+apply plugin: 'jacoco'
 apply plugin: 'io.fabric'
 
 android {
@@ -35,8 +36,21 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+            testCoverageEnabled = true
+        }
     }
+
 }
+coveralls {
+    jacocoReportPath = "${buildDir}/reports/coverage/debug/report.xml"
+}
+
+tasks.coveralls {
+    dependsOn 'connectedAndroidTest'
+    onlyIf { System.env.'CI' }
+}
+
 
 def build_param = "${build}";
 
@@ -64,8 +78,8 @@ dependencies {
     testImplementation 'junit:junit:' + rootProject.juntiVersion
     androidTestImplementation 'com.android.support.test:runner:' + rootProject.runner
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:' + rootProject.espressoCore
-    implementation project(':blelib')
-//    implementation 'cc.noharry.blelib:blelib:0.0.4'
+//    implementation project(':blelib')
+    implementation 'cc.noharry.blelib:blelib:0.0.7'
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:' + rootProject.baseRecyclerViewAdapterVersion
     implementation 'android.arch.navigation:navigation-fragment:' + rootProject.navigationVersion
     implementation 'android.arch.navigation:navigation-ui:' + rootProject.navigationVersion
