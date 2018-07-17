@@ -73,6 +73,14 @@ task jacocoTestReport(type: JacocoReport) {
     sourceDirectories = files(coverageSourceDirs)
     executionData = files('build/jacoco/testDebug.exec')
 }
+coveralls {
+    jacocoReportPath = "${buildDir}/reports/coverage/debug/report.xml"
+}
+
+tasks.coveralls {
+    dependsOn 'connectedAndroidTest'
+    onlyIf { System.env.'CI' }
+}
 
 def build_param = "${build}";
 
