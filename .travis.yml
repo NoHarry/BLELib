@@ -32,5 +32,8 @@ before_install:
  - touch local.properties
 
 script:
-  - ./gradlew clean build -Pbuild=dev
+#  - ./gradlew clean build -Pbuild=dev
   - ./gradlew connectedAndroidTest coveralls -Pbuild=dev
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
