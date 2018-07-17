@@ -35,6 +35,7 @@ android {
         dev {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            testCoverageEnabled = true
         }
         debug {
             testCoverageEnabled = true
@@ -43,11 +44,11 @@ android {
 
 }
 coveralls {
-    jacocoReportPath = "${buildDir}/reports/coverage/debug/report.xml"
+    jacocoReportPath = "${buildDir}/reports/jacoco/testBlueDebugUnitTestCoverage/testBlueDebugUnitTestCoverage.xml"
 }
 
 tasks.coveralls {
-    dependsOn 'connectedAndroidTest'
+    dependsOn 'testBlueDebugUnitTestCoverage'
     onlyIf { System.env.'CI' }
 }
 
