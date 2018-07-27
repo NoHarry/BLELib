@@ -34,6 +34,11 @@ public class ConnectionPriorityTask extends Task {
   }
 
   @Override
+  public Task setTaskTimeOut(long taskTimeOut){
+    return super.setTaskTimeOut(taskTimeOut);
+  }
+
+  @Override
   protected void notitySuccess(BleDevice bleDevice) {
     mBleConnectorProxy.taskNotify(0);
     if (mConnectionPriorityCallback!=null){

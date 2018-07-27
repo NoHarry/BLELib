@@ -81,6 +81,7 @@ public class GattError {
 	public static final int LOCAL_GATT_OPERATION_FAIL = -1;
 	public static final int LOCAL_GATT_OPERATION_DEVICE_DISCONNECTED = -2;
 	public static final int LOCAL_GATT_CONN_TIME_OUT = -3;
+	public static final int LOCAL_GATT_TASK_TIME_OUT = -4;
 	/**
 	 * Converts the connection status given by the {@link android.bluetooth.BluetoothGattCallback#onConnectionStateChange(BluetoothGatt, int, int)} to error name.
 	 * @param error the status number
@@ -205,7 +206,9 @@ public class GattError {
 			case LOCAL_GATT_OPERATION_DEVICE_DISCONNECTED:
 				return "LOCAL GATT OPERATION DEVICE DISCONNECTED";
 			case LOCAL_GATT_CONN_TIME_OUT:
-				return "LOCAL_GATT_CONN_TIME_OUT";
+				return "LOCAL GATT CONN TIME OUT";
+			case LOCAL_GATT_TASK_TIME_OUT:
+				return "LOCAL GATT TASK TIME OUT";
 			default:
 				return "UNKNOWN (" + error + ")";
 		}

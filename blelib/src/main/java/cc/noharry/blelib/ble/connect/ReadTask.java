@@ -16,6 +16,7 @@ import cc.noharry.blelib.exception.GattError;
 public class ReadTask extends Task {
   private ReadCallback mReadCallback;
   private BleConnectorProxy mBleConnectorProxy;
+  private long mTaskTimeOut = NO_TIME_OUT;
 
 
   protected ReadTask(Type type, BleDevice bleDevice,
@@ -37,6 +38,12 @@ public class ReadTask extends Task {
 
   public ReadTask with(ReadCallback callback){
     mReadCallback=callback;
+    return this;
+  }
+
+  @Override
+  public ReadTask setTaskTimeOut(long taskTimeOut){
+    mTaskTimeOut=taskTimeOut;
     return this;
   }
 
@@ -66,5 +73,10 @@ public class ReadTask extends Task {
       mReadCallback.onComplete(bleDevice);
     }
 
+  }
+
+  @Override
+  public long getTaskTimeOut() {
+    return mTaskTimeOut;
   }
 }

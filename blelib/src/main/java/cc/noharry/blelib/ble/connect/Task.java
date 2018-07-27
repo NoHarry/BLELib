@@ -28,8 +28,10 @@ public class Task{
   protected boolean isUseUUID=false;
   protected BleDevice mBleDevice;
   protected int mMtu;
+  protected long mTaskTimeOut = NO_TIME_OUT;
   private TaskCallback callback;
   private BleConnectorProxy mBleConnectorProxy;
+  protected static final long NO_TIME_OUT=-1;
 
 
 
@@ -92,6 +94,11 @@ public class Task{
 
   public Task with(TaskCallback callback){
     this.callback=callback;
+    return this;
+  }
+
+  public Task setTaskTimeOut(long taskTimeOut){
+    this.mTaskTimeOut=taskTimeOut;
     return this;
   }
 
@@ -333,6 +340,10 @@ public class Task{
 
   public TaskCallback getCallback() {
     return callback;
+  }
+
+  public long getTaskTimeOut() {
+    return mTaskTimeOut;
   }
 
   protected void notitySuccess(BleDevice bleDevice){

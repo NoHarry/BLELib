@@ -22,6 +22,7 @@ public class WriteTask extends Task {
   private BleConnectorProxy mBleConnectorProxy;
   private int mWriteType;
   private DataChangeCallback mDataChangeCallback;
+  private long mTaskTimeOut = NO_TIME_OUT;
 
   protected WriteTask(Type type, BleDevice bleDevice,
       BluetoothGattCharacteristic bluetoothGattCharacteristic,WriteData data) {
@@ -88,6 +89,12 @@ public class WriteTask extends Task {
   }
 
   @Override
+  public WriteTask setTaskTimeOut(long taskTimeOut){
+    mTaskTimeOut=taskTimeOut;
+    return this;
+  }
+
+  @Override
   protected void notifyError(BleDevice bleDevice, int statuCode) {
     mBleConnectorProxy.taskNotify(statuCode);
     if (mWriteCallback!=null){
@@ -150,5 +157,10 @@ public class WriteTask extends Task {
 
   public int getWriteType() {
     return mWriteType;
+  }
+
+  @Override
+  public long getTaskTimeOut() {
+    return mTaskTimeOut;
   }
 }

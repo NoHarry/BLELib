@@ -225,6 +225,7 @@ public class BleConnectorProxy implements IBleOperation{
 
   public void clear(){
     mBlockingDeque.clear();
+    L.i("Clear all task!");
   }
 
   public int getConnectionState(BleDevice bleDevice){
@@ -262,7 +263,13 @@ public class BleConnectorProxy implements IBleOperation{
 
   public void taskNotify(int state){
     L.i("Task Finished:"+state+" message:"+ GattError.parse(state));
-    isOperating.set(false);
+    if (state==GattError.LOCAL_GATT_TASK_TIME_OUT){
+      clear();
+      isOperating.set(false);
+    }else {
+      isOperating.set(false);
+    }
+
   }
 
   public void connectionNotify(int state){

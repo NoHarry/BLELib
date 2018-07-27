@@ -45,8 +45,12 @@ public class BleClient implements IBleOperation{
   private WriteTask mCurrentDataChangeTask;
   private int mCurrentConnectionState=BluetoothProfile.STATE_DISCONNECTED;
   private ScheduledThreadPoolExecutor mTimeOutService;
-  private long mLocalTimeOut;
-  private boolean isTimeOutMode=false;
+  private long mLocalTimeOut=Task.NO_TIME_OUT;
+  private static final int CONNECT_TIME_OUT_MODE=1;
+  private static final int TASK_TIME_OUT_MODE=2;
+  private static final int NO_TIME_OUT_MODE=3;
+
+  private int timeOutMode=NO_TIME_OUT_MODE;
 
 
   public BleClient(BleDevice bleDevice) {
@@ -125,13 +129,38 @@ public class BleClient implements IBleOperation{
     }
   }
 
-  private synchronized void disconnectByTimeout(){
+
+
+  private synchronized void handleTimeout(){
+    switch (timeOutMode){
+      case CONNECT_TIME_OUT_MODE:
+        handleConnectTimeOut();
+        break;
+      case TASK_TIME_OUT_MODE:
+        handleTaskTimeOut();
+        break;
+        default:
+    }
+  }
+
+  private void handleConnectTimeOut() {
     if (gatt!=null){
       gatt.disconnect();
       gatt.close();
-      mBleConnectCallback.onDeviceDisconnectedBase(getBleDevice(),-3);
-      mBleConnectorProxy.connectionNotify(-3);
-      L.e("disconnectByTimeout():"+mBleDevice);;
+      mBleConnectCallback.onDeviceDisconnectedBase(getBleDevice(),GattError.LOCAL_GATT_CONN_TIME_OUT);
+      mBleConnectorProxy.connectionNotify(GattError.LOCAL_GATT_CONN_TIME_OUT);
+      L.e("handleConnectTimeOut():"+mBleDevice);;
+    }
+  }
+
+  private void handleTaskTimeOut() {
+    if (gatt!=null&&mCurrentTask!=null){
+      gatt.disconnect();
+      gatt.close();
+      mBleConnectCallback.onDeviceDisconnectedBase(getBleDevice(),GattError.LOCAL_GATT_CONN_TIME_OUT);
+      mBleConnectorProxy.connectionNotify(GattError.LOCAL_GATT_TASK_TIME_OUT);
+      mCurrentTask.notifyError(getBleDevice(),GattError.LOCAL_GATT_TASK_TIME_OUT);
+      L.e("handleTaskTimeOut():"+mBleDevice);
     }
   }
 
@@ -245,6 +274,7 @@ public class BleClient implements IBleOperation{
 //      L.i("onCharacteristicReadMain"+" statu:"+status+" characteristic:"+ Arrays.toString(characteristic.getValue()));
 //        mBleConnectorProxy.taskNotify(status);
         ReadTask readTask= (ReadTask) mCurrentTask;
+        stopTimeTask();
         if (GattError.GATT_SUCCESS==status){
           Data data=new Data();
           data.setValue(characteristic.getValue());
@@ -328,6 +358,7 @@ public class BleClient implements IBleOperation{
   public void doConnect(BleDevice bleDevice, boolean isAutoConnect, BaseBleConnectCallback callback,
       long timeOut) {
     mLocalTimeOut = timeOut;
+    timeOutMode=CONNECT_TIME_OUT_MODE;
     startTimeTask();
     connect(isAutoConnect, callback);
   }
@@ -344,6 +375,7 @@ public class BleClient implements IBleOperation{
   public void doConnect(BleDevice bleDevice, boolean isAutoConnect, int preferredPhy,
       BaseBleConnectCallback callback, long timeOut) {
     mLocalTimeOut = timeOut;
+    timeOutMode=CONNECT_TIME_OUT_MODE;
     startTimeTask();
     connect(isAutoConnect, preferredPhy, callback);
   }
@@ -371,10 +403,15 @@ public class BleClient implements IBleOperation{
 
   @SuppressLint("NewApi")
   private void handleTask(Task task) {
+    long taskTimeOut = task.getTaskTimeOut();
+    L.i("操作超时时间:"+taskTimeOut);
+    mLocalTimeOut=taskTimeOut;
+    timeOutMode=TASK_TIME_OUT_MODE;
     BluetoothGattService mBluetoothGattService;
     BluetoothGattCharacteristic mBluetoothGattCharacteristic;
     BluetoothGattDescriptor mBluetoothGattDescriptor=null;
     isOperating.set(true);
+    startTimeTask();
     if (mCurrentTask.isUseUUID){
       mBluetoothGattService=gatt.getService(UUID.fromString(mCurrentTask.mServiceUUID));
       mBluetoothGattCharacteristic=mBluetoothGattService.getCharacteristic(UUID.fromString(mCurrentTask.mCharacteristicUUID));
@@ -645,17 +682,25 @@ public class BleClient implements IBleOperation{
     mCurrentConnectionState = currentConnectionState;
   }
 
+
+
   private void startTimeTask(){
-    mTimeOutService = new ScheduledThreadPoolExecutor(1);
-    mTimeOutService.schedule(()->{
-      L.e("startTimeOutTask");
-      runOnUiThread(this::disconnectByTimeout);
-    },mLocalTimeOut,TimeUnit.MILLISECONDS);
+    if (timeOutMode!=NO_TIME_OUT_MODE){
+      if (mLocalTimeOut>0){
+        mTimeOutService = new ScheduledThreadPoolExecutor(1);
+        L.e("startTimeOutTask mode:"+timeOutMode+" time:"+mLocalTimeOut);
+        mTimeOutService.schedule(()->{
+          runOnUiThread(this::handleTimeout);
+        },mLocalTimeOut,TimeUnit.MILLISECONDS);
+      }
+
+    }
+
   }
 
   private void stopTimeTask(){
-    if (mTimeOutService!=null){
-      L.e("stopTimeOutTask");
+    if (mTimeOutService!=null&&timeOutMode!=NO_TIME_OUT_MODE){
+      L.e("stopTimeOutTask mode:"+timeOutMode+" time:"+mLocalTimeOut);
       mTimeOutService.shutdownNow();
       mTimeOutService=null;
     }

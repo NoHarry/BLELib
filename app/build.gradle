@@ -109,8 +109,8 @@ dependencies {
     testImplementation 'junit:junit:' + rootProject.juntiVersion
     androidTestImplementation 'com.android.support.test:runner:' + rootProject.runner
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:' + rootProject.espressoCore
-//    implementation project(':blelib')
-    implementation 'cc.noharry.blelib:blelib:0.0.7'
+    implementation project(':blelib')
+//    implementation 'cc.noharry.blelib:blelib:0.0.7'
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:' + rootProject.baseRecyclerViewAdapterVersion
     implementation 'android.arch.navigation:navigation-fragment:' + rootProject.navigationVersion
     implementation 'android.arch.navigation:navigation-ui:' + rootProject.navigationVersion
