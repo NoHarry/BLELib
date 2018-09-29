@@ -1,5 +1,6 @@
 package cc.noharry.blelib.data;
 
+import cc.noharry.blelib.util.L;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -36,8 +37,8 @@ public class WriteData extends Data {
 
   public void setValue(byte[] value,boolean isAutoSplit) {
     this.isAutoSplit.set(isAutoSplit);
-    this.value=value;
-    handleValue(value);
+    this.value=value.clone();
+    handleValue(this.value);
   }
 
   public void setValue(List<byte[]> value) {
@@ -76,6 +77,9 @@ public class WriteData extends Data {
       value=mQueue.poll();
     }
     reamainPackSize=mQueue.size();
+    if (value==null){
+      L.e("No Write Data!");
+    }
     return value;
   }
 

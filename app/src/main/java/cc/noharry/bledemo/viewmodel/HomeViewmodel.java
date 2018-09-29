@@ -462,14 +462,25 @@ public class HomeViewmodel extends AndroidViewModel {
   public void write(Device device,BluetoothGattCharacteristic characteristic,byte[] data){
     WriteData writeData=new WriteData();
     writeData.setValue(data,true);
-    writeData.setMTUSize(517);
+//    writeData.setMTUSize(517);
 //    writeData.setValue(data);
 //    WriteTask task = Task.newWriteTask(device.getBleDevice(), characteristic, writeData,BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
 //        .with(mWriteCallback);
-
     WriteTask task = Task.newWriteTask(device.getBleDevice(), characteristic, writeData)
         .with(mWriteCallback);
     BleAdmin.getINSTANCE(getApplication()).addTask(task);
+    /*List<Task> list=new ArrayList<>();
+    for (int i=0;i<10;i++){
+      WriteData writeData1=new WriteData();
+      writeData1.setValue(data,true);
+      WriteTask task = Task.newWriteTask(device.getBleDevice(), characteristic, writeData1)
+          .with(mWriteCallback).setTaskTimeOut(10000-i*1000);
+      list.add(task);
+    }
+    for (int i=0;i<list.size();i++){
+      BleAdmin.getINSTANCE(getApplication()).addTask(list.get(i));
+    }*/
+
   }
 
   private boolean checkSameDevice(BleDevice bleDevice1,BleDevice bleDevice2){

@@ -218,6 +218,7 @@ public class BleClient implements IBleOperation{
       mBleConnectCallback.onDescriptorReadBase(getBleDevice(),gatt,descriptor,status);
 //      L.i("onDescriptorReadMain"+" statu:"+status+" descriptor:"+descriptor);
       ReadTask readTask= (ReadTask) mCurrentTask;
+      stopTimeTask();
       if (GattError.GATT_SUCCESS==status){
         Data data=new Data();
         data.setValue(descriptor.getValue());
@@ -233,6 +234,7 @@ public class BleClient implements IBleOperation{
       mBleConnectCallback.onDescriptorWriteBase(getBleDevice(),gatt,descriptor,status);
 //      L.i("onDescriptorWriteMain"+" statu:"+status+" descriptor:"+descriptor);
       WriteTask writeTask= (WriteTask) mCurrentTask;
+      stopTimeTask();
       if (GattError.GATT_SUCCESS==status){
         Data data=new Data();
         data.setValue(descriptor.getValue());
@@ -253,6 +255,7 @@ public class BleClient implements IBleOperation{
 //      L.i("onCharacteristicWriteMain"+" statu:"+status+" characteristic:"+characteristic);
 //      mBleConnectorProxy.taskNotify(status);
       WriteTask writeTask= (WriteTask) mCurrentTask;
+      stopTimeTask();
       if (GattError.GATT_SUCCESS==status){
         Data data=new Data();
         data.setValue(characteristic.getValue());
@@ -404,7 +407,7 @@ public class BleClient implements IBleOperation{
   @SuppressLint("NewApi")
   private void handleTask(Task task) {
     long taskTimeOut = task.getTaskTimeOut();
-    L.i("操作超时时间:"+taskTimeOut);
+//    L.i("操作超时时间:"+taskTimeOut);
     mLocalTimeOut=taskTimeOut;
     timeOutMode=TASK_TIME_OUT_MODE;
     BluetoothGattService mBluetoothGattService;
@@ -643,8 +646,10 @@ public class BleClient implements IBleOperation{
       return false;
     }
     WriteTask writeTask= (WriteTask) mCurrentTask;
-    mBluetoothGattCharacteristic.setValue(writeTask.getData().getValue());
+    byte[] value = writeTask.getData().getValue();
+    mBluetoothGattCharacteristic.setValue(value);
     mBluetoothGattCharacteristic.setWriteType(writeTask.getWriteType());
+    L.i("write Characteristic:"+MethodUtils.getString(value));
     return gatt.writeCharacteristic(mBluetoothGattCharacteristic);
   }
 

@@ -32,6 +32,10 @@ public class Task{
   private TaskCallback callback;
   private BleConnectorProxy mBleConnectorProxy;
   protected static final long NO_TIME_OUT=-1;
+  public static final int WRITE_TYPE_DEFAULT=BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT;
+  public static final int WRITE_TYPE_NO_RESPONSE=BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE;
+  public static final int WRITE_TYPE_SIGNED=BluetoothGattCharacteristic.WRITE_TYPE_SIGNED;
+
 
 
 
