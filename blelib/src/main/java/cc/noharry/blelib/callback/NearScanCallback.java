@@ -126,8 +126,8 @@ public  class NearScanCallback {
           runOnUiThread(new Runnable() {
             @Override
             public void run() {
-              mBleScanCallback.onFoundDevice(bleDevice);
               mBleDevices.offer(bleDevice);
+              mBleScanCallback.onFoundDevice(bleDevice);
             }
           });
 
