@@ -56,7 +56,6 @@ public class BleClient implements IBleOperation{
   public BleClient(BleDevice bleDevice) {
     mBleDevice = bleDevice;
     MultipleBleController.getInstance(BleAdmin.getContext()).getClientMap().put(getKey(),this);
-//    BleAdmin.getINSTANCE(BleAdmin.getContext()).getMultipleBleController()
     mBleConnectorProxy = BleConnectorProxy.getInstance(BleAdmin.getContext());
   }
 
@@ -200,15 +199,11 @@ public class BleClient implements IBleOperation{
       }else {
         handleGattStatu(status);
       }
-//      L.i("onConnectionStateChangeMain"+" statu:"+status+" newState:"+newState);
     }
 
     @Override
     public void onServicesDiscoveredMain(BluetoothGatt gatt, int status) {
       mBleConnectCallback.onServicesDiscoveredBase(getBleDevice(),gatt,status);
-      /*for (BluetoothGattService service:gatt.getServices()){
-        L.i("onServicesDiscoveredMain"+" statu:"+status+" services:"+service.getUuid().toString());
-      }*/
 
     }
 
@@ -216,57 +211,73 @@ public class BleClient implements IBleOperation{
     public void onDescriptorReadMain(BluetoothGatt gatt, BluetoothGattDescriptor descriptor,
         int status) {
       mBleConnectCallback.onDescriptorReadBase(getBleDevice(),gatt,descriptor,status);
-//      L.i("onDescriptorReadMain"+" statu:"+status+" descriptor:"+descriptor);
-      ReadTask readTask= (ReadTask) mCurrentTask;
-      stopTimeTask();
-      if (GattError.GATT_SUCCESS==status){
-        Data data=new Data();
-        data.setValue(descriptor.getValue());
-        readTask.notifyDataRecived(getBleDevice(),data);
-      }else {
-        readTask.notifyError(getBleDevice(),status);
+      if (mCurrentTask.mType== Type.READ_DESCRIPTOR){
+        ReadTask readTask= (ReadTask) mCurrentTask;
+        stopTimeTask();
+        if (GattError.GATT_SUCCESS==status){
+          Data data=new Data();
+          data.setValue(descriptor.getValue());
+          readTask.notifyDataRecived(getBleDevice(),data);
+        }else {
+          readTask.notifyError(getBleDevice(),status);
+        }
       }
+
     }
 
     @Override
     public void onDescriptorWriteMain(BluetoothGatt gatt, BluetoothGattDescriptor descriptor,
         int status) {
       mBleConnectCallback.onDescriptorWriteBase(getBleDevice(),gatt,descriptor,status);
-//      L.i("onDescriptorWriteMain"+" statu:"+status+" descriptor:"+descriptor);
-      WriteTask writeTask= (WriteTask) mCurrentTask;
-      stopTimeTask();
-      if (GattError.GATT_SUCCESS==status){
-        Data data=new Data();
-        data.setValue(descriptor.getValue());
-        writeTask.notifyDataSent(getBleDevice(),data);
-      }else {
-        writeTask.notifyError(getBleDevice(),status);
+      if (mCurrentTask.mType== Type.WRITE_DESCRIPTOR){
+        WriteTask writeTask= (WriteTask) mCurrentTask;
+        stopTimeTask();
+        if (GattError.GATT_SUCCESS==status){
+          Data data=new Data();
+          data.setValue(descriptor.getValue());
+          writeTask.notifyDataSent(getBleDevice(),data);
+        }else {
+          writeTask.notifyError(getBleDevice(),status);
+        }
+
+        if (!writeTask.getData().isFinished()){
+          handleWriteDescriptor(descriptor);
+        }
       }
 
-      if (!writeTask.getData().isFinished()){
-        handleWriteDescriptor(descriptor);
+      if (mCurrentTask.mType==Type.ENABLE_INDICATIONS
+          ||mCurrentTask.mType==Type.ENABLE_NOTIFICATIONS
+          ||mCurrentTask.mType==Type.DISABLE_INDICATIONS
+          ||mCurrentTask.mType==Type.DISABLE_NOTIFICATIONS){
+        if (GattError.GATT_SUCCESS==status){
+          mCurrentTask.notitySuccess(mBleDevice);
+        }else {
+          mCurrentTask.notifyError(getBleDevice(),status);
+        }
       }
+
     }
 
     @Override
     public void onCharacteristicWriteMain(BluetoothGatt gatt,
         BluetoothGattCharacteristic characteristic, int status) {
       mBleConnectCallback.onCharacteristicWriteBase(getBleDevice(),gatt,characteristic,status);
-//      L.i("onCharacteristicWriteMain"+" statu:"+status+" characteristic:"+characteristic);
-//      mBleConnectorProxy.taskNotify(status);
-      WriteTask writeTask= (WriteTask) mCurrentTask;
-      stopTimeTask();
-      if (GattError.GATT_SUCCESS==status){
-        Data data=new Data();
-        data.setValue(characteristic.getValue());
-        writeTask.notifyDataSent(getBleDevice(),data);
-      }else {
-        writeTask.notifyError(getBleDevice(),status);
+      if (mCurrentTask.mType==Type.WRITE){
+        WriteTask writeTask= (WriteTask) mCurrentTask;
+        stopTimeTask();
+        if (GattError.GATT_SUCCESS==status){
+          Data data=new Data();
+          data.setValue(characteristic.getValue());
+          writeTask.notifyDataSent(getBleDevice(),data);
+        }else {
+          writeTask.notifyError(getBleDevice(),status);
+        }
+
+        if (!writeTask.getData().isFinished()){
+          handleWrite(characteristic);
+        }
       }
 
-      if (!writeTask.getData().isFinished()){
-        handleWrite(characteristic);
-      }
 
     }
 
@@ -274,17 +285,18 @@ public class BleClient implements IBleOperation{
     public void onCharacteristicReadMain(BluetoothGatt gatt,
         BluetoothGattCharacteristic characteristic, int status) {
       mBleConnectCallback.onCharacteristicReadBase(getBleDevice(),gatt,characteristic,status);
-//      L.i("onCharacteristicReadMain"+" statu:"+status+" characteristic:"+ Arrays.toString(characteristic.getValue()));
-//        mBleConnectorProxy.taskNotify(status);
-        ReadTask readTask= (ReadTask) mCurrentTask;
-        stopTimeTask();
-        if (GattError.GATT_SUCCESS==status){
-          Data data=new Data();
-          data.setValue(characteristic.getValue());
-          readTask.notifyDataRecived(getBleDevice(),data);
-        }else {
-          readTask.notifyError(getBleDevice(),status);
+        if (mCurrentTask.mType==Type.READ){
+          ReadTask readTask= (ReadTask) mCurrentTask;
+          stopTimeTask();
+          if (GattError.GATT_SUCCESS==status){
+            Data data=new Data();
+            data.setValue(characteristic.getValue());
+            readTask.notifyDataRecived(getBleDevice(),data);
+          }else {
+            readTask.notifyError(getBleDevice(),status);
+          }
         }
+
 
     }
 
@@ -292,7 +304,6 @@ public class BleClient implements IBleOperation{
     public void onCharacteristicChangedMain(BluetoothGatt gatt,
         BluetoothGattCharacteristic characteristic) {
       mBleConnectCallback.onCharacteristicChangedBase(getBleDevice(),gatt,characteristic);
-//      L.i("onCharacteristicChangedMain"+" characteristic:"+Arrays.toString(characteristic.getValue())+" dataTask:"+mCurrentDataChangeTask);
       if(mCurrentDataChangeTask!=null&&mCurrentDataChangeTask.getType()== Type.ENABLE_NOTIFICATIONS){
         Data data=new Data();
         data.setValue(characteristic.getValue());
@@ -303,20 +314,17 @@ public class BleClient implements IBleOperation{
     @Override
     public void onReadRemoteRssiMain(BluetoothGatt gatt, int rssi, int status) {
       mBleConnectCallback.onReadRemoteRssiBase(getBleDevice(),gatt,rssi,status);
-//      L.i("onReadRemoteRssiMain"+" statu:"+status+" rssi:"+rssi);
     }
 
     @Override
     public void onReliableWriteCompletedMain(BluetoothGatt gatt, int status) {
       mBleConnectCallback.onReliableWriteCompletedBase(getBleDevice(),gatt,status);
-//      L.i("onReliableWriteCompletedMain"+" statu:"+status);
     }
 
     @RequiresApi(api = VERSION_CODES.LOLLIPOP)
     @Override
     public void onMtuChangedMain(BluetoothGatt gatt, int mtu, int status) {
       mBleConnectCallback.onMtuChangedBase(getBleDevice(),gatt,mtu,status);
-//      L.i("onMtuChangedMain"+" statu:"+status+" mtu:"+mtu);
       if (mCurrentTask!=null&&mCurrentTask.getType()==Type.CHANGE_MTU){
         MtuTask task= (MtuTask) mCurrentTask;
         if (status==BluetoothGatt.GATT_SUCCESS){
@@ -331,14 +339,12 @@ public class BleClient implements IBleOperation{
     @Override
     public void onPhyReadMain(BluetoothGatt gatt, int txPhy, int rxPhy, int status) {
       mBleConnectCallback.onPhyReadBase(getBleDevice(),gatt,txPhy,rxPhy,status);
-//      L.i("onPhyReadMain"+" statu:"+status+" txPhy:"+txPhy+" rxPhy:"+rxPhy);
     }
 
     @RequiresApi(api = VERSION_CODES.O)
     @Override
     public void onPhyUpdateMain(BluetoothGatt gatt, int txPhy, int rxPhy, int status) {
       mBleConnectCallback.onPhyUpdateBase(getBleDevice(),gatt,txPhy,rxPhy,status);
-//      L.i("onPhyUpdateMain"+" statu:"+status+" txPhy:"+txPhy+" rxPhy:"+rxPhy);
     }
 
     @RequiresApi(api = VERSION_CODES.O)
@@ -396,7 +402,6 @@ public class BleClient implements IBleOperation{
       handleTask(task);
     }else {
       mCurrentTask.notifyError(getBleDevice(),GattError.LOCAL_GATT_OPERATION_DEVICE_DISCONNECTED);
-//      mBleConnectorProxy.taskNotify(1);
       L.e("Device Disconnected");
     }
 
@@ -407,7 +412,6 @@ public class BleClient implements IBleOperation{
   @SuppressLint("NewApi")
   private void handleTask(Task task) {
     long taskTimeOut = task.getTaskTimeOut();
-//    L.i("操作超时时间:"+taskTimeOut);
     mLocalTimeOut=taskTimeOut;
     timeOutMode=TASK_TIME_OUT_MODE;
     BluetoothGattService mBluetoothGattService;
@@ -427,7 +431,6 @@ public class BleClient implements IBleOperation{
     switch (mCurrentTask.mType){
       case READ:
         isOperationSuccess= handleRead(mBluetoothGattCharacteristic);
-//        L.e("Read:"+isOperationSuccess);
         break;
       case WRITE:
         isOperationSuccess=handleWrite(mBluetoothGattCharacteristic);
@@ -459,12 +462,30 @@ public class BleClient implements IBleOperation{
       default:
     }
     isOperating.set(false);
-//    mBleConnectorProxy.taskNotify(0);
-    if (isOperationSuccess){
-      task.notitySuccess(getBleDevice());
-    }else {
-      task.notifyError(getBleDevice(),GattError.LOCAL_GATT_OPERATION_FAIL);
+    switch (mCurrentTask.mType){
+      case READ:
+      case WRITE:
+      case CHANGE_MTU:
+      case READ_DESCRIPTOR:
+      case WRITE_DESCRIPTOR:
+      case CHANGE_CONNECTION_PRIORITY:
+        if (isOperationSuccess){
+          task.notitySuccess(getBleDevice());
+        }else {
+          task.notifyError(getBleDevice(),GattError.LOCAL_GATT_OPERATION_FAIL);
+        }
+        break;
+
+      //For these 4 methods, since they require 2 steps
+      // , we need to deal with them separately in their methods.
+      case ENABLE_NOTIFICATIONS:
+      case DISABLE_NOTIFICATIONS:
+      case ENABLE_INDICATIONS:
+      case DISABLE_INDICATIONS:
+
+      default:
     }
+
   }
 
   @RequiresApi(api = VERSION_CODES.LOLLIPOP)
@@ -492,14 +513,24 @@ public class BleClient implements IBleOperation{
     BluetoothGattDescriptor descriptor = mBluetoothGattCharacteristic
         .getDescriptor(CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR_UUID);
     boolean remote=false;
+    //when the charateristic contains CCCD,we need to unlock task queue after
+    //CCCD is written,otherwise we can unlock it immediately.
     if (descriptor!=null){
-//      descriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
       descriptor.setValue(mCurrentDataChangeTask.getData().getValue());
       int originWriteTye = mBluetoothGattCharacteristic.getWriteType();
       mBluetoothGattCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
       remote = gatt.writeDescriptor(descriptor);
       mBluetoothGattCharacteristic.setWriteType(originWriteTye);
+      if (!remote){
+        mCurrentTask.notifyError(getBleDevice(),GattError.LOCAL_GATT_OPERATION_FAIL);
+      }
       L.v("Enable Indications for " + mBluetoothGattCharacteristic.getUuid());
+    }else {
+      if (local){
+        mCurrentTask.notitySuccess(getBleDevice());
+      }else {
+        mCurrentTask.notifyError(getBleDevice(),GattError.LOCAL_GATT_OPERATION_FAIL);
+      }
     }
     return local&remote;
   }
@@ -520,14 +551,24 @@ public class BleClient implements IBleOperation{
     BluetoothGattDescriptor descriptor = mBluetoothGattCharacteristic
         .getDescriptor(CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR_UUID);
     boolean remote=false;
+    //when the charateristic contains CCCD,we need to unlock task queue after
+    //CCCD is written,otherwise we can unlock it immediately.
     if (descriptor!=null){
-//      descriptor.setValue(BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
       descriptor.setValue(mCurrentDataChangeTask.getData().getValue());
       int originWriteTye = mBluetoothGattCharacteristic.getWriteType();
       mBluetoothGattCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
       remote = gatt.writeDescriptor(descriptor);
       mBluetoothGattCharacteristic.setWriteType(originWriteTye);
+      if (!remote){
+        mCurrentTask.notifyError(getBleDevice(),GattError.LOCAL_GATT_OPERATION_FAIL);
+      }
       L.v("Disable Indications for " + mBluetoothGattCharacteristic.getUuid());
+    }else {
+      if (local){
+        mCurrentTask.notitySuccess(getBleDevice());
+      }else {
+        mCurrentTask.notifyError(getBleDevice(),GattError.LOCAL_GATT_OPERATION_FAIL);
+      }
     }
     return local&remote;
   }
@@ -585,14 +626,24 @@ public class BleClient implements IBleOperation{
     final BluetoothGattDescriptor descriptor = mBluetoothGattCharacteristic
         .getDescriptor(CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR_UUID);
     boolean remoteEnable=false;
+    //when the charateristic contains CCCD,we need to unlock task queue after
+    //CCCD is written,otherwise we can unlock it immediately.
     if (descriptor != null) {
-//      descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
       descriptor.setValue(mCurrentDataChangeTask.getData().getValue());
       int originWriteType = mBluetoothGattCharacteristic.getWriteType();
       mBluetoothGattCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
       remoteEnable = gatt.writeDescriptor(descriptor);
       mBluetoothGattCharacteristic.setWriteType(originWriteType);
+      if (!remoteEnable){
+        mCurrentTask.notifyError(getBleDevice(),GattError.LOCAL_GATT_OPERATION_FAIL);
+      }
       L.v("Enable notifications for " + mBluetoothGattCharacteristic.getUuid());
+    }else {
+      if (localEnable){
+        mCurrentTask.notitySuccess(getBleDevice());
+      }else {
+        mCurrentTask.notifyError(getBleDevice(),GattError.LOCAL_GATT_OPERATION_FAIL);
+      }
     }
     L.i("result:"+" localEnable:"+localEnable+" remoteEnable:"+remoteEnable+" descriptor:"+descriptor);
     boolean result = localEnable & remoteEnable;
@@ -623,12 +674,22 @@ public class BleClient implements IBleOperation{
     final BluetoothGattDescriptor descriptor = mBluetoothGattCharacteristic
         .getDescriptor(CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR_UUID);
     boolean remoteDisable=false;
+    //when the charateristic contains CCCD,we need to unlock task queue after
+    //CCCD is written,otherwise we can unlock it immediately.
     if (descriptor != null) {
-//      descriptor.setValue(BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
       descriptor.setValue(mCurrentDataChangeTask.getData().getValue());
       mBluetoothGattCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
       remoteDisable = gatt.writeDescriptor(descriptor);
+      if (!remoteDisable){
+        mCurrentTask.notifyError(getBleDevice(),GattError.LOCAL_GATT_OPERATION_FAIL);
+      }
       L.v("Disable notifications for " + mBluetoothGattCharacteristic.getUuid());
+    }else {
+      if (localDisable){
+        mCurrentTask.notitySuccess(getBleDevice());
+      }else {
+        mCurrentTask.notifyError(getBleDevice(),GattError.LOCAL_GATT_OPERATION_FAIL);
+      }
     }
     boolean result = localDisable & remoteDisable;
     return result;
