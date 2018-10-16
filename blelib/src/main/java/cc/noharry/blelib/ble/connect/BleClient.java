@@ -179,7 +179,6 @@ public class BleClient implements IBleOperation{
       mCurrentConnectionState=newState;
       if (status == BluetoothGatt.GATT_SUCCESS && newState == BluetoothProfile.STATE_CONNECTED){
         isConnected.set(true);
-        refreshCache();
         BleClient.this.gatt.discoverServices();
         mBleConnectorProxy.taskNotify(status);
         mBleConnectCallback.onDeviceConnectedBase(getBleDevice());
@@ -188,6 +187,7 @@ public class BleClient implements IBleOperation{
       }
       if (newState==BluetoothProfile.STATE_DISCONNECTED){
         isConnected.set(false);
+        refreshCache();
         mBleConnectorProxy.taskNotify(status);
         mBleConnectCallback.onDeviceDisconnectedBase(getBleDevice(),status);
         gatt.close();
@@ -645,7 +645,7 @@ public class BleClient implements IBleOperation{
         mCurrentTask.notifyError(getBleDevice(),GattError.LOCAL_GATT_OPERATION_FAIL);
       }
     }
-    L.i("result:"+" localEnable:"+localEnable+" remoteEnable:"+remoteEnable+" descriptor:"+descriptor);
+    L.i("result:"+" localEnable:"+localEnable+" remoteEnable:"+remoteEnable+" descriptor:"+descriptor.getUuid());
     boolean result = localEnable & remoteEnable;
     return result;
   }
@@ -692,6 +692,7 @@ public class BleClient implements IBleOperation{
       }
     }
     boolean result = localDisable & remoteDisable;
+    L.i("result:"+" localEnable:"+localDisable+" remoteEnable:"+remoteDisable+" descriptor:"+descriptor.getUuid());
     return result;
   }
 
