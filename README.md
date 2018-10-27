@@ -18,7 +18,7 @@ Blelib is an Android-side Bluetooth Low Energy library that contains many of the
 * Support for setting the maximum transmission unit (MTU)
 * Support log switch
 
-## Configuration
+## Set Up
 ### Gradle
 
 ```

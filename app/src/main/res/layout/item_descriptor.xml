@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
   android:orientation="vertical"
   android:layout_width="match_parent"
-  android:layout_height="64dp">
+  android:layout_height="200dp">
   <RelativeLayout
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:layout_marginLeft="32dp"
     >
     <TextView
@@ -35,5 +36,83 @@
       android:text="111"
       />
 
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="20dp"
+      android:gravity="bottom"
+      android:layout_below="@id/tv_descriptor_uuid"
+      android:text="Properties:"
+      android:id="@+id/tv_descriptor_properties_title"
+      />
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="20dp"
+      android:gravity="bottom"
+      android:layout_toRightOf="@id/tv_descriptor_properties_title"
+      android:layout_below="@id/tv_descriptor_uuid"
+      android:layout_marginLeft="10dp"
+      android:id="@+id/tv_descriptor_properties"
+      />
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="20dp"
+      android:text="Value:"
+      android:layout_below="@id/tv_descriptor_properties"
+      android:gravity="bottom"
+      android:id="@+id/tv_descriptor_value_title"
+      />
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_below="@id/tv_descriptor_properties"
+      android:layout_toRightOf="@id/tv_descriptor_value_title"
+      android:layout_marginLeft="10dp"
+      android:gravity="bottom"
+      android:id="@+id/tv_descriptor_value"
+      />
+
   </RelativeLayout>
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:gravity="right|bottom"
+    android:layout_marginBottom="16dp"
+    android:layout_marginRight="60dp"
+    >
+
+    <ImageView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginRight="30dp"
+      android:id="@+id/iv_descriptor_write"
+      android:src="@drawable/baseline_create_black_24"
+      android:background="?attr/selectableItemBackgroundBorderless"
+      />
+    <ImageView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:id="@+id/iv_descriptor_read"
+      android:layout_marginRight="30dp"
+      android:src="@drawable/baseline_visibility_black_24"
+      android:background="?attr/selectableItemBackgroundBorderless"
+      />
+    <cc.noharry.bledemo.ui.view.ToggleImageView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:id="@+id/iv_descriptor_notify"
+      android:layout_marginRight="30dp"
+      app:is_switch_on="false"
+      app:switch_off_drawable="@drawable/ic_notify_on_off"
+      app:switch_on_drawable="@drawable/ic_notify_off_on"
+      />
+    <ImageView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:id="@+id/iv_characteristic_operation"
+      android:layout_marginRight="30dp"
+      android:src="@drawable/baseline_computer_black_24"
+      android:background="?attr/selectableItemBackgroundBorderless"
+      />
+  </LinearLayout>
 </LinearLayout>

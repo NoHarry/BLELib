@@ -1,7 +1,9 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
-
+apply plugin: 'com.github.kt3k.coveralls'
+//apply from: '../jacoco.gradle'
+apply plugin: 'jacoco'
 
 
 
@@ -29,6 +31,9 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+            testCoverageEnabled = true
+        }
     }
 
     compileOptions {
@@ -36,6 +41,48 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
     }
 }
+
+/*coveralls {
+    jacocoReportPath = "${buildDir}/reports/jacoco/testBlueDebugUnitTestCoverage/testBlueDebugUnitTestCoverage.xml"
+}
+tasks.coveralls {
+    dependsOn 'testBlueDebugUnitTestCoverage'
+    onlyIf { System.env.'CI' }
+}*/
+
+
+//def coverageSourceDirs = [
+//        'src/main/java',
+//        'src/gen'
+//]
+//task jacocoTestReport(type: JacocoReport) {
+//    group = "Reporting"
+//    description = "Generate Jacoco coverage reports after running tests."
+//    reports {
+//        xml.enabled = true
+//        html.enabled = true
+//        xml.destination "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+//    }
+//
+//     Class R is used, but usage will not be covered, so ignore this class from report
+//    classDirectories = fileTree(
+//            dir: './build/intermediates/classes/debug',
+//            excludes: ['**/R.class',
+//                       '**/R$*.class'
+//            ])
+//    sourceDirectories = files(coverageSourceDirs)
+//    executionData = files('build/jacoco/testDebug.exec')
+//}
+coveralls {
+    sourceDirs = files('blelib/src/main/java').flatten()
+    jacocoReportPath = "${buildDir}/reports/coverage/debug/report.xml"
+}
+
+tasks.coveralls {
+    dependsOn 'connectedAndroidTest'
+    onlyIf { System.env.'CI' }
+}
+
 
 def build_param = "${build}";
 
@@ -61,7 +108,7 @@ dependencies {
 
 }
 
-version = "0.0.7"
+version = "0.0.8"
 
 def siteUrl = 'https://github.com/NoHarry/BLELib'      // 项目的主页
 def gitUrl = 'https://github.com/NoHarry/BLELib.git'   // Git仓库的url

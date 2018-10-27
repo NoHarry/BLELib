@@ -1,6 +1,11 @@
 language: android
 jdk:
   - oraclejdk8
+
+env:
+  matrix:
+    - ANDROID_TARGET=android-22 ANDROID_ABI=armeabi-v7a
+
 android:
   components:
     - tools
@@ -8,15 +13,27 @@ android:
     - platform-tools
     - build-tools-26.0.2
     - android-27
+    - android-22
     - extra-android-support
     - extra-google-google_play_services
     - extra-android-m2repository
     - extra-google-m2repository
     - addon-google_apis-google-21
+    - sys-img-armeabi-v7a-android-22
+
+before_script:
+    - echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
+    - emulator -avd test -no-skin -no-audio -no-window &
+    - android-wait-for-emulator
+    - adb shell input keyevent 82 &
 
 before_install:
  - chmod +x gradlew
  - touch local.properties
 
 script:
-  - ./gradlew clean build -Pbuild=dev
+#  - ./gradlew clean build -Pbuild=dev
+  - ./gradlew connectedAndroidTest coveralls -Pbuild=dev
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)

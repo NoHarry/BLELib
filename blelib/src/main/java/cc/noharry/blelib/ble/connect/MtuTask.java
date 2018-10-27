@@ -13,6 +13,7 @@ public class MtuTask extends Task {
   private MtuCallback mMtuCallback;
   private BleConnectorProxy mBleConnectorProxy;
   private int mMtu;
+  private long mTaskTimeOut = Task.NO_TIME_OUT;
 
   protected MtuTask(Type type, BleDevice bleDevice, int mtu) {
     super(type, bleDevice, mtu);
@@ -22,6 +23,12 @@ public class MtuTask extends Task {
 
   public MtuTask with(MtuCallback callback){
     mMtuCallback=callback;
+    return this;
+  }
+
+  @Override
+  public MtuTask setTaskTimeOut(long taskTimeOut){
+    mTaskTimeOut=taskTimeOut;
     return this;
   }
 
@@ -61,5 +68,10 @@ public class MtuTask extends Task {
     }else {
       mMtu=mtu;
     }
+  }
+
+  @Override
+  public long getTaskTimeOut() {
+    return mTaskTimeOut;
   }
 }
