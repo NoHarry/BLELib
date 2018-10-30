@@ -455,7 +455,7 @@ public class HomeViewmodel extends AndroidViewModel {
 
   public void read(Device device,BluetoothGattCharacteristic characteristic){
     ReadTask task = Task.newReadTask(device.getBleDevice(), characteristic)
-        .with(mReadCallback).setTaskTimeOut(1000);
+        .with(mReadCallback).setTaskTimeOut(10*1000);
     BleAdmin.getINSTANCE(getApplication()).addTask(task);
   }
 
@@ -467,7 +467,7 @@ public class HomeViewmodel extends AndroidViewModel {
 //    WriteTask task = Task.newWriteTask(device.getBleDevice(), characteristic, writeData,BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
 //        .with(mWriteCallback);
     WriteTask task = Task.newWriteTask(device.getBleDevice(), characteristic, writeData)
-        .with(mWriteCallback);
+        .with(mWriteCallback).setTaskTimeOut(10*1000);
     BleAdmin.getINSTANCE(getApplication()).addTask(task);
     /*List<Task> list=new ArrayList<>();
     for (int i=0;i<10;i++){
