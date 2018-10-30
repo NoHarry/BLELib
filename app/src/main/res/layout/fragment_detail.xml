@@ -25,6 +25,7 @@
     app:switch_off_drawable="@drawable/ic_notify_on_off"
     app:switch_on_drawable="@drawable/ic_notify_off_on"
     android:id="@+id/btn_test"
+    android:visibility="gone"
     />
   <android.support.v7.widget.RecyclerView
     android:layout_width="match_parent"
