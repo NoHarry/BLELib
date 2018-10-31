@@ -25,7 +25,8 @@
   <string name="dialog_close">Close</string>
   <string name="dialog_confirm">Confirm</string>
 
-
+  <string name="toast_wrong_uuid">Wrong UUID Format</string>
+  <string name="toast_wrong_mac">Wrong MAC Format</string>
   <string name="toast_open_location">Please Open Location!</string>
   <string name="confirm">OK</string>
   <string name="Cancel">CANCEL</string>

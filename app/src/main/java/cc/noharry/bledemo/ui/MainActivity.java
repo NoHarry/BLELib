@@ -84,7 +84,12 @@ public class MainActivity extends AppCompatActivity {
             L.i("onScanCompleted:"+deviceList);
             mBleDevices=deviceList;
           }
-        });
+
+              @Override
+              public void onScanFail(int errorCode, String msg) {
+
+              }
+            });
 
       }
     });

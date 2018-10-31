@@ -55,6 +55,7 @@ public class BleScanner {
         handleScanNew(config);
       }catch (IllegalArgumentException e){
         L.e("isScanning:"+isScanning.get());
+        callback.onScanFail(BleScanCallback.SCAN_FAIL_SCAN_WRONG_FILTER,e.getMessage());
         e.printStackTrace();
       }
 

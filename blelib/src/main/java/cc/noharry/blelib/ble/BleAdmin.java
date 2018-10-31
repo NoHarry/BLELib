@@ -275,9 +275,11 @@ public class BleAdmin {
         mBleScanner.scan(config,callback);
       }else {
         L.e("already start scan");
+        callback.onScanFail(BleScanCallback.SCAN_FAIL_SCAN_ALREADLY_STARTED,"scan already started");
       }
     }else {
       L.e("Bluetooth not enabled");
+      callback.onScanFail(BleScanCallback.SCAN_FAIL_ADAPTER_NOT_ENABLE,"Bluetooth not enabled");
     }
 
   }

@@ -29,7 +29,8 @@
   <string name="dialog_close">关闭</string>
   <string name="dialog_confirm">确定</string>
 
-
+  <string name="toast_wrong_uuid">UUID格式错误</string>
+  <string name="toast_wrong_mac">MAC格式错误</string>
   <string name="toast_open_location">请打开位置信息!</string>
   <string name="confirm">确定</string>
   <string name="Cancel">取消</string>

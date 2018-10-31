@@ -12,6 +12,7 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import cc.noharry.bledemo.data.Device;
+import cc.noharry.bledemo.data.StatuData;
 import cc.noharry.bledemo.util.L;
 import cc.noharry.bledemo.util.Log;
 import cc.noharry.bledemo.util.LogUtil;
@@ -60,6 +61,7 @@ public class HomeViewmodel extends AndroidViewModel {
   public final ObservableBoolean isDialogShowing=new ObservableBoolean(false);
   private final SingleLiveEvent<Integer> valueChange=new SingleLiveEvent<>();
 //  public final SingleLiveEvent<Boolean> isScanning=new SingleLiveEvent<>();
+  private final SingleLiveEvent<StatuData> status=new SingleLiveEvent<>();
   private Handler mHandler=new Handler(Looper.getMainLooper());
   private LogCallback mLogCallback;
   private BleScanCallback mBleScanCallback;
@@ -67,6 +69,9 @@ public class HomeViewmodel extends AndroidViewModel {
   private List<Log> mLogList=new ArrayList<>();
   public static final int SCANNING=0;
   public static final int NOT_SCAN=1;
+  public static final int SCAN_FAIL=2;
+  public static final int STATU_WRONG_UUID=10001;
+  public static final int STATU_WRONG_MAC=10002;
   private BaseBleConnectCallback mBaseBleConnectCallback;
   private WriteCallback mWriteCallback;
   private DataChangeCallback mDataChangeCallback;
@@ -129,6 +134,14 @@ public class HomeViewmodel extends AndroidViewModel {
         isScanning.set(false);
         scanState.setValue(NOT_SCAN);
         L.i("onScanCompleted:"+isScanning.get());
+      }
+
+      @Override
+      public void onScanFail(int errorCode, String msg) {
+        isScanning.set(false);
+        scanState.setValue(SCAN_FAIL);
+        status.setValue(new StatuData(errorCode,msg));
+        L.i("onScanFail code:"+errorCode+" msg:"+msg);
       }
     };
 
@@ -518,24 +531,35 @@ public class HomeViewmodel extends AndroidViewModel {
   public void scan(){
     if (!isScanning.get()&&checkLocation()){
 //      BleScanConfig config=new BleScanConfig.Builder().setScanTime(5000).build();
-      if (BleAdmin.getINSTANCE(getApplication()).isEnable()){
-        BleAdmin
-            .getINSTANCE(getApplication())
-            .setLogEnable(true)
-            .setLogStyle(BleAdmin.LOG_STYLE_DEFAULT)
-            .scan(getConfig(), mBleScanCallback);
-      }else {
-        BleAdmin.getINSTANCE(getApplication()).openBT(new OnBTOpenStateListener() {
-          @Override
-          public void onBTOpen() {
+      try {
+        if (BleAdmin.getINSTANCE(getApplication()).isEnable()){
+          if (getConfig()!=null){
             BleAdmin
                 .getINSTANCE(getApplication())
                 .setLogEnable(true)
                 .setLogStyle(BleAdmin.LOG_STYLE_DEFAULT)
                 .scan(getConfig(), mBleScanCallback);
           }
-        });
+
+        }else {
+          BleAdmin.getINSTANCE(getApplication()).openBT(new OnBTOpenStateListener() {
+            @Override
+            public void onBTOpen() {
+              if (getConfig()!=null){
+                BleAdmin
+                    .getINSTANCE(getApplication())
+                    .setLogEnable(true)
+                    .setLogStyle(BleAdmin.LOG_STYLE_DEFAULT)
+                    .scan(getConfig(), mBleScanCallback);
+              }
+
+            }
+          });
+        }
+      }catch (IllegalArgumentException e){
+        status.setValue(new StatuData(STATU_WRONG_MAC,e.getMessage()));
       }
+
     }
 
 
@@ -544,10 +568,20 @@ public class HomeViewmodel extends AndroidViewModel {
   private BleScanConfig getConfig(){
     Builder builder = new Builder();
     if (!TextUtils.isEmpty(filterMac)){
-      builder.setDeviceMac(new String[]{filterMac});
+      try {
+        builder.setDeviceMac(new String[]{filterMac});
+      }catch (Exception e){
+        status.setValue(new StatuData(STATU_WRONG_MAC,e.getMessage()));
+        return null;
+      }
     }
     if (!TextUtils.isEmpty(filterUUID)){
-      builder.setUUID(new UUID[]{UUID.fromString(filterUUID)});
+      try {
+        builder.setUUID(new UUID[]{UUID.fromString(filterUUID)});
+      }catch (Exception e){
+        status.setValue(new StatuData(STATU_WRONG_UUID,e.getMessage()));
+        return null;
+      }
     }
     if (!TextUtils.isEmpty(filterName)){
       builder.setDeviceName(new String[]{filterName},true);
@@ -655,5 +689,9 @@ public class HomeViewmodel extends AndroidViewModel {
     filterMac=mac;
     filterName=name;
     filterUUID=uuid;
+  }
+
+  public SingleLiveEvent<StatuData> getStatus() {
+    return status;
   }
 }

@@ -17,9 +17,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 import androidx.navigation.Navigation;
 import cc.noharry.bledemo.R;
 import cc.noharry.bledemo.data.Device;
+import cc.noharry.bledemo.data.StatuData;
 import cc.noharry.bledemo.databinding.FragmentHomeBinding;
 import cc.noharry.bledemo.ui.adapter.DeviceAdapter;
 import cc.noharry.bledemo.ui.adapter.DeviceAdapter.OnConnectClickListener;
@@ -30,6 +32,7 @@ import cc.noharry.bledemo.ui.view.ScanFilterDialog.OnFilterConfirmListener;
 import cc.noharry.bledemo.util.L;
 import cc.noharry.bledemo.util.ThreadPoolProxyFactory;
 import cc.noharry.bledemo.viewmodel.HomeViewmodel;
+import cc.noharry.blelib.callback.BleScanCallback;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -186,10 +189,39 @@ public class HomeFragment extends Fragment implements IWithoutBack {
           case HomeViewmodel.NOT_SCAN:
             mItem.setTitle(getString(R.string.menu_scan));
             break;
+
         }
       }
     });
-
+    mHomeViewmodel.getStatus().observe(this, new Observer<StatuData>() {
+      @Override
+      public void onChanged(@Nullable StatuData statuData) {
+        int integer=statuData.getStatuCode();
+        switch (integer){
+          case HomeViewmodel.STATU_WRONG_MAC:
+            mBinding.homeSwipe.setRefreshing(false);
+            Toast.makeText(mParent, getString(R.string.toast_wrong_mac), Toast.LENGTH_SHORT).show();
+            break;
+          case HomeViewmodel.STATU_WRONG_UUID:
+            mBinding.homeSwipe.setRefreshing(false);
+            Toast.makeText(mParent, getString(R.string.toast_wrong_uuid), Toast.LENGTH_SHORT).show();
+            break;
+          case BleScanCallback
+                .SCAN_FAIL_SCAN_WRONG_FILTER:
+            mBinding.homeSwipe.setRefreshing(false);
+            Toast.makeText(mParent, statuData.getMsg(), Toast.LENGTH_SHORT).show();
+            break;
+          case BleScanCallback.SCAN_FAIL_ADAPTER_NOT_ENABLE:
+            mBinding.homeSwipe.setRefreshing(false);
+            Toast.makeText(mParent, statuData.getMsg(), Toast.LENGTH_SHORT).show();
+            break;
+          case BleScanCallback.SCAN_FAIL_SCAN_ALREADLY_STARTED:
+            mBinding.homeSwipe.setRefreshing(false);
+            Toast.makeText(mParent, statuData.getMsg(), Toast.LENGTH_SHORT).show();
+            break;
+        }
+      }
+    });
   }
 
   private void updateData(Device device) {

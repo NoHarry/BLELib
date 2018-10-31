@@ -9,8 +9,14 @@ import java.util.List;
  */
 
 public abstract class BleScanCallback {
+  public static final int SCAN_FAIL_ADAPTER_NOT_ENABLE=1001;
+  public static final int SCAN_FAIL_SCAN_ALREADLY_STARTED=1002;
+  public static final int SCAN_FAIL_SCAN_WRONG_FILTER=1003;
+
+
   public abstract void onScanStarted(boolean isStartSuccess);
   public abstract void onFoundDevice(BleDevice bleDevice);
   public abstract void onScanCompleted(List<BleDevice> deviceList);
+  public abstract void onScanFail(int errorCode,String msg);
 
 }
