@@ -250,8 +250,10 @@ public class BleClient implements IBleOperation{
           ||mCurrentTask.mType==Type.DISABLE_INDICATIONS
           ||mCurrentTask.mType==Type.DISABLE_NOTIFICATIONS){
         if (GattError.GATT_SUCCESS==status){
+          stopTimeTask();
           mCurrentTask.notitySuccess(mBleDevice);
         }else {
+          stopTimeTask();
           mCurrentTask.notifyError(getBleDevice(),status);
         }
       }
@@ -522,13 +524,16 @@ public class BleClient implements IBleOperation{
       remote = gatt.writeDescriptor(descriptor);
       mBluetoothGattCharacteristic.setWriteType(originWriteTye);
       if (!remote){
+        stopTimeTask();
         mCurrentTask.notifyError(getBleDevice(),GattError.LOCAL_GATT_OPERATION_FAIL);
       }
       L.v("Enable Indications for " + mBluetoothGattCharacteristic.getUuid());
     }else {
       if (local){
+        stopTimeTask();
         mCurrentTask.notitySuccess(getBleDevice());
       }else {
+        stopTimeTask();
         mCurrentTask.notifyError(getBleDevice(),GattError.LOCAL_GATT_OPERATION_FAIL);
       }
     }
@@ -560,13 +565,16 @@ public class BleClient implements IBleOperation{
       remote = gatt.writeDescriptor(descriptor);
       mBluetoothGattCharacteristic.setWriteType(originWriteTye);
       if (!remote){
+        stopTimeTask();
         mCurrentTask.notifyError(getBleDevice(),GattError.LOCAL_GATT_OPERATION_FAIL);
       }
       L.v("Disable Indications for " + mBluetoothGattCharacteristic.getUuid());
     }else {
       if (local){
+        stopTimeTask();
         mCurrentTask.notitySuccess(getBleDevice());
       }else {
+        stopTimeTask();
         mCurrentTask.notifyError(getBleDevice(),GattError.LOCAL_GATT_OPERATION_FAIL);
       }
     }
@@ -635,13 +643,16 @@ public class BleClient implements IBleOperation{
       remoteEnable = gatt.writeDescriptor(descriptor);
       mBluetoothGattCharacteristic.setWriteType(originWriteType);
       if (!remoteEnable){
+        stopTimeTask();
         mCurrentTask.notifyError(getBleDevice(),GattError.LOCAL_GATT_OPERATION_FAIL);
       }
       L.v("Enable notifications for " + mBluetoothGattCharacteristic.getUuid());
     }else {
       if (localEnable){
+        stopTimeTask();
         mCurrentTask.notitySuccess(getBleDevice());
       }else {
+        stopTimeTask();
         mCurrentTask.notifyError(getBleDevice(),GattError.LOCAL_GATT_OPERATION_FAIL);
       }
     }
@@ -681,13 +692,16 @@ public class BleClient implements IBleOperation{
       mBluetoothGattCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
       remoteDisable = gatt.writeDescriptor(descriptor);
       if (!remoteDisable){
+        stopTimeTask();
         mCurrentTask.notifyError(getBleDevice(),GattError.LOCAL_GATT_OPERATION_FAIL);
       }
       L.v("Disable notifications for " + mBluetoothGattCharacteristic.getUuid());
     }else {
       if (localDisable){
+        stopTimeTask();
         mCurrentTask.notitySuccess(getBleDevice());
       }else {
+        stopTimeTask();
         mCurrentTask.notifyError(getBleDevice(),GattError.LOCAL_GATT_OPERATION_FAIL);
       }
     }
