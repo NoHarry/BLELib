@@ -14,6 +14,7 @@ import cc.noharry.blelib.callback.BleScanCallback;
 import cc.noharry.blelib.callback.NearLeScanDeviceCallback;
 import cc.noharry.blelib.callback.NearScanDeviceCallback;
 import cc.noharry.blelib.util.L;
+import cc.noharry.blelib.util.ThreadPoolProxyFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -67,10 +68,23 @@ public class BleScanner {
   }
 
   private void handleScan(BleScanConfig config) {
-    boolean startLeScan = BleAdmin.getINSTANCE(mContext).getBluetoothAdapter()
+    ThreadPoolProxyFactory.getSingleScanThreadPoolProxy().execute(new Runnable() {
+      @Override
+      public void run() {
+        boolean startLeScan = BleAdmin.getINSTANCE(mContext).getBluetoothAdapter()
+            .startLeScan(mNearLeScanDeviceCallback);
+        isScanning.set(startLeScan);
+
+      }
+    });
+    mNearLeScanDeviceCallback.onScanStart(isScanning.get());
+
+
+    /*boolean startLeScan = BleAdmin.getINSTANCE(mContext).getBluetoothAdapter()
         .startLeScan(mNearLeScanDeviceCallback);
     isScanning.set(startLeScan);
-    mNearLeScanDeviceCallback.onScanStart(startLeScan);
+    mNearLeScanDeviceCallback.onScanStart(isScanning.get());*/
+
   }
 
   public void stopScan(){
@@ -116,7 +130,26 @@ public class BleScanner {
         list.add(filter);
       }
     }
-    BleAdmin
+    ThreadPoolProxyFactory.getSingleScanThreadPoolProxy().execute(new Runnable() {
+      @Override
+      public void run() {
+        BleAdmin
+            .getINSTANCE(mContext)
+            .getBluetoothAdapter()
+            .getBluetoothLeScanner()
+            .startScan(list
+                ,new ScanSettings.Builder().setScanMode(SCAN_MODE_LOW_LATENCY).build()
+                ,mScanDeviceCallback);
+        isScanning.set(true);
+
+      }
+    });
+    mScanDeviceCallback.onScanStart(isScanning.get());
+
+
+
+
+    /*BleAdmin
         .getINSTANCE(mContext)
         .getBluetoothAdapter()
         .getBluetoothLeScanner()
@@ -124,6 +157,6 @@ public class BleScanner {
             ,new ScanSettings.Builder().setScanMode(SCAN_MODE_LOW_LATENCY).build()
             ,mScanDeviceCallback);
     isScanning.set(true);
-    mScanDeviceCallback.onScanStart(true);
+    mScanDeviceCallback.onScanStart(isScanning.get());*/
   }
 }

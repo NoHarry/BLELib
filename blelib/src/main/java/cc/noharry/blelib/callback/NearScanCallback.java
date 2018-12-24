@@ -8,15 +8,17 @@ import cc.noharry.blelib.ble.scan.BleScanner;
 import cc.noharry.blelib.data.BleDevice;
 import cc.noharry.blelib.util.L;
 import cc.noharry.blelib.util.MethodUtils;
+import cc.noharry.blelib.util.ThreadPoolProxy.LocalTheadFactory;
 import cc.noharry.blelib.util.ThreadPoolProxyFactory;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -32,12 +34,15 @@ public  class NearScanCallback {
   private Context mContext;
   private ScheduledExecutorService mExecutorService;
   private List<BleDevice> mDeviceList;
-  private BlockingQueue<BleDevice> mBleDevices;
+  private ConcurrentLinkedQueue<BleDevice> mBleDevices;
   private NearLeScanDeviceCallback mNearLeScanDeviceCallback;
   private static final int LEGACY_SCAN=1;
   private static final int NEW_SCAN=2;
   private int scanMode=0;
   private Handler mHandler=new Handler(Looper.getMainLooper());
+  private ThreadFactory mThreadFactory;
+  private ScheduledFuture<?> mSchedule;
+
 
   private void runOnUiThread(Runnable runnable){
     if (Looper.myLooper()==Looper.getMainLooper()){
@@ -54,6 +59,8 @@ public  class NearScanCallback {
     mNearScanDeviceCallback=nearScanDeviceCallback;
     mContext=context;
     scanMode=NEW_SCAN;
+    mThreadFactory = new LocalTheadFactory("timeTask");
+    mExecutorService = new ScheduledThreadPoolExecutor(1,mThreadFactory);
   }
 
   public NearScanCallback(Context context,BleScanConfig config,BleScanCallback bleScanCallback,
@@ -63,6 +70,8 @@ public  class NearScanCallback {
     mNearLeScanDeviceCallback=nearScanDeviceCallback;
     mContext=context;
     scanMode=LEGACY_SCAN;
+    mThreadFactory = new LocalTheadFactory("timeTask");
+    mExecutorService = new ScheduledThreadPoolExecutor(1,mThreadFactory);
   }
 
   public void onScanStarted(boolean isStartSuccess){
@@ -70,7 +79,7 @@ public  class NearScanCallback {
     mStartTime = System.currentTimeMillis();
     mDeviceList = new ArrayList<>();
     mDeviceList.clear();
-    mBleDevices=new LinkedBlockingQueue<>();
+    mBleDevices=new ConcurrentLinkedQueue<>();
     mBleDevices.clear();
     if (mBleScanConfig.getScanTime()!=0){
       startTimeTask();
@@ -84,18 +93,34 @@ public  class NearScanCallback {
 
 
   public void onScanCompleted(List<BleDevice> deviceList){
-    if (mBleScanCallback!=null){
-      Map<String,BleDevice> map=new HashMap<>();
-        while (!mBleDevices.isEmpty()){
-          BleDevice bleDevice = mBleDevices.poll();
-          map.put(bleDevice.getBluetoothDevice().getAddress(),bleDevice);
+    handleComplete(deviceList);
+  }
+
+  private void handleComplete(List<BleDevice> deviceList) {
+    ThreadPoolProxyFactory.getScanThreadPoolProxy().execute(new Runnable() {
+      @Override
+      public void run() {
+        if (mBleScanCallback!=null){
+          Map<String,BleDevice> map=new HashMap<>();
+          while (!mBleDevices.isEmpty()){
+            BleDevice bleDevice = mBleDevices.poll();
+            map.put(bleDevice.getBluetoothDevice().getAddress(),bleDevice);
+          }
+          List<String> mac=new ArrayList<>(map.keySet());
+          for (String s:mac){
+            mDeviceList.add(map.get(s));
+          }
+          runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              mBleScanCallback.onScanCompleted(deviceList);
+            }
+          });
+
         }
-        List<String> mac=new ArrayList<>(map.keySet());
-        for (String s:mac){
-          mDeviceList.add(map.get(s));
-        }
-       mBleScanCallback.onScanCompleted(deviceList);
-    }
+      }
+    });
+
   }
 
   public void onScanFail(int statuCode){
@@ -123,14 +148,8 @@ public  class NearScanCallback {
                 MethodUtils.checkBleDeviceNew(bleScanConfig, bleDevice):
                 MethodUtils.checkBleDevice(bleScanConfig,bleDevice);
         if (checkBleDevice){
-          runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-              mBleDevices.offer(bleDevice);
-              mBleScanCallback.onFoundDevice(bleDevice);
-            }
-          });
-
+          mBleDevices.offer(bleDevice);
+          mBleScanCallback.onFoundDevice(bleDevice);
         }
       }
     });
@@ -138,8 +157,7 @@ public  class NearScanCallback {
   }
 
   private void startTimeTask(){
-    mExecutorService = new ScheduledThreadPoolExecutor(1);
-    mExecutorService.schedule(new Runnable() {
+    mSchedule = mExecutorService.schedule(new Runnable() {
       @Override
       public void run() {
 
@@ -153,15 +171,14 @@ public  class NearScanCallback {
         });
 
       }
-    },mBleScanConfig.getScanTime(),TimeUnit.MILLISECONDS);
+    }, mBleScanConfig.getScanTime(), TimeUnit.MILLISECONDS);
 
   }
 
   private void stopTimeTask(){
-    if (mExecutorService!=null){
+    if (mSchedule!=null){
       L.i("stopTimeTask");
-      mExecutorService.shutdownNow();
-      mExecutorService=null;
+      mSchedule.cancel(true);
     }
   }
 

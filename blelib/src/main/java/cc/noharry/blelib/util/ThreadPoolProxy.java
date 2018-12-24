@@ -78,7 +78,7 @@ public class ThreadPoolProxy {
         mExecutor.remove(task);
     }
 
-    static class LocalTheadFactory implements ThreadFactory {
+    public static class LocalTheadFactory implements ThreadFactory {
         private static final AtomicInteger POOLNUMBER = new AtomicInteger(1);
         private final ThreadGroup group;
         private final AtomicInteger threadNumber = new AtomicInteger(1);

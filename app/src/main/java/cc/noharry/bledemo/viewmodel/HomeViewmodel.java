@@ -123,9 +123,15 @@ public class HomeViewmodel extends AndroidViewModel {
 
       @Override
       public void onFoundDevice(BleDevice bleDevice) {
-        Device device=new Device(bleDevice);
-        foundDevice.setValue(device);
-//        L.i("onFoundDevice:"+bleDevice);
+
+        runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            Device device=new Device(bleDevice);
+            foundDevice.setValue(device);
+          }
+        });
+
       }
 
       @Override

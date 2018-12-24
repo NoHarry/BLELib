@@ -5,6 +5,7 @@ public class ThreadPoolProxyFactory {
     static ThreadPoolProxy mScanThreadPoolProxy;
     static ThreadPoolProxy mTaskThreadPoolProxy;
     static ThreadPoolProxy mConnectionThreadPoolProxy;
+    static ThreadPoolProxy mSingleScanThreadPoolProxy;
 
 
 
@@ -26,11 +27,22 @@ public class ThreadPoolProxyFactory {
         if (mScanThreadPoolProxy == null) {
             synchronized (ThreadPoolProxyFactory.class) {
                 if (mScanThreadPoolProxy == null) {
-                    mScanThreadPoolProxy = new ThreadPoolProxy(3, 3,"scan");
+                    mScanThreadPoolProxy = new ThreadPoolProxy(3, 3,"ScanHandler");
                 }
             }
         }
         return mScanThreadPoolProxy;
+    }
+
+    public static ThreadPoolProxy getSingleScanThreadPoolProxy() {
+        if (mSingleScanThreadPoolProxy == null) {
+            synchronized (ThreadPoolProxyFactory.class) {
+                if (mSingleScanThreadPoolProxy == null) {
+                    mSingleScanThreadPoolProxy = new ThreadPoolProxy(1, 1,"Scan");
+                }
+            }
+        }
+        return mSingleScanThreadPoolProxy;
     }
 
     public static ThreadPoolProxy getTaskThreadPoolProxy() {
