@@ -30,7 +30,7 @@ repositories {
 // Add the following dependencies to the build.gradle file
 // at your project's Module level
 dependencies {
-    implementation 'cc.noharry.blelib:blelib:0.0.8'
+    implementation 'cc.noharry.blelib:blelib:0.0.9'
 }
 ```
 
@@ -39,7 +39,7 @@ dependencies {
 <dependency>
   <groupId>cc.noharry.blelib</groupId>
   <artifactId>blelib</artifactId>
-  <version>0.0.8</version>
+  <version>0.0.9</version>
   <type>pom</type>
 </dependency>
 ```
