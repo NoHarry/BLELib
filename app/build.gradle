@@ -3,7 +3,7 @@ apply plugin: 'com.github.kt3k.coveralls'
 //apply from: '../jacoco.gradle'
 apply plugin: 'jacoco'
 
-apply plugin: 'io.fabric'
+//apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 27
@@ -124,7 +124,7 @@ dependencies {
 //    implementation 'com.google.firebase:firebase-messaging:' + rootProject.firebaseMessageVersion
 
 }
-apply plugin: 'com.google.gms.google-services'
+//apply plugin: 'com.google.gms.google-services'
 
 
 

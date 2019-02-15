@@ -15,7 +15,7 @@ android:
     - android-27
     - android-22
     - extra-android-support
-    - extra-google-google_play_services
+#    - extra-google-google_play_services
     - extra-android-m2repository
     - extra-google-m2repository
     - addon-google_apis-google-21
