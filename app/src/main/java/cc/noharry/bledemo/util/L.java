@@ -1,23 +1,4 @@
-/*   
- * Copyright (c) 2015-10-10 下午1:57:59  Founder Ltd. All Rights Reserved.   
- *   
- * This software is the confidential and proprietary information of   
- * Founder. You shall not disclose such Confidential Information   
- * and shall use it only in accordance with the terms of the agreements   
- * you entered into with Founder.   
- * @author borturn  
- */
-/**
- * @Title: L.java
- * @Package com.lingyun.rtc.doorphone.utils
- * @Description: TODO
- * Copyright: Copyright (c) 2011 
- * Company:深圳市呤云科技有限公司
- * 
- * @author borturn
- * @date 2015-10-10 下午1:57:59
- * @version V1.0
- */
+
 package cc.noharry.bledemo.util;
 
 import android.util.Log;
