@@ -8,17 +8,13 @@ import cc.noharry.blelib.ble.scan.BleScanner;
 import cc.noharry.blelib.data.BleDevice;
 import cc.noharry.blelib.util.L;
 import cc.noharry.blelib.util.MethodUtils;
-import cc.noharry.blelib.util.ThreadPoolProxy.LocalTheadFactory;
 import cc.noharry.blelib.util.ThreadPoolProxyFactory;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -32,7 +28,6 @@ public  class NearScanCallback {
   private long mStartTime;
   private NearScanDeviceCallback mNearScanDeviceCallback;
   private Context mContext;
-  private ScheduledExecutorService mExecutorService;
   private List<BleDevice> mDeviceList;
   private ConcurrentLinkedQueue<BleDevice> mBleDevices;
   private NearLeScanDeviceCallback mNearLeScanDeviceCallback;
@@ -40,7 +35,6 @@ public  class NearScanCallback {
   private static final int NEW_SCAN=2;
   private int scanMode=0;
   private Handler mHandler=new Handler(Looper.getMainLooper());
-  private ThreadFactory mThreadFactory;
   private ScheduledFuture<?> mSchedule;
 
 
@@ -52,26 +46,24 @@ public  class NearScanCallback {
     }
   }
 
-  public NearScanCallback(Context context,BleScanConfig config,BleScanCallback bleScanCallback,
+  public NearScanCallback(Context context, BleScanConfig config, BleScanCallback bleScanCallback,
       NearScanDeviceCallback nearScanDeviceCallback) {
     mBleScanCallback = bleScanCallback;
     mBleScanConfig = config;
     mNearScanDeviceCallback=nearScanDeviceCallback;
     mContext=context;
     scanMode=NEW_SCAN;
-    mThreadFactory = new LocalTheadFactory("timeTask");
-    mExecutorService = new ScheduledThreadPoolExecutor(1,mThreadFactory);
   }
 
-  public NearScanCallback(Context context,BleScanConfig config,BleScanCallback bleScanCallback,
+
+
+  public NearScanCallback(Context context, BleScanConfig config, BleScanCallback bleScanCallback,
       NearLeScanDeviceCallback nearScanDeviceCallback) {
     mBleScanCallback = bleScanCallback;
     mBleScanConfig = config;
     mNearLeScanDeviceCallback=nearScanDeviceCallback;
     mContext=context;
     scanMode=LEGACY_SCAN;
-    mThreadFactory = new LocalTheadFactory("timeTask");
-    mExecutorService = new ScheduledThreadPoolExecutor(1,mThreadFactory);
   }
 
   public void onScanStarted(boolean isStartSuccess){
@@ -101,7 +93,7 @@ public  class NearScanCallback {
       @Override
       public void run() {
         if (mBleScanCallback!=null){
-          Map<String,BleDevice> map=new HashMap<>();
+          Map<String, BleDevice> map=new HashMap<>();
           while (!mBleDevices.isEmpty()){
             BleDevice bleDevice = mBleDevices.poll();
             map.put(bleDevice.getBluetoothDevice().getAddress(),bleDevice);
@@ -157,10 +149,9 @@ public  class NearScanCallback {
   }
 
   private void startTimeTask(){
-    mSchedule = mExecutorService.schedule(new Runnable() {
+    Runnable stopRunner = new Runnable() {
       @Override
       public void run() {
-
         runOnUiThread(new Runnable() {
           @Override
           public void run() {
@@ -171,7 +162,9 @@ public  class NearScanCallback {
         });
 
       }
-    }, mBleScanConfig.getScanTime(), TimeUnit.MILLISECONDS);
+    };
+    mSchedule = ThreadPoolProxyFactory
+        .getTimeTaskThreadPoolProxy().schedule(stopRunner, mBleScanConfig.getScanTime(), TimeUnit.MILLISECONDS);
 
   }
 

@@ -2,18 +2,18 @@ package cc.noharry.blelib.util;
 
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class ThreadPoolProxy {
+public class ScheduledThreadPoolProxy {
 
-    ThreadPoolExecutor mExecutor;
+    ScheduledThreadPoolExecutor mExecutor;
     private int mCorePoolSize;
     private int mMaximumPoolSize;
     private String name;
@@ -23,11 +23,11 @@ public class ThreadPoolProxy {
      * @param corePoolSize    核心池的大小
      * @param maximumPoolSize 最大线程数
      */
-    public ThreadPoolProxy(int corePoolSize, int maximumPoolSize) {
+    public ScheduledThreadPoolProxy(int corePoolSize, int maximumPoolSize) {
        this(corePoolSize,maximumPoolSize,"");
     }
 
-    public ThreadPoolProxy(int corePoolSize, int maximumPoolSize, String name) {
+    public ScheduledThreadPoolProxy(int corePoolSize, int maximumPoolSize, String name) {
         mCorePoolSize = corePoolSize;
         mMaximumPoolSize = maximumPoolSize;
         this.name = name;
@@ -39,16 +39,11 @@ public class ThreadPoolProxy {
      */
     private void initThreadPoolExecutor() {
         if (mExecutor == null || mExecutor.isShutdown() || mExecutor.isTerminated()) {
-            synchronized (ThreadPoolProxy.class) {
+            synchronized (ScheduledThreadPoolProxy.class) {
                 if (mExecutor == null || mExecutor.isShutdown() || mExecutor.isTerminated()) {
-                    long keepAliveTime = 3000;
-                    TimeUnit unit = TimeUnit.MILLISECONDS;
-                    BlockingQueue<Runnable> workQueue = new LinkedBlockingDeque<>();
                     ThreadFactory threadFactory = new LocalTheadFactory(name);
                     RejectedExecutionHandler handler = new ThreadPoolExecutor.DiscardPolicy();
-
-                    mExecutor = new ThreadPoolExecutor(mCorePoolSize, mMaximumPoolSize, keepAliveTime, unit, workQueue,
-                            threadFactory, handler);
+                    mExecutor = new ScheduledThreadPoolExecutor(mCorePoolSize,threadFactory,handler);
                 }
             }
         }
@@ -60,6 +55,11 @@ public class ThreadPoolProxy {
     public void execute(Runnable task) {
         initThreadPoolExecutor();
         mExecutor.execute(task);
+    }
+
+    public ScheduledFuture<?> schedule(Runnable task,long delay, TimeUnit unit) {
+        initThreadPoolExecutor();
+        return mExecutor.schedule(task,delay,unit);
     }
 
     /**

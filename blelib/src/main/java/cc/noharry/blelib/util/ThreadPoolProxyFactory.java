@@ -6,6 +6,7 @@ public class ThreadPoolProxyFactory {
     static ThreadPoolProxy mTaskThreadPoolProxy;
     static ThreadPoolProxy mConnectionThreadPoolProxy;
     static ThreadPoolProxy mSingleScanThreadPoolProxy;
+    static ScheduledThreadPoolProxy mTimeTaskThreadPoolProxy;
 
 
 
@@ -16,7 +17,7 @@ public class ThreadPoolProxyFactory {
         if (mNormalThreadPoolProxy == null) {
             synchronized (ThreadPoolProxyFactory.class) {
                 if (mNormalThreadPoolProxy == null) {
-                    mNormalThreadPoolProxy = new ThreadPoolProxy(5, 5);
+                    mNormalThreadPoolProxy = new ThreadPoolProxy(5, 5,"normal");
                 }
             }
         }
@@ -66,5 +67,17 @@ public class ThreadPoolProxyFactory {
             }
         }
         return mConnectionThreadPoolProxy;
+    }
+
+
+    public static ScheduledThreadPoolProxy getTimeTaskThreadPoolProxy() {
+        if (mTimeTaskThreadPoolProxy == null) {
+            synchronized (ThreadPoolProxyFactory.class) {
+                if (mTimeTaskThreadPoolProxy == null) {
+                    mTimeTaskThreadPoolProxy = new ScheduledThreadPoolProxy(1, 1,"Timer");
+                }
+            }
+        }
+        return mTimeTaskThreadPoolProxy;
     }
 }
