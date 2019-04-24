@@ -86,7 +86,7 @@ public class BleConnectorProxy implements IBleOperation{
   }
 
   private void initQueue() {
-    mBlockingDeque = new LinkedBlockingDeque();
+    mBlockingDeque = new LinkedBlockingDeque<>();
     mConnectionDeque=new LinkedBlockingDeque<>();
     ThreadPoolProxyFactory.getTaskThreadPoolProxy().submit(()->{
       while (true){
