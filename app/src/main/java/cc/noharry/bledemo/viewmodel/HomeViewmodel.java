@@ -151,7 +151,6 @@ public class HomeViewmodel extends AndroidViewModel {
       }
     };
 
-
     mBleConnectCallback = new BleConnectCallback() {
       @Override
       public void onDeviceConnecting(BleDevice bleDevice) {
